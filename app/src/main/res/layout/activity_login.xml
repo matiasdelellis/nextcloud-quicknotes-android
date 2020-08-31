@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="80dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
+    tools:context="ar.delellis.quicknotes.activity.LoginActivity"
+    android:background="@color/colorPrimaryDark"
+    android:theme="@style/SplashTheme">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_logo"/>
+    <TextView
+        android:id="@+id/text_logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/nextcloud_quicknotes"
+        android:layout_below="@id/logo"
+        android:textSize="28sp"
+        android:gravity="center_horizontal"
+        android:textColor="@color/colorAccent"/>
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_below="@id/text_logo"
+        android:visibility="gone"/>
+
+</RelativeLayout>
