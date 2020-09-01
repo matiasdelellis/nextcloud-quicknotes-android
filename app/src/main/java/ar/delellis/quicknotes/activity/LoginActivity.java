@@ -13,7 +13,9 @@ import com.nextcloud.android.sso.AccountImporter;
 import com.nextcloud.android.sso.api.NextcloudAPI;
 import com.nextcloud.android.sso.exceptions.AccountImportCancelledException;
 import com.nextcloud.android.sso.exceptions.AndroidGetAccountsPermissionNotGranted;
+import com.nextcloud.android.sso.exceptions.NextcloudFilesAppAccountNotFoundException;
 import com.nextcloud.android.sso.exceptions.NextcloudFilesAppNotInstalledException;
+import com.nextcloud.android.sso.exceptions.NoCurrentAccountSelectedException;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
 import com.nextcloud.android.sso.model.SingleSignOnAccount;
 import com.nextcloud.android.sso.ui.UiExceptionManager;
@@ -27,6 +29,8 @@ public class LoginActivity extends AppCompatActivity {
     protected ApiProvider mApi;
     protected ProgressBar progress;
 
+    protected SingleSignOnAccount ssoAccount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +38,14 @@ public class LoginActivity extends AppCompatActivity {
 
         progress = findViewById(R.id.progress);
 
-        openAccountChooser();
+        try {
+            ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(getApplicationContext());
+            SingleAccountHelper.setCurrentAccount(getApplicationContext(), ssoAccount.name);
+            accountAccessDone();
+        } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
+            openAccountChooser();
+        }
     }
-
     private void openAccountChooser() {
         try {
             AccountImporter.pickNewAccount(this);
@@ -67,12 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                     Context l_context = getApplicationContext();
                     SingleAccountHelper.setCurrentAccount(l_context, account.name);
 
-                    mApi = new ApiProvider(l_context);
-
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-
-                    finish();
+                    accountAccessDone();
                 }
             });
         } catch (AccountImportCancelledException e) {
@@ -88,4 +92,13 @@ public class LoginActivity extends AppCompatActivity {
         AccountImporter.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
+    private void accountAccessDone() {
+        Context l_context = getApplicationContext();
+        mApi = new ApiProvider(l_context);
+
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+
+        finish();
+    }
 }
