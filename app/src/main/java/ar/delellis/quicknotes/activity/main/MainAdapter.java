@@ -6,26 +6,35 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Note;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAdapter> {
+public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAdapter> implements Filterable {
 
     private Context context;
+
     private List<Note> notes;
+    private List<Note> notesAll;
+
     private ItemClickListener itemClickListener;
 
     public MainAdapter(Context context, List<Note> notes, ItemClickListener itemClickListener) {
         this.context = context;
         this.notes = notes;
+        this.notesAll = new ArrayList<>(notes);
+
         this.itemClickListener = itemClickListener;
     }
 
@@ -48,6 +57,43 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
     public int getItemCount() {
         return notes.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    Filter filter = new Filter() {
+        @Override
+        // Run on Background thread.
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            FilterResults filterResults = new FilterResults();
+            List <Note> filteredNotes = new ArrayList<>();
+
+            if (charSequence.toString().isEmpty()) {
+                filteredNotes.addAll(notesAll);
+            } else {
+                for (Note note: notesAll) {
+                    String query = charSequence.toString().toLowerCase();
+                    if (note.getTitle().toLowerCase().contains(query)) {
+                        filteredNotes.add(note);
+                    } else if (note.getContent().toLowerCase().contains(query)) {
+                        filteredNotes.add(note);
+                    }
+                }
+            }
+
+            filterResults.values = filteredNotes;
+            return filterResults;
+        }
+        //Run on ui thread
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            notes.clear();
+            notes.addAll((Collection<? extends Note>) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
 
     class RecyclerViewAdapter extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tv_title, tv_content;
