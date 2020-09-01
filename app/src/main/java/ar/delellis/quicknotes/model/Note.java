@@ -16,6 +16,12 @@ public class Note {
     @Expose
     @SerializedName("color") private String color;
 
+    @Expose
+    @SerializedName("timestamp") private int timestamp;
+
+    @Expose
+    @SerializedName("is_shared") private boolean is_shared;
+
     public int getId() {
         return id;
     }
@@ -46,6 +52,22 @@ public class Note {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public int getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(int timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public boolean getIsShared() {
+        return is_shared;
+    }
+
+    public void setIsShared(boolean is_shared) {
+        this.is_shared = is_shared;
     }
 
 }

@@ -6,11 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     String title;
     String content;
     String color;
+    boolean is_shared;
 
     Menu actionMenu;
 
@@ -67,6 +70,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         title = intent.getStringExtra("title");
         content = intent.getStringExtra("content");
         color = intent.getStringExtra("color");
+        is_shared = intent.getBooleanExtra("is_shared", false);
 
         setDataFromIntentExtra();
     }
@@ -79,13 +83,11 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         actionMenu = menu;
         if (id != 0) {
-            actionMenu.findItem(R.id.delete).setVisible(true);
-            actionMenu.findItem(R.id.edit).setVisible(true);
+            actionMenu.findItem(R.id.delete).setVisible(!is_shared);
             actionMenu.findItem(R.id.save).setVisible(false);
             actionMenu.findItem(R.id.update).setVisible(true);
         } else {
             actionMenu.findItem(R.id.delete).setVisible(false);
-            actionMenu.findItem(R.id.edit).setVisible(false);
             actionMenu.findItem(R.id.save).setVisible(true);
             actionMenu.findItem(R.id.update).setVisible(false);
         }
@@ -108,14 +110,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
                     presenter.createNote(title, content, color);
                 }
                 return true;
-            case R.id.edit:
-                editMode();
-                actionMenu.findItem(R.id.delete).setVisible(false);
-                actionMenu.findItem(R.id.edit).setVisible(false);
-                actionMenu.findItem(R.id.save).setVisible(false);
-                actionMenu.findItem(R.id.update).setVisible(true);
-                return true;
             case R.id.update:
+                if (is_shared) {
+                    setResult(RESULT_CANCELED);
+                    finish();
+                    return true;
+                }
                 if (title.isEmpty()) {
                     et_title.setError(getString(R.string.enter_title));
                 } else if (content.isEmpty()) {
@@ -176,8 +176,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         if (id != 0) {
             et_title.setText(Html.fromHtml(title));
             et_content.setText(Html.fromHtml(content));
-            //palette.setSelectedColor(color);
-            readMode();
+            palette.setSelectedColor(Color.parseColor(color));
+            if (is_shared) {
+                readMode();
+            } else {
+                editMode();
+            }
         } else {
             // Default color.
             palette.setSelectedColor(getResources().getColor(R.color.color_01));
@@ -189,7 +193,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     private void editMode() {
         et_title.setFocusableInTouchMode(true);
         et_content.setFocusableInTouchMode(true);
-        palette.setEnabled(true);
+        palette.setVisibility(View.VISIBLE);
     }
 
     private void readMode() {
@@ -197,7 +201,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_content.setFocusableInTouchMode(false);
         et_title.setFocusable(false);
         et_content.setFocusable(false);
-        palette.setEnabled(false);
+        palette.setVisibility(View.GONE);
     }
 
 }

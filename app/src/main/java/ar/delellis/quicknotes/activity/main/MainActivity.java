@@ -57,12 +57,14 @@ public class MainActivity extends AppCompatActivity implements MainView {
             String title = note.get(position).getTitle();
             String content = note.get(position).getContent();
             String color = note.get(position).getColor();
+            boolean is_shared = note.get(position).getIsShared();
 
             Intent intent = new Intent(this, EditorActivity.class);
             intent.putExtra("id", id);
             intent.putExtra("title", title);
             intent.putExtra("content", content);
             intent.putExtra("color", color);
+            intent.putExtra("is_shared", is_shared);
 
             startActivityForResult(intent, INTENT_EDIT);
         });
