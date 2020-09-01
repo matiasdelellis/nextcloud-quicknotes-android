@@ -50,7 +50,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         Note note = notes.get(position);
         holder.tv_title.setText(Html.fromHtml(note.getTitle().trim()));
         holder.tv_content.setText(Html.fromHtml(note.getContent().trim()));
-        holder.card_item.setBackgroundColor(Color.parseColor(note.getColor()));
+        holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
     }
 
     @Override
