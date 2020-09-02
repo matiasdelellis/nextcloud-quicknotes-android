@@ -7,24 +7,108 @@
     android:layout_height="match_parent"
     tools:context=".activity.main.MainActivity">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible"/>
-        <TextView
-            android:id="@+id/empty_view"
+            android:layout_height="?attr/actionBarSize"
+            app:elevation="0dp">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:contentInsetStartWithNavigation="0dp"
+                app:titleMarginStart="0dp"
+                tools:title="@string/app_name">
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/search_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </androidx.appcompat.widget.SearchView>
+            </androidx.appcompat.widget.Toolbar>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/home_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacer_1x"
+                android:layout_marginTop="@dimen/spacer_1hx"
+                android:layout_marginEnd="@dimen/spacer_1x"
+                android:layout_marginBottom="@dimen/spacer_1hx"
+                app:cardBackgroundColor="@color/appbar"
+                app:cardCornerRadius="@dimen/spacer_1x"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageButton
+                        android:id="@+id/menu_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:paddingStart="@dimen/spacer_1x"
+                        android:paddingTop="@dimen/spacer_2x"
+                        android:paddingEnd="@dimen/spacer_1x"
+                        android:paddingBottom="@dimen/spacer_2x"
+                        android:tint="?attr/colorAccent"
+                        android:src="@drawable/ic_search"/>
+                    <!--com.google.android.material.textview.MaterialTextView-->
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/search_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/spacer_1x"
+                        android:layout_marginEnd="@dimen/spacer_1x"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="start"
+                        android:lines="1"
+                        android:textSize="16sp"
+                        android:text="@string/search_in_all"/>
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/view_mode"
+                        android:layout_width="?attr/actionBarSize"
+                        android:layout_height="?attr/actionBarSize"
+                        android:layout_gravity="center_vertical|end"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/list_mode"
+                        android:padding="@dimen/spacer_2x"
+                        android:tint="?attr/colorAccent"
+                        android:translationX="@dimen/spacer_1x"
+                        android:src="@drawable/ic_view_list" />
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/take_first_notes"
-            android:visibility="visible"/>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                tools:listitem="@layout/item_note">
+            </androidx.recyclerview.widget.RecyclerView>
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add"
@@ -32,6 +116,7 @@
         android:layout_gravity="bottom|end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_add"/>
+        android:src="@drawable/ic_add"
+        app:backgroundTint="@color/defaultBrand"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

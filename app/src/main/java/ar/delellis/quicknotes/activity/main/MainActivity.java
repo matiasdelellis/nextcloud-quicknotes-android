@@ -1,17 +1,21 @@
 package ar.delellis.quicknotes.activity.main;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.text.TextUtils;
 import androidx.appcompat.widget.SearchView;
+
+import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -21,22 +25,29 @@ import ar.delellis.quicknotes.activity.editor.EditorActivity;
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class MainActivity extends AppCompatActivity implements MainView {
 
     private static final int INTENT_ADD = 100;
     private static final int INTENT_EDIT = 200;
 
-    FloatingActionButton fab;
-    RecyclerView recyclerView;
-    SwipeRefreshLayout swipeRefresh;
+    private FloatingActionButton fab;
+    private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefresh;
+    private SearchView searchView;
+    private MaterialCardView homeToolbar;
+    private Toolbar toolbar;
+    private AppBarLayout appBar;
 
-    MainPresenter presenter;
-    MainAdapter adapter;
-    MainAdapter.ItemClickListener itemClickListener;
+    private MainPresenter presenter;
+    private MainAdapter adapter;
+    private MainAdapter.ItemClickListener itemClickListener;
 
-    List<Note> note;
+    private List<Note> note;
 
-    protected ApiProvider mApi;
+    private  ApiProvider mApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,26 +90,11 @@ public class MainActivity extends AppCompatActivity implements MainView {
                         INTENT_ADD)
         );
 
-        mApi = new ApiProvider(getApplicationContext());
+        appBar = findViewById(R.id.appBar);
+        toolbar = findViewById(R.id.toolbar);
+        homeToolbar = findViewById(R.id.home_toolbar);
 
-        presenter.getData();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == INTENT_ADD && resultCode == RESULT_OK) {
-            presenter.getData();
-        } else if (requestCode == INTENT_EDIT && resultCode == RESULT_OK) {
-            presenter.getData();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
+        searchView = findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -112,7 +108,44 @@ public class MainActivity extends AppCompatActivity implements MainView {
             }
         });
 
-        return super.onCreateOptionsMenu(menu);
+        searchView.setOnCloseListener(() -> {
+            if (toolbar.getVisibility() == VISIBLE && TextUtils.isEmpty(searchView.getQuery())) {
+                updateToolbars(true);
+                return true;
+            }
+            return false;
+        });
+
+        setSupportActionBar(toolbar);
+
+        homeToolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateToolbars(false);
+            }
+        });
+
+        mApi = new ApiProvider(getApplicationContext());
+        presenter.getData();
+    }
+
+    private void updateToolbars(boolean disableSearch) {
+        homeToolbar.setVisibility(disableSearch ? VISIBLE : GONE);
+        toolbar.setVisibility(disableSearch ? GONE : VISIBLE);
+        if (disableSearch) {
+            searchView.setQuery(null, true);
+        }
+        searchView.setIconified(disableSearch);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == INTENT_ADD && resultCode == RESULT_OK) {
+            presenter.getData();
+        } else if (requestCode == INTENT_EDIT && resultCode == RESULT_OK) {
+            presenter.getData();
+        }
     }
 
     @Override

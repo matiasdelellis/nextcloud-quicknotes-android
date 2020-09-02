@@ -6,10 +6,11 @@
     <string name="please_wait">Please wait…</string>
     <string name="error">Error</string>
     <string name="enter_title">Please enter a title</string>
-    <string name="take_first_notes">Nothing here. Take your first quick notes</string>
+    <string name="take_first_notes">Nothing here. Take your first quick notes.</string>
     <string name="edit_note">Edit note</string>
     <string name="delete_note">Delete note</string>
     <string name="update_note">Update Note</string>
     <string name="nextcloud_quicknotes">Nextcloud Quicknotes</string>
-    <string name="search_notes">Search notes…</string>
+    <string name="list_mode">List</string>
+    <string name="search_in_all">Search all notes</string>
 </resources>
