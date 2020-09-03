@@ -1,3 +1,24 @@
+/*
+ * Nextcloud Quicknotes Android client application.
+ *
+ * @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+ *
+ * @author Matias De lellis <mati86dl@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package ar.delellis.quicknotes.activity;
 
 import androidx.annotation.NonNull;
@@ -8,6 +29,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Button;
 
 import com.nextcloud.android.sso.AccountImporter;
 import com.nextcloud.android.sso.api.NextcloudAPI;
@@ -28,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
 
     protected ApiProvider mApi;
     protected ProgressBar progress;
+    protected Button button;
 
     protected SingleSignOnAccount ssoAccount;
 
@@ -37,13 +60,17 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         progress = findViewById(R.id.progress);
+        button = findViewById(R.id.chose_button);
+        button.setOnClickListener(view -> {
+            progress.setVisibility(View.VISIBLE);
+            openAccountChooser();
+        });
 
         try {
             ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(getApplicationContext());
             SingleAccountHelper.setCurrentAccount(getApplicationContext(), ssoAccount.name);
             accountAccessDone();
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
-            openAccountChooser();
         }
     }
     private void openAccountChooser() {
@@ -87,8 +114,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        progress.setVisibility(View.VISIBLE);
-
         AccountImporter.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
