@@ -1,3 +1,24 @@
+/*
+ * Nextcloud Quicknotes Android client application.
+ *
+ * @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+ *
+ * @author Matias De lellis <mati86dl@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package ar.delellis.quicknotes.activity.main;
 
 import android.content.Context;
@@ -20,6 +41,7 @@ import java.util.List;
 
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Note;
+import ar.delellis.quicknotes.model.Tag;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAdapter> implements Filterable {
 
@@ -94,6 +116,69 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
             notifyDataSetChanged();
         }
     };
+
+    public Filter getTagFilter() {
+        return tagFilter;
+    }
+
+    Filter tagFilter = new Filter() {
+        @Override
+        // Run on Background thread.
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            FilterResults filterResults = new FilterResults();
+            List <Note> filteredNotes = new ArrayList<>();
+
+            if (charSequence.toString().isEmpty()) {
+                filteredNotes.addAll(notesAll);
+            } else {
+                String query = charSequence.toString();
+                for (Note note: notesAll) {
+                    for (Tag tag: note.getTags()) {
+                        if (tag.getName().equals(query)) {
+                            filteredNotes.add(note);
+                            break;
+                        }
+                    }
+                }
+            }
+            filterResults.values = filteredNotes;
+            return filterResults;
+        }
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            notes.clear();
+            notes.addAll((Collection<? extends Note>) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
+
+    public Filter getIsSharedFilter() {
+        return isSharedFilter;
+    }
+
+    Filter isSharedFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            FilterResults filterResults = new FilterResults();
+            List <Note> filteredNotes = new ArrayList<>();
+
+            for (Note note: notesAll) {
+                if (note.getIsShared()) {
+                    filteredNotes.add(note);
+                }
+            }
+
+            filterResults.values = filteredNotes;
+            return filterResults;
+        }
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            notes.clear();
+            notes.addAll((Collection<? extends Note>) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
+
 
     class RecyclerViewAdapter extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tv_title, tv_content;

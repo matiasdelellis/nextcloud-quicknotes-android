@@ -35,7 +35,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import androidx.appcompat.widget.SearchView;
 
-import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -69,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public static final String ADAPTER_KEY_ABOUT = "about";
     public static final String ADAPTER_KEY_LOGOUT = "logout";
 
+    DrawerLayout drawerLayout;
     private FloatingActionButton fab;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefresh;
@@ -164,11 +164,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         homeToolbar.setOnClickListener(view -> updateToolbars(false));
 
+        drawerLayout = findViewById(R.id.drawerLayout);
         AppCompatImageButton menuButton = findViewById(R.id.menu_button);
-        menuButton.setOnClickListener(view -> {
-            DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
-            drawerLayout.openDrawer(GravityCompat.START);
-        });
+        menuButton.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
 
         mApi = new ApiProvider(getApplicationContext());
         presenter.getData();
@@ -178,9 +176,19 @@ public class MainActivity extends AppCompatActivity implements MainView {
         ArrayList<NavigationItem> navItems = new ArrayList<>();
 
         navigationFilterAdapter = new NavigationAdapter(this, item -> {
-            Toast.makeText(MainActivity.this, "Selected " + item.label, Toast.LENGTH_SHORT).show();
+            if (item.id == ADAPTER_KEY_ALL) {
+                adapter.getFilter().filter("");
+            } else if (item.id == ADAPTER_KEY_SHARED_BY) {
+                adapter.getIsSharedFilter().filter("");
+            } else if (item.id == ADAPTER_KEY_SHARED_WITH) {
+                adapter.getIsSharedFilter().filter("");
+            } else if (item.id.startsWith(ADAPTER_KEY_TAG_PREFIX)) {
+                adapter.getTagFilter().filter(item.label);
+            }
             navigationFilterAdapter.setSelectedItem(item.id);
+            drawerLayout.closeDrawer(GravityCompat.START);
         });
+
         RecyclerView navigationMenuFilter = findViewById(R.id.navigationFilter);
         navigationMenuFilter.setAdapter(navigationFilterAdapter);
 
