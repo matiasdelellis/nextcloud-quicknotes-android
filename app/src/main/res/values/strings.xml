@@ -39,4 +39,5 @@
     <string name="shared_with_you">Shared with you</string>
     <string name="choose_account">Choose account</string>
     <string name="welcome_quicknotes">Welcome to Nextcloud Quicknotes</string>
+    <string name="favorites">Favorites</string>
 </resources>

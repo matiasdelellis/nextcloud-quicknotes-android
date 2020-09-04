@@ -37,10 +37,16 @@ public class Note {
     @SerializedName("content") private String content;
 
     @Expose
+    @SerializedName("pinned") private int pinned;
+
+    @Expose
     @SerializedName("color") private String color;
 
     @Expose
     @SerializedName("timestamp") private int timestamp;
+
+    @Expose
+    @SerializedName("shared_with") private List<Share> share_with;
 
     @Expose
     @SerializedName("is_shared") private boolean is_shared;
@@ -72,6 +78,14 @@ public class Note {
         this.content = content;
     }
 
+    public int getPinned() {
+        return pinned;
+    }
+
+    public void setPinned(int pinned) {
+        this.pinned = pinned;
+    }
+
     public String getColor() {
         return color;
     }
@@ -86,6 +100,14 @@ public class Note {
 
     public void setTimestamp(int timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public List<Share> getShareWith() {
+        return share_with;
+    }
+
+    public void setShareWith(List<Share> share) {
+        this.share_with = share;
     }
 
     public boolean getIsShared() {

@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private static final int INTENT_EDIT = 200;
 
     public static final String ADAPTER_KEY_ALL = "all_notes";
+    public static final String ADAPTER_KEY_PINNED = "pinned";
     public static final String ADAPTER_KEY_SHARED_BY = "shared_by";
     public static final String ADAPTER_KEY_SHARED_WITH = "shared_with";
     public static final String ADAPTER_KEY_TAG_PREFIX = "tag:";
@@ -178,10 +179,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
         navigationFilterAdapter = new NavigationAdapter(this, item -> {
             if (item.id == ADAPTER_KEY_ALL) {
                 adapter.getFilter().filter("");
+            } else if (item.id == ADAPTER_KEY_PINNED) {
+                adapter.getPinnedFilter().filter("");
             } else if (item.id == ADAPTER_KEY_SHARED_BY) {
                 adapter.getIsSharedFilter().filter("");
             } else if (item.id == ADAPTER_KEY_SHARED_WITH) {
-                adapter.getIsSharedFilter().filter("");
+                adapter.getSharedWithOthersFilter().filter("");
             } else if (item.id.startsWith(ADAPTER_KEY_TAG_PREFIX)) {
                 adapter.getTagFilter().filter(item.label);
             }
@@ -210,8 +213,15 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private void updateNavigationMenu() {
         ArrayList<NavigationItem> navItems = new ArrayList<>();
         NavigationItem homeNav = new NavigationItem(ADAPTER_KEY_ALL, getString(R.string.all_notes), NavigationAdapter.ICON_HOME);
-
         navItems.add(homeNav);
+
+        for (Note note: notes) {
+            if (note.getPinned() > 0) {
+                navItems.add(new NavigationItem(ADAPTER_KEY_PINNED, getString(R.string.favorites), NavigationAdapter.ICON_STAR));
+                break;
+            }
+        }
+
         for (Note note: notes) {
             if (note.getIsShared()) {
                 navItems.add(new NavigationItem(ADAPTER_KEY_SHARED_BY, getString(R.string.shared_with_you), NavigationAdapter.ICON_SHARED));
@@ -219,8 +229,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
             }
         }
 
-        // TODO:
-        //navItems.add(new NavigationItem(ADAPTER_KEY_SHARED_WITH, getString(R.string.shared_with_others), NavigationAdapter.ICON_SHARED));
+        for (Note note: notes) {
+            if (note.getShareWith().size() > 0) {
+                navItems.add(new NavigationItem(ADAPTER_KEY_SHARED_WITH, getString(R.string.shared_with_others), NavigationAdapter.ICON_SHARED));
+                break;
+            }
+        }
 
         for (Tag tag: tags) {
             TagNavigationItem item = new TagNavigationItem(ADAPTER_KEY_TAG_PREFIX + tag.getId(), tag.getName(), NavigationAdapter.ICON_TAG, tag.getId());

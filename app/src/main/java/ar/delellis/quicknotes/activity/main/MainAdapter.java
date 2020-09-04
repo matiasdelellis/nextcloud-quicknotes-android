@@ -179,6 +179,59 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         }
     };
 
+    public Filter getSharedWithOthersFilter() {
+        return sharedWithOthersFilter;
+    }
+
+    Filter sharedWithOthersFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            FilterResults filterResults = new FilterResults();
+            List <Note> filteredNotes = new ArrayList<>();
+
+            for (Note note: notesAll) {
+                if (note.getShareWith().size() > 0) {
+                    filteredNotes.add(note);
+                }
+            }
+
+            filterResults.values = filteredNotes;
+            return filterResults;
+        }
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            notes.clear();
+            notes.addAll((Collection<? extends Note>) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
+
+    public Filter getPinnedFilter() {
+        return pinnedFilter;
+    }
+
+    Filter pinnedFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            FilterResults filterResults = new FilterResults();
+            List <Note> filteredNotes = new ArrayList<>();
+
+            for (Note note: notesAll) {
+                if (note.getPinned() > 0) {
+                    filteredNotes.add(note);
+                }
+            }
+
+            filterResults.values = filteredNotes;
+            return filterResults;
+        }
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            notes.clear();
+            notes.addAll((Collection<? extends Note>) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
 
     class RecyclerViewAdapter extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tv_title, tv_content;

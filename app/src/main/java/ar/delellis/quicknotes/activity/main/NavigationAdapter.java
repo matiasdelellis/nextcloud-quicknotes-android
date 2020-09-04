@@ -48,6 +48,8 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
     @DrawableRes
     public static final int ICON_HOME = R.drawable.ic_time_grey;
     @DrawableRes
+    public static final int ICON_STAR = R.drawable.ic_starred;
+    @DrawableRes
     public static final int ICON_TAG = R.drawable.ic_tag_grey;
     @DrawableRes
     public static final int ICON_SHARED = R.drawable.ic_shared_grey;
