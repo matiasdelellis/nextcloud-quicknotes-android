@@ -40,12 +40,14 @@ import android.widget.Toast;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.nextcloud.android.sso.helper.SingleAccountHelper;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import ar.delellis.quicknotes.R;
+import ar.delellis.quicknotes.activity.LoginActivity;
 import ar.delellis.quicknotes.activity.editor.EditorActivity;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.NavigationItem;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.TagNavigationItem;
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public static final String ADAPTER_KEY_SHARED_WITH = "shared_with";
     public static final String ADAPTER_KEY_TAG_PREFIX = "tag:";
     public static final String ADAPTER_KEY_ABOUT = "about";
-    public static final String ADAPTER_KEY_LOGOUT = "logout";
+    public static final String ADAPTER_KEY_SWITCH_ACCOUNT = "switch_account";
 
     DrawerLayout drawerLayout;
     private FloatingActionButton fab;
@@ -196,12 +198,15 @@ public class MainActivity extends AppCompatActivity implements MainView {
         navigationMenuFilter.setAdapter(navigationFilterAdapter);
 
         navigationCommonAdapter = new NavigationAdapter(this, item -> {
-            //TODO:
-            Toast.makeText(MainActivity.this, "Selected " + item.label, Toast.LENGTH_SHORT).show();
+            if (item.id == ADAPTER_KEY_SWITCH_ACCOUNT) {
+                switch_account();
+            } else {
+                Toast.makeText(MainActivity.this, "Selected " + item.label, Toast.LENGTH_SHORT).show();
+            }
         });
 
-        navItems.add(new NavigationItem(ADAPTER_KEY_ABOUT, "About", NavigationAdapter.ICON_INFO));
-        navItems.add(new NavigationItem(ADAPTER_KEY_LOGOUT, "Logout", NavigationAdapter.ICON_LOGOUT));
+        navItems.add(new NavigationItem(ADAPTER_KEY_ABOUT, getString(R.string.about), NavigationAdapter.ICON_INFO));
+        navItems.add(new NavigationItem(ADAPTER_KEY_SWITCH_ACCOUNT, getString(R.string.switch_account), NavigationAdapter.ICON_LOGOUT));
         navigationCommonAdapter.setItems(navItems);
 
         RecyclerView navigationMenuCommon = findViewById(R.id.navigationCommon);
@@ -252,6 +257,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
             searchView.setQuery(null, true);
         }
         searchView.setIconified(disableSearch);
+    }
+
+    private void switch_account() {
+        SingleAccountHelper.setCurrentAccount(this, null);
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 
     @Override

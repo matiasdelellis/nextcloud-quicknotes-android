@@ -40,4 +40,6 @@
     <string name="choose_account">Choose account</string>
     <string name="welcome_quicknotes">Welcome to Nextcloud Quicknotes</string>
     <string name="favorites">Favorites</string>
+    <string name="switch_account">Switch account</string>
+    <string name="about">About</string>
 </resources>
