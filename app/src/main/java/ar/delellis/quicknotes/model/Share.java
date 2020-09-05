@@ -24,8 +24,6 @@ package ar.delellis.quicknotes.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
-
 public class Share {
     @Expose
     @SerializedName("id") private int id;
@@ -37,10 +35,10 @@ public class Share {
     @SerializedName("note_id") private String noteId;
 
     @Expose
-    @SerializedName("share_user") private String shareUser;
+    @SerializedName("shared_user") private String sharedUser;
 
     @Expose
-    @SerializedName("share_group") private String shareGroup;
+    @SerializedName("shared_group") private String sharedGroup;
 
     public int getId() {
         return id;
@@ -66,19 +64,19 @@ public class Share {
         this.noteId = noteId;
     }
 
-    public String getShareUser() {
-        return shareUser;
+    public String getSharedUser() {
+        return sharedUser;
     }
 
-    public void setShareUser(String shareUser) {
-        this.shareUser = shareUser;
+    public void setSharedUser(String sharedUser) {
+        this.sharedUser = sharedUser;
     }
 
-    public String getShareGroup() {
-        return shareGroup;
+    public String getSharedGroup() {
+        return sharedGroup;
     }
 
-    public void setShareGroup(String shareGroup) {
-        this.shareGroup = shareGroup;
+    public void setSharedGroup(String sharedGroup) {
+        this.sharedGroup = sharedGroup;
     }
 }

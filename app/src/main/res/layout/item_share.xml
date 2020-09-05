@@ -23,7 +23,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/tag_item"
+    android:id="@+id/share_item"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginLeft="2dp"
@@ -41,15 +41,15 @@
 
         <ImageView
             android:id="@+id/icon"
-            android:contentDescription="@string/tag"
+            android:contentDescription="@string/share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_tag_small"
+            android:src="@drawable/ic_share_small"
             android:layout_gravity="center"/>
 
         <TextView
-            android:id="@+id/tag_name"
-            android:text="@string/tags"
+            android:id="@+id/share_user"
+            android:text="@string/share"
             android:textSize="@dimen/secondary_font_size"
             android:textColor="@android:color/black"
             android:layout_width="wrap_content"

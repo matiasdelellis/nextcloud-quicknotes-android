@@ -75,10 +75,15 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         holder.tv_content.setText(Html.fromHtml(note.getContent().trim()));
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
         holder.im_pinned.setVisibility(note.getIsPinned() ? View.VISIBLE : View.GONE);
-        holder.tagAdapter.setItems(note.getTags());
 
+        holder.tagAdapter.setItems(note.getTags());
         holder.tagAdapter.notifyDataSetChanged();
         holder.tagRecyclerView.setAdapter(holder.tagAdapter);
+
+        holder.shareAdapter.setItems(note.getShareWith());
+        holder.shareAdapter.notifyDataSetChanged();
+        holder.shareRecyclerView.setAdapter(holder.shareAdapter);
+
     }
 
     @Override
@@ -243,22 +248,28 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         TextView tv_title, tv_content;
         CardView card_item;
         ImageView im_pinned;
-        TagAdapter tagAdapter;
 
+        TagAdapter tagAdapter;
         RecyclerView tagRecyclerView;
+
+        ShareAdapter shareAdapter;
+        RecyclerView shareRecyclerView;
 
         ItemClickListener itemClickListener;
 
         RecyclerViewAdapter(@NonNull View itemView, ItemClickListener itemClickListener) {
             super(itemView);
 
-            tagAdapter = new TagAdapter();
-
             card_item = itemView.findViewById(R.id.card_item);
-            tagRecyclerView = itemView.findViewById(R.id.recyclerTags);
             tv_title = itemView.findViewById(R.id.title);
             tv_content = itemView.findViewById(R.id.content);
             im_pinned = itemView.findViewById(R.id.pinned);
+
+            tagAdapter = new TagAdapter();
+            tagRecyclerView = itemView.findViewById(R.id.recyclerTags);
+
+            shareAdapter = new ShareAdapter();
+            shareRecyclerView = itemView.findViewById(R.id.recyclerShares);
 
             this.itemClickListener = itemClickListener;
             card_item.setOnClickListener(this);

@@ -84,6 +84,16 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_tag">
         </androidx.recyclerview.widget.RecyclerView>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerShares"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:orientation="horizontal"
+            android:layout_below="@id/recyclerTags"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_share">
+        </androidx.recyclerview.widget.RecyclerView>
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
