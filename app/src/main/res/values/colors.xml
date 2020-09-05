@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Nextcloud Quicknotes Android client application.
+  ~
+  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ @author Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <resources>
     <!-- Colors -->
 
@@ -41,29 +62,5 @@
     <color name="widget_background_dark_theme">#bf222222</color>
     <color name="widget_fg_dark_theme">#ffffff</color>
 
-    <!-- Notes Colors -->
-    <color name="color_01">#F7EB96</color>
-    <color name="color_02">#88B7E3</color>
-    <color name="color_03">#C1ECB0</color>
-    <color name="color_04">#BFA6E9</color>
-    <color name="color_05">#DAF188</color>
-    <color name="color_06">#FF96AC</color>
-    <color name="color_07">#FCF66F</color>
-    <color name="color_08">#F2F1EF</color>
-    <color name="color_09">#C1D756</color>
-    <color name="color_10">#CECECE</color>
-
-    <array name="palette_colors">
-        <item>@color/color_01</item>
-        <item>@color/color_02</item>
-        <item>@color/color_03</item>
-        <item>@color/color_04</item>
-        <item>@color/color_05</item>
-        <item>@color/color_06</item>
-        <item>@color/color_07</item>
-        <item>@color/color_08</item>
-        <item>@color/color_09</item>
-        <item>@color/color_10</item>
-    </array>
-
+    <color name="defaultColor">#F7EB96</color>
 </resources>

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Nextcloud Quicknotes Android client application.
   ~
@@ -20,17 +19,13 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <item android:id="@+id/delete"
-        android:title="@string/delete_note"
-        android:icon="@drawable/ic_delete_grey"
-        app:showAsAction="always"/>
-
-    <item android:id="@+id/save"
-        android:title="@string/save"
-        android:icon="@drawable/ic_save_grey"
-        app:showAsAction="ifRoom"/>
-
-</menu>
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:autoMirrored="true"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportHeight="24.0"
+    android:viewportWidth="24.0">
+    <path android:fillColor="#FF757575"
+        android:pathData="M20,11H7.83l5.59,-5.59L12,4l-8,8 8,8 1.41,-1.41L7.83,13H20v-2z"/>
+</vector>

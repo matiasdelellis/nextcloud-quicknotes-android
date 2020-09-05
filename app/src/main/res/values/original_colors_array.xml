@@ -20,17 +20,21 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<resources>
 
-    <item android:id="@+id/delete"
-        android:title="@string/delete_note"
-        android:icon="@drawable/ic_delete_grey"
-        app:showAsAction="always"/>
+    <!-- Array For My ColorPalette colors -->
+    <string-array name="colors">
+        <item>#F7EB96</item>
+        <item>#88B7E3</item>
+        <item>#C1ECB0</item>
+        <item>#BFA6E9</item>
+        <item>#DAF188</item>
+        <item>#FF96AC</item>
+        <item>#FCF66F</item>
+        <item>#F2F1EF</item>
+        <item>#C1D756</item>
+        <item>#CECECE</item>
 
-    <item android:id="@+id/save"
-        android:title="@string/save"
-        android:icon="@drawable/ic_save_grey"
-        app:showAsAction="ifRoom"/>
+    </string-array>
 
-</menu>
+</resources>
