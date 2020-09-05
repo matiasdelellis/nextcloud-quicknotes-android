@@ -43,4 +43,6 @@
     <string name="switch_account">Switch account</string>
     <string name="about">About</string>
     <string name="new_note">New note</string>
+    <string name="pin_note">Pin note</string>
+    <string name="pinned">Pinned</string>
 </resources>

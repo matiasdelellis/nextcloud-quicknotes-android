@@ -113,17 +113,20 @@ public class MainActivity extends AppCompatActivity implements MainView {
         );
 
         itemClickListener = ((view, position) -> {
-            int id = notes.get(position).getId();
-            String title = notes.get(position).getTitle();
-            String content = notes.get(position).getContent();
-            String color = notes.get(position).getColor();
-            boolean is_shared = notes.get(position).getIsShared();
+            Note note = notes.get(position);
+            int id = note.getId();
+            String title = note.getTitle();
+            String content = note.getContent();
+            String color = note.getColor();
+            boolean is_shared = note.getIsShared();
+            boolean is_pinned = note.getIsPinned();
 
             Intent intent = new Intent(this, EditorActivity.class);
             intent.putExtra("id", id);
             intent.putExtra("title", title);
             intent.putExtra("content", content);
             intent.putExtra("color", color);
+            intent.putExtra("is_pinned", is_pinned);
             intent.putExtra("is_shared", is_shared);
 
             startActivityForResult(intent, INTENT_EDIT);
@@ -221,8 +224,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         navItems.add(homeNav);
 
         for (Note note: notes) {
-            if (note.getPinned() > 0) {
-                navItems.add(new NavigationItem(ADAPTER_KEY_PINNED, getString(R.string.favorites), NavigationAdapter.ICON_STAR));
+            if (note.getIsPinned()) {
+                navItems.add(new NavigationItem(ADAPTER_KEY_PINNED, getString(R.string.pinned), NavigationAdapter.ICON_PINNED));
                 break;
             }
         }

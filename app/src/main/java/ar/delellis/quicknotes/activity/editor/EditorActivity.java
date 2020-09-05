@@ -58,6 +58,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     String title;
     String content;
     String color;
+    boolean is_pinned;
     boolean is_shared;
 
     Menu actionMenu;
@@ -97,6 +98,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         title = intent.getStringExtra("title");
         content = intent.getStringExtra("content");
         color = intent.getStringExtra("color");
+        is_pinned = intent.getBooleanExtra("is_pinned", false);
         is_shared = intent.getBooleanExtra("is_shared", false);
 
         setDataFromIntentExtra();
@@ -111,7 +113,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         actionMenu = menu;
         if (id != 0) {
             actionMenu.findItem(R.id.delete).setVisible(!is_shared);
+            actionMenu.findItem(R.id.pin).setVisible(!is_shared);
+            actionMenu.findItem(R.id.pin).setIcon(is_pinned ? R.drawable.ic_pinned : R.drawable.ic_pin);
         } else {
+            actionMenu.findItem(R.id.pin).setVisible(false);
             actionMenu.findItem(R.id.delete).setVisible(false);
         }
 
@@ -124,6 +129,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         String content = et_content.getText().toString().trim();
         String color = this.color;
         switch (item.getItemId()) {
+            case R.id.pin:
+                is_pinned = !is_pinned;
+                item.setIcon(is_pinned ? R.drawable.ic_pinned : R.drawable.ic_pin);
+                return true;
             case R.id.save:
                 if (is_shared) {
                     closeEdition();
@@ -137,7 +146,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
                     if (id == 0)
                         presenter.createNote(title, content, color);
                     else
-                        presenter.updateNote(id, title, content, color);
+                        presenter.updateNote(id, title, content, color, is_pinned);
                 }
                 return true;
             case R.id.delete:

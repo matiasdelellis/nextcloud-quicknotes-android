@@ -23,19 +23,20 @@ package ar.delellis.quicknotes.api;
 
 // int $id, string $title, string $content, array $attachts, bool $pinned, array $tags, string $color = "#F7EB96"
 public class NoteRequest {
-    final int id;
-    final String title;
-    final String content;
+    int id;
+    String title;
+    String content;
+    String color;
+    boolean pinned;
     final String[] attachts = {}; //Fake response
-    final boolean pinned = false; //Fake response
     final String[] tags = {}; // Fake response
     final String[] shared_with = {}; // Fake response
-    final String color;
 
-    public NoteRequest(int id, String title, String content, String color) {
+    public NoteRequest(int id, String title, String content, String color, boolean pinned) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.color = color;
+        this.pinned = pinned;
     }
 }

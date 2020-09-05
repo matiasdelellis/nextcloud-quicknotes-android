@@ -217,7 +217,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
             List <Note> filteredNotes = new ArrayList<>();
 
             for (Note note: notesAll) {
-                if (note.getPinned() > 0) {
+                if (note.getIsPinned()) {
                     filteredNotes.add(note);
                 }
             }

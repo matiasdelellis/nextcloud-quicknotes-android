@@ -37,7 +37,7 @@ public class Note {
     @SerializedName("content") private String content;
 
     @Expose
-    @SerializedName("pinned") private int pinned;
+    @SerializedName("ispinned") private boolean is_pinned;
 
     @Expose
     @SerializedName("color") private String color;
@@ -78,12 +78,12 @@ public class Note {
         this.content = content;
     }
 
-    public int getPinned() {
-        return pinned;
+    public boolean getIsPinned() {
+        return is_pinned;
     }
 
-    public void setPinned(int pinned) {
-        this.pinned = pinned;
+    public void setIsPinned(boolean is_pinned) {
+        this.is_pinned = is_pinned;
     }
 
     public String getColor() {

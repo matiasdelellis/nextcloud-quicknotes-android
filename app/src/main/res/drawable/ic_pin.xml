@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Nextcloud Quicknotes Android client application.
   ~
@@ -20,23 +19,13 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<menu
+<vector
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <item android:id="@+id/pin"
-        android:title="@string/pin_note"
-        android:icon="@drawable/ic_pin"
-        app:showAsAction="ifRoom"/>
-
-    <item android:id="@+id/delete"
-        android:title="@string/delete_note"
-        android:icon="@drawable/ic_delete_grey"
-        app:showAsAction="always"/>
-
-    <item android:id="@+id/save"
-        android:title="@string/save"
-        android:icon="@drawable/ic_save_grey"
-        app:showAsAction="ifRoom"/>
-
-</menu>
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportHeight="16"
+    android:viewportWidth="16"
+    android:tint="#757575">
+    <path android:fillColor="#FF000000"
+        android:pathData="m11.571,2.4v4.9l1.4286,2.1v1.4h-4.2857v3.5l-0.7143,0.7 -0.7143,-0.7v-3.5h-4.2857v-1.4l1.4286,-2.1v-4.9c0,-0.77 0.6429,-1.4 1.4286,-1.4h4.2857c0.7929,0 1.4286,0.623 1.4286,1.4zM5.8567,2.4v5.425l-1.0714,1.575h6.4286l-1.0714,-1.575v-5.425z" android:strokeWidth=".70711"/>
+</vector>
