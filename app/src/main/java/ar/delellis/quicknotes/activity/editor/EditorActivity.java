@@ -25,11 +25,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
@@ -67,7 +71,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     ColorPalette palette;
 
-    Note note;
+    Note note = new Note();
 
     int id = 0;
     String title;
@@ -87,7 +91,14 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_back_grey);
+
+            Drawable drawable = ResourcesCompat.getDrawable(this.getResources(), R.drawable.ic_back_grey, null);
+            if (drawable != null) {
+                DrawableCompat.setTint(drawable, getResources().getColor(R.color.defaultNoteTint));
+                actionBar.setHomeAsUpIndicator(drawable);
+            } else {
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_back_grey);
+            }
         }
 
         mApi = new ApiProvider(getApplicationContext());
@@ -135,15 +146,20 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_editor, menu);
 
-        actionMenu = menu;
+        MenuItem deleteItem = menu.findItem(R.id.delete);
+        MenuItem pinItem = menu.findItem(R.id.pin);
         if (id != 0) {
-            actionMenu.findItem(R.id.delete).setVisible(!is_shared);
-            actionMenu.findItem(R.id.pin).setVisible(!is_shared);
-            actionMenu.findItem(R.id.pin).setIcon(is_pinned ? R.drawable.ic_pinned : R.drawable.ic_pin);
+            deleteItem.setVisible(!is_shared);
+            pinItem.setVisible(!is_shared);
+            pinItem.setIcon(is_pinned ? R.drawable.ic_pinned : R.drawable.ic_pin);
         } else {
-            actionMenu.findItem(R.id.pin).setVisible(false);
-            actionMenu.findItem(R.id.delete).setVisible(false);
+            deleteItem.setVisible(false);
+            pinItem.setVisible(false);
         }
+
+        tintMenuIcon(this, deleteItem, R.color.defaultNoteTint);
+        tintMenuIcon(this, pinItem, R.color.defaultNoteTint);
+        tintMenuIcon(this, menu.findItem(R.id.save), R.color.defaultNoteTint);
 
         return true;
     }
@@ -241,8 +257,8 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             }
         } else {
             // Default color.
-            et_content.getRootView().setBackgroundColor(getResources().getColor(R.color.defaultColor));
-            palette.setSelectedColor(getResources().getColor(R.color.defaultColor));
+            et_content.getRootView().setBackgroundColor(getResources().getColor(R.color.defaultNoteColor));
+            palette.setSelectedColor(getResources().getColor(R.color.defaultNoteColor));
             editMode();
         }
     }
@@ -259,6 +275,14 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_title.setFocusable(false);
         et_content.setFocusable(false);
         palette.setVisibility(View.GONE);
+    }
+
+    private void tintMenuIcon(Context context, MenuItem item, int color) {
+        Drawable normalDrawable = item.getIcon();
+        Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
+        DrawableCompat.setTint(wrapDrawable,  context.getResources().getColor(color));
+
+        item.setIcon(wrapDrawable);
     }
 
     private void closeEdition () {

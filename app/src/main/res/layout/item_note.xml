@@ -80,17 +80,19 @@
             android:layout_height="wrap_content"
             android:visibility="visible"
             android:orientation="horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="3dp"
             android:layout_below="@id/content"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_share">
         </androidx.recyclerview.widget.RecyclerView>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="visible"
             android:orientation="horizontal"
+            android:layout_marginTop="3dp"
             android:layout_below="@id/recyclerShares"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_tag">

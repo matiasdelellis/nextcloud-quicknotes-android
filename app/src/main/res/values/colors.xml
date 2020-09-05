@@ -62,5 +62,6 @@
     <color name="widget_background_dark_theme">#bf222222</color>
     <color name="widget_fg_dark_theme">#ffffff</color>
 
-    <color name="defaultColor">#F7EB96</color>
+    <color name="defaultNoteColor">#F7EB96</color>
+    <color name="defaultNoteTint">#202124</color>
 </resources>

@@ -36,10 +36,11 @@
 
         <EditText
             android:id="@+id/title"
+            android:inputType="textCapSentences"
             android:hint="@string/to_do"
             android:autofillHints="@string/to_do"
             android:textSize="25sp"
-            android:inputType="textCapSentences"
+            android:textColor="@color/defaultNoteTint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </EditText>
@@ -49,6 +50,7 @@
             android:layout_below="@id/title"
             android:hint="@string/enter_note"
             android:autofillHints="@string/enter_title"
+            android:textColor="@color/defaultNoteTint"
             android:inputType="textMultiLine"
             android:minLines="6"
             android:gravity="top|start"
@@ -74,6 +76,7 @@
             android:layout_below="@+id/recyclerShares"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:visibility="visible"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -86,7 +89,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+        </com.imagine.colorpalette.ColorPalette>
 
     </RelativeLayout>
 
