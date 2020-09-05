@@ -45,4 +45,6 @@
     <string name="new_note">New note</string>
     <string name="pin_note">Pin note</string>
     <string name="pinned">Pinned</string>
+    <string name="tags">Tags</string>
+    <string name="tag">Tag</string>
 </resources>

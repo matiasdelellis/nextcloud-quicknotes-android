@@ -20,9 +20,9 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_pinned_small"
-            android:layout_alignRight="@id/title"/>
+            android:layout_alignEnd="@id/title"/>
 
         <TextView
             android:id="@+id/content"
@@ -74,5 +74,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:orientation="horizontal"
+            android:layout_below="@id/content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_tag">
+        </androidx.recyclerview.widget.RecyclerView>
+
     </RelativeLayout>
 </androidx.cardview.widget.CardView>
