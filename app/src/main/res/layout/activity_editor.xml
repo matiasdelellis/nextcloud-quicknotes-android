@@ -20,11 +20,11 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<androidx.core.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activity.editor.EditorActivity">
 
     <RelativeLayout
@@ -41,7 +41,9 @@
             android:textSize="25sp"
             android:inputType="textCapSentences"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+        </EditText>
+
         <EditText
             android:id="@+id/content"
             android:layout_below="@id/title"
@@ -52,10 +54,35 @@
             android:gravity="top|start"
             android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+        </EditText>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerShares"
+            android:layout_below="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:orientation="horizontal"
+            android:layout_marginTop="5dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_share">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerTags"
+            android:layout_below="@+id/recyclerShares"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_tag">
+        </androidx.recyclerview.widget.RecyclerView>
+
         <com.imagine.colorpalette.ColorPalette
             android:id="@+id/palette"
-            android:layout_below="@+id/content"
+            android:layout_below="@+id/recyclerTags"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
             android:layout_width="match_parent"

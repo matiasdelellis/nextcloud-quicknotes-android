@@ -24,9 +24,10 @@ package ar.delellis.quicknotes.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Note {
+public class Note implements Serializable {
     @Expose
     @SerializedName("id") private int id;
 

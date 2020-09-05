@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -40,8 +41,13 @@ import android.widget.Toast;
 
 import com.imagine.colorpalette.ColorPalette;
 
+import java.util.Objects;
+
 import ar.delellis.quicknotes.R;
+import ar.delellis.quicknotes.activity.main.ShareAdapter;
+import ar.delellis.quicknotes.activity.main.TagAdapter;
 import ar.delellis.quicknotes.api.ApiProvider;
+import ar.delellis.quicknotes.model.Note;
 
 public class EditorActivity extends AppCompatActivity implements EditorView {
 
@@ -52,9 +58,18 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     EditText et_title;
     EditText et_content;
+
+    TagAdapter tagAdapter;
+    RecyclerView tagRecyclerView;
+
+    ShareAdapter shareAdapter;
+    RecyclerView shareRecyclerView;
+
     ColorPalette palette;
 
-    int id;
+    Note note;
+
+    int id = 0;
     String title;
     String content;
     String color;
@@ -81,6 +96,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_content = findViewById(R.id.content);
         palette = findViewById(R.id.palette);
 
+        tagAdapter = new TagAdapter();
+        tagRecyclerView = findViewById(R.id.recyclerTags);
+
+        shareAdapter = new ShareAdapter();
+        shareRecyclerView = findViewById(R.id.recyclerShares);
+
         // Color selection
         palette.setListener(color_hex -> {
             et_content.getRootView().setBackgroundColor(Color.parseColor(color_hex));
@@ -94,12 +115,16 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         presenter = new EditorPresenter(this);
 
         Intent intent = getIntent();
-        id = intent.getIntExtra("id", 0);
-        title = intent.getStringExtra("title");
-        content = intent.getStringExtra("content");
-        color = intent.getStringExtra("color");
-        is_pinned = intent.getBooleanExtra("is_pinned", false);
-        is_shared = intent.getBooleanExtra("is_shared", false);
+        if (intent.hasExtra("note")) {
+            note = (Note)  Objects.requireNonNull(intent.getSerializableExtra("note"));
+
+            id = note.getId();
+            title = note.getTitle();
+            content = note.getContent();
+            color = note.getColor();
+            is_pinned = note.getIsPinned();
+            is_shared = note.getIsShared();
+        }
 
         setDataFromIntentExtra();
     }
@@ -198,7 +223,17 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             et_title.setText(Html.fromHtml(title));
             et_content.setText(Html.fromHtml(content));
             et_content.getRootView().setBackgroundColor(Color.parseColor(color));
+
+            tagAdapter.setItems(note.getTags());
+            tagAdapter.notifyDataSetChanged();
+            tagRecyclerView.setAdapter(tagAdapter);
+
+            shareAdapter.setItems(note.getShareWith());
+            shareAdapter.notifyDataSetChanged();
+            shareRecyclerView.setAdapter(shareAdapter);
+
             palette.setSelectedColor(color);
+
             if (is_shared) {
                 readMode();
             } else {

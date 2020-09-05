@@ -122,12 +122,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
             boolean is_pinned = note.getIsPinned();
 
             Intent intent = new Intent(this, EditorActivity.class);
-            intent.putExtra("id", id);
-            intent.putExtra("title", title);
-            intent.putExtra("content", content);
-            intent.putExtra("color", color);
-            intent.putExtra("is_pinned", is_pinned);
-            intent.putExtra("is_shared", is_shared);
+            intent.putExtra("note", note);
 
             startActivityForResult(intent, INTENT_EDIT);
         });
