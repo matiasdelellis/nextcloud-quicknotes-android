@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -73,6 +74,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         holder.tv_title.setText(Html.fromHtml(note.getTitle().trim()));
         holder.tv_content.setText(Html.fromHtml(note.getContent().trim()));
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
+        holder.im_pinned.setVisibility(note.getIsPinned() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -236,6 +238,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
     class RecyclerViewAdapter extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tv_title, tv_content;
         CardView card_item;
+        ImageView im_pinned;
         ItemClickListener itemClickListener;
 
         RecyclerViewAdapter(@NonNull View itemView, ItemClickListener itemClickListener) {
@@ -244,6 +247,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
             card_item = itemView.findViewById(R.id.card_item);
             tv_title = itemView.findViewById(R.id.title);
             tv_content = itemView.findViewById(R.id.content);
+            im_pinned = itemView.findViewById(R.id.pinned);
 
             this.itemClickListener = itemClickListener;
             card_item.setOnClickListener(this);
