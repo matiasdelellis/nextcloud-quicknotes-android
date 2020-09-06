@@ -1,20 +1,22 @@
 # Nextcloud Quicknotes
 
-This is an Android application for Nextcloud Quicknotes. 😄 
+This is an Android application for Nextcloud [Quicknotes](https://github.com/matiasdelellis/quicknotes). 😄 
 
-Notes list| Note detail
--- | --
-![Screenshot_20200831-122551(1)](https://user-images.githubusercontent.com/733715/91786189-6bf8f900-ebdd-11ea-9189-70a059ef0fbd.png) | ![Screenshot_20200831-225604](https://user-images.githubusercontent.com/733715/91786191-6d2a2600-ebdd-11ea-8011-d9aa692b387f.png)
+## 👀 Screenshots
 
-# Resume
+Choose account | Notes View | Note | Sidebar filters
+-- | -- | -- | -- 
+![Screenshot_20200903-210951](https://user-images.githubusercontent.com/733715/92190347-5121c100-ee37-11ea-9b36-01ba67e94457.png) | ![Screenshot_20200905-201348](https://user-images.githubusercontent.com/733715/92315034-86a0e880-efb6-11ea-9f85-36bb97b0c731.png) | ![Screenshot_20200905-201110](https://user-images.githubusercontent.com/733715/92315024-66712980-efb6-11ea-8b97-a0bfce0ebdb0.png) | ![Screenshot_20200903-210726](https://user-images.githubusercontent.com/733715/92190161-c0e37c00-ee36-11ea-9096-dfe7e403c31a.png)
+
+## Resume
 In current state, it only implements the basic CRUD functions.. So, you can:
 * Create Notes
 * Read Notes
 * Update Notes
 * Delete Notes
 
-# Limitations:
-* It only implements edit the title, content, and color. if you save a note, you will lose attachments, tags or shares.
+## Limitations:
+* It only implements edit the title, content, and color.
 * It can display the HTML quite well, but if you save a note, you will lose the formatting.
 * It only works with the nextcloud client installed. I don't expect to create a custom login!
 * It works 100% online, without any type of cache.
