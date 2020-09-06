@@ -24,7 +24,6 @@ package ar.delellis.quicknotes.activity.editor;
 import androidx.annotation.NonNull;
 
 import ar.delellis.quicknotes.api.ApiProvider;
-import ar.delellis.quicknotes.api.NoteRequest;
 import ar.delellis.quicknotes.model.Note;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,10 +37,10 @@ public class EditorPresenter {
         this.view = view;
     }
 
-    void createNote(final String title, final String content, final String color) {
+    void createNote(Note note) {
         view.showProgress();
 
-        Call<Note> call = ApiProvider.getAPI().create(title, content, color);
+        Call<Note> call = ApiProvider.getAPI().create(note.getTitle(), note.getContent(), note.getColor());
         call.enqueue(new Callback<Note>() {
             @Override
             public void onResponse(Call<Note> call, Response<Note> response) {
@@ -61,12 +60,10 @@ public class EditorPresenter {
         });
     }
 
-    void updateNote(int id, final String title, final String content, final String color, final  boolean is_pinned) {
+    void updateNote(Note note) {
         view.showProgress();
 
-        NoteRequest note = new NoteRequest(id, title, content, color, is_pinned);
-
-        Call<Note> call = ApiProvider.getAPI().updateNote(id, note);
+        Call<Note> call = ApiProvider.getAPI().updateNote(note.getId(), note);
         call.enqueue(new Callback<Note>() {
             @Override
             public void onResponse(@NonNull Call<Note> call, @NonNull Response<Note> response) {

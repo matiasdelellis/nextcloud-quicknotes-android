@@ -73,15 +73,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     Note note = new Note();
 
-    int id = 0;
-    String title;
-    String content;
-    String color;
-    boolean is_pinned;
-    boolean is_shared;
-
-    Menu actionMenu;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +107,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         // Color selection
         palette.setListener(color_hex -> {
             et_content.getRootView().setBackgroundColor(Color.parseColor(color_hex));
-            color = color_hex;
+            note.setColor(color_hex);
         });
 
         // Create progress dialog.
@@ -127,14 +118,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         Intent intent = getIntent();
         if (intent.hasExtra("note")) {
-            note = (Note)  Objects.requireNonNull(intent.getSerializableExtra("note"));
-
-            id = note.getId();
-            title = note.getTitle();
-            content = note.getContent();
-            color = note.getColor();
-            is_pinned = note.getIsPinned();
-            is_shared = note.getIsShared();
+            note = (Note) Objects.requireNonNull(intent.getSerializableExtra("note"));
         }
 
         setDataFromIntentExtra();
@@ -148,10 +132,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         MenuItem deleteItem = menu.findItem(R.id.delete);
         MenuItem pinItem = menu.findItem(R.id.pin);
-        if (id != 0) {
-            deleteItem.setVisible(!is_shared);
-            pinItem.setVisible(!is_shared);
-            pinItem.setIcon(is_pinned ? R.drawable.ic_pinned : R.drawable.ic_pin);
+        if (note.getId() != 0) {
+            deleteItem.setVisible(!note.getIsShared());
+            pinItem.setVisible(!note.getIsShared());
+            pinItem.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
         } else {
             deleteItem.setVisible(false);
             pinItem.setVisible(false);
@@ -166,28 +150,27 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        String title = et_title.getText().toString().trim();
-        String content = et_content.getText().toString().trim();
-        String color = this.color;
+        note.setTitle(et_title.getText().toString().trim());
+        note.setContent(et_content.getText().toString().trim());
         switch (item.getItemId()) {
             case R.id.pin:
-                is_pinned = !is_pinned;
-                item.setIcon(is_pinned ? R.drawable.ic_pinned : R.drawable.ic_pin);
+                note.setIsPinned(!note.getIsPinned());
+                item.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
                 return true;
             case R.id.save:
-                if (is_shared) {
+                if (note.getIsShared()) {
                     closeEdition();
                     return true;
                 }
-                if (title.isEmpty()) {
+                if (note.getTitle().isEmpty()) {
                     et_title.setError(getString(R.string.enter_title));
-                } else if (content.isEmpty()) {
+                } else if (note.getContent().isEmpty()) {
                     et_content.setError(getString(R.string.enter_note));
                 } else {
-                    if (id == 0)
-                        presenter.createNote(title, content, color);
+                    if (note.getId() == 0)
+                        presenter.createNote(note);
                     else
-                        presenter.updateNote(id, title, content, color, is_pinned);
+                        presenter.updateNote(note);
                 }
                 return true;
             case R.id.delete:
@@ -196,7 +179,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
                 alertDialog.setMessage("Are you sure you want to delete the note?");
                 alertDialog.setNegativeButton("Yes", (dialog, wich) -> {
                     dialog.dismiss();
-                    presenter.deleteNote(id);
+                    presenter.deleteNote(note.getId());
                 });
                 alertDialog.setPositiveButton("Cancel", ((dialog, which) -> dialog.dismiss()));
                 alertDialog.show();
@@ -235,10 +218,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     }
 
     private void setDataFromIntentExtra() {
-        if (id != 0) {
-            et_title.setText(Html.fromHtml(title));
-            et_content.setText(Html.fromHtml(content));
-            et_content.getRootView().setBackgroundColor(Color.parseColor(color));
+        if (note.getId() != 0) {
+            et_title.setText(Html.fromHtml(note.getTitle()));
+            et_content.setText(Html.fromHtml(note.getContent()));
+            et_content.getRootView().setBackgroundColor(Color.parseColor(note.getColor()));
 
             tagAdapter.setItems(note.getTags());
             tagAdapter.notifyDataSetChanged();
@@ -248,9 +231,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             shareAdapter.notifyDataSetChanged();
             shareRecyclerView.setAdapter(shareAdapter);
 
-            palette.setSelectedColor(color);
+            palette.setSelectedColor(note.getColor());
 
-            if (is_shared) {
+            if (note.getIsShared()) {
                 readMode();
             } else {
                 editMode();

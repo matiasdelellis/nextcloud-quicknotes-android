@@ -55,6 +55,9 @@ public class Note implements Serializable {
     @Expose
     @SerializedName("tags") private List<Tag> tags;
 
+    @Expose
+    @SerializedName("attachts") private List<Attachment> attachts;
+
     public int getId() {
         return id;
     }
@@ -125,5 +128,13 @@ public class Note implements Serializable {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public List<Attachment> getAttachts() {
+        return attachts;
+    }
+
+    public void setAttachts(List<Attachment> attachts) {
+        this.attachts = attachts;
     }
 }
