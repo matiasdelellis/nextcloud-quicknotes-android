@@ -20,7 +20,8 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_item"
@@ -62,7 +63,7 @@
             android:contentDescription="@string/pinned"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_pinned_small"
+            android:src="@drawable/ic_pinned"
             android:layout_alignEnd="@id/title"/>
 
         <TextView
@@ -74,26 +75,30 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerShares"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
             android:orientation="horizontal"
             android:layout_marginTop="3dp"
             android:layout_below="@id/content"
+            tools:itemCount="1"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_share">
         </androidx.recyclerview.widget.RecyclerView>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerTags"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="visible"
             android:orientation="horizontal"
             android:layout_marginTop="3dp"
-            android:layout_below="@id/recyclerShares"
+            tools:itemCount="2"
+            android:layout_below="@id/content"
+            android:layout_toEndOf="@+id/recyclerShares"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_tag">
         </androidx.recyclerview.widget.RecyclerView>

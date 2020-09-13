@@ -20,78 +20,108 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activity.editor.EditorActivity">
 
-    <RelativeLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="20dp">
+        android:layout_marginBottom="48dp">
 
-        <EditText
-            android:id="@+id/title"
-            android:inputType="textCapSentences"
-            android:hint="@string/to_do"
-            android:autofillHints="@string/to_do"
-            android:textSize="25sp"
-            android:textColor="@color/defaultNoteTint"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </EditText>
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="20dp">
 
-        <EditText
-            android:id="@+id/content"
-            android:layout_below="@id/title"
-            android:hint="@string/enter_note"
-            android:autofillHints="@string/enter_title"
-            android:textColor="@color/defaultNoteTint"
-            android:inputType="textMultiLine"
-            android:minLines="6"
-            android:gravity="top|start"
-            android:layout_marginTop="20dp"
+            <EditText
+                android:id="@+id/title"
+                android:inputType="textCapSentences"
+                android:hint="@string/to_do"
+                android:autofillHints="@string/to_do"
+                android:textSize="25sp"
+                android:textColor="@color/defaultNoteTint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </EditText>
+
+            <org.wordpress.aztec.AztecText
+                android:id="@+id/content"
+                android:layout_below="@id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:padding="8dp"
+                android:scrollbars="vertical"
+                android:gravity="top|start"
+                android:hint="@string/new_note"
+                android:minLines="5"
+                app:backgroundColor="@color/transparent"
+                app:textColor="@color/defaultNoteTint"
+                app:bulletColor="@color/defaultNoteTint"
+                app:lineSpacingExtra="10dp"
+                app:blockVerticalPadding="1dp">
+            </org.wordpress.aztec.AztecText>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerShares"
+                android:layout_below="@+id/content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_share"
+                tools:itemCount="1">
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerTags"
+                android:layout_below="@+id/recyclerShares"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:visibility="visible"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_tag"
+                tools:itemCount="3">
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <com.imagine.colorpalette.ColorPalette
+                android:id="@+id/palette"
+                android:layout_below="@+id/recyclerTags"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </com.imagine.colorpalette.ColorPalette>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/rich_toolbar"
+        android:layout_height="48dp"
+        android:background="@color/colorAquaHaze"
+        android:layout_width="match_parent"
+        android:gravity="center_vertical|start"
+        android:layout_gravity="bottom">
+
+        <androidx.appcompat.widget.ActionMenuView
+            android:id="@+id/rich_action_menu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </EditText>
+            android:layout_height="match_parent"
+            android:layout_gravity="start">
+        </androidx.appcompat.widget.ActionMenuView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerShares"
-            android:layout_below="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:orientation="horizontal"
-            android:layout_marginTop="5dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_share">
-        </androidx.recyclerview.widget.RecyclerView>
+    </androidx.appcompat.widget.Toolbar>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerTags"
-            android:layout_below="@+id/recyclerShares"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:visibility="visible"
-            android:orientation="horizontal"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_tag">
-        </androidx.recyclerview.widget.RecyclerView>
-
-        <com.imagine.colorpalette.ColorPalette
-            android:id="@+id/palette"
-            android:layout_below="@+id/recyclerTags"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </com.imagine.colorpalette.ColorPalette>
-
-    </RelativeLayout>
-
-</androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

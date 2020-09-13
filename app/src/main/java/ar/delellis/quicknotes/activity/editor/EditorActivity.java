@@ -25,6 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.ActionMenuView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,6 +44,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import org.wordpress.aztec.AztecText;
+import org.wordpress.aztec.AztecTextFormat;
 
 import com.imagine.colorpalette.ColorPalette;
 
@@ -61,7 +66,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     protected ApiProvider mApi;
 
     EditText et_title;
-    EditText et_content;
+    AztecText et_content;
 
     TagAdapter tagAdapter;
     RecyclerView tagRecyclerView;
@@ -70,6 +75,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     RecyclerView shareRecyclerView;
 
     ColorPalette palette;
+    Toolbar rich_toolbar;
 
     Note note = new Note();
 
@@ -92,6 +98,11 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             }
         }
 
+        ActionMenuView actionMenuView =  findViewById(R.id.rich_action_menu);
+        Menu actionMenu = actionMenuView.getMenu();
+        getMenuInflater().inflate(R.menu.rich_editor, actionMenu);
+        actionMenuView.setOnMenuItemClickListener(item -> OnMenuItemClick(item));
+
         mApi = new ApiProvider(getApplicationContext());
 
         et_title = findViewById(R.id.title);
@@ -109,6 +120,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             et_content.getRootView().setBackgroundColor(Color.parseColor(color_hex));
             note.setColor(color_hex);
         });
+
+        rich_toolbar = findViewById(R.id.rich_toolbar);
+        rich_toolbar.setTitle(null);
 
         // Create progress dialog.
         progressDialog = new ProgressDialog(this);
@@ -150,8 +164,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        note.setTitle(et_title.getText().toString().trim());
-        note.setContent(et_content.getText().toString().trim());
         switch (item.getItemId()) {
             case R.id.pin:
                 note.setIsPinned(!note.getIsPinned());
@@ -162,6 +174,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
                     closeEdition();
                     return true;
                 }
+                // Update note from view.
+                note.setTitle(et_title.getText().toString().trim());
+                note.setContent(et_content.toFormattedHtml().trim());
+
                 if (note.getTitle().isEmpty()) {
                     et_title.setError(getString(R.string.enter_title));
                 } else if (note.getContent().isEmpty()) {
@@ -193,6 +209,34 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         }
     }
 
+    public boolean OnMenuItemClick(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.bold:
+                et_content.toggleFormatting(AztecTextFormat.FORMAT_BOLD);
+                return true;
+            case R.id.italic:
+                et_content.toggleFormatting(AztecTextFormat.FORMAT_ITALIC);
+                return true;
+            case R.id.underline:
+                et_content.toggleFormatting(AztecTextFormat.FORMAT_UNDERLINE);
+                return true;
+            case R.id.strike:
+                et_content.toggleFormatting(AztecTextFormat.FORMAT_STRIKETHROUGH);
+                return true;
+            case R.id.quote:
+                et_content.toggleFormatting(AztecTextFormat.FORMAT_QUOTE);
+                return true;
+            case R.id.ordered_list:
+                et_content.toggleFormatting(AztecTextFormat.FORMAT_ORDERED_LIST);
+                return true;
+            case R.id.unordered_list:
+                et_content.toggleFormatting(AztecTextFormat.FORMAT_UNORDERED_LIST);
+                return true;
+            default:
+                return false;
+        }
+    }
+
     @Override
     public void showProgress() {
         progressDialog.show();
@@ -220,7 +264,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     private void setDataFromIntentExtra() {
         if (note.getId() != 0) {
             et_title.setText(Html.fromHtml(note.getTitle()));
-            et_content.setText(Html.fromHtml(note.getContent()));
+            et_content.fromHtml(note.getContent(), true);
             et_content.getRootView().setBackgroundColor(Color.parseColor(note.getColor()));
 
             tagAdapter.setItems(note.getTags());
@@ -250,6 +294,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_title.setFocusableInTouchMode(true);
         et_content.setFocusableInTouchMode(true);
         palette.setVisibility(View.VISIBLE);
+        rich_toolbar.setVisibility(View.VISIBLE);
     }
 
     private void readMode() {
@@ -258,6 +303,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_title.setFocusable(false);
         et_content.setFocusable(false);
         palette.setVisibility(View.GONE);
+        rich_toolbar.setVisibility(View.GONE);
     }
 
     private void tintMenuIcon(Context context, MenuItem item, int color) {
