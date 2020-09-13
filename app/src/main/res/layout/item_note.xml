@@ -27,26 +27,18 @@
     android:id="@+id/card_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
-    app:cardCornerRadius="4dp"
+    app:cardCornerRadius="10dp"
     app:cardElevation="1dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
 
-    <LinearLayout
-        android:layout_width="10dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="#49000000"
-        />
-
     <RelativeLayout
-        android:padding="10dp"
-        android:layout_marginStart="10dp"
+        android:padding="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

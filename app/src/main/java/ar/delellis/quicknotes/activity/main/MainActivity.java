@@ -23,11 +23,12 @@ package ar.delellis.quicknotes.activity.main;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     DrawerLayout drawerLayout;
     private FloatingActionButton fab;
     private RecyclerView recyclerView;
+    StaggeredGridLayoutManager layoutManager;
     private SwipeRefreshLayout swipeRefresh;
     private SearchView searchView;
     private MaterialCardView homeToolbar;
@@ -101,8 +103,8 @@ public class MainActivity extends AppCompatActivity implements MainView {
         swipeRefresh = findViewById(R.id.swipe_refresh);
 
         recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
 
         tags = new ArrayList<>();
 
@@ -114,12 +116,6 @@ public class MainActivity extends AppCompatActivity implements MainView {
 
         itemClickListener = ((view, position) -> {
             Note note = notes.get(position);
-            int id = note.getId();
-            String title = note.getTitle();
-            String content = note.getContent();
-            String color = note.getColor();
-            boolean is_shared = note.getIsShared();
-            boolean is_pinned = note.getIsPinned();
 
             Intent intent = new Intent(this, EditorActivity.class);
             intent.putExtra("note", note);
@@ -168,6 +164,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
         drawerLayout = findViewById(R.id.drawerLayout);
         AppCompatImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
+
+        AppCompatImageView viewButton = findViewById(R.id.view_mode);
+        viewButton.setOnClickListener(view -> {
+            int spanCount = layoutManager.getSpanCount() == 1 ? 2 : 1;
+            layoutManager.setSpanCount(spanCount);
+            viewButton.setImageResource(spanCount == 1 ? R.drawable.ic_view_module : R.drawable.ic_view_list);
+        });
 
         mApi = new ApiProvider(getApplicationContext());
         presenter.getData();

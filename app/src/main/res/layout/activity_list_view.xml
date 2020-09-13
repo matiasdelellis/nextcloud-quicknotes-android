@@ -107,10 +107,11 @@
                         android:padding="@dimen/spacer_2x"
                         android:tint="?attr/colorAccent"
                         android:translationX="@dimen/spacer_1x"
-                        android:src="@drawable/ic_view_list" />
+                        android:src="@drawable/ic_view_module" />
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
+
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -123,6 +124,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="visible"
+                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                app:spanCount="1"
                 tools:listitem="@layout/item_note">
             </androidx.recyclerview.widget.RecyclerView>
 

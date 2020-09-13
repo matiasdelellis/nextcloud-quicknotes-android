@@ -55,6 +55,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
 
     public MainAdapter(Context context, List<Note> notes, ItemClickListener itemClickListener) {
         this.context = context;
+
         this.notes = notes;
         this.notesAll = new ArrayList<>(notes);
 
