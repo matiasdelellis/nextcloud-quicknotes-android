@@ -25,6 +25,8 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class Note implements Serializable {
@@ -137,4 +139,40 @@ public class Note implements Serializable {
     public void setAttachts(List<Attachment> attachts) {
         this.attachts = attachts;
     }
+
+    public static Comparator<Note> ByTitleAZ = new Comparator<Note>() {
+        @Override
+        public int compare(Note note, Note t1) {
+            return note.title.compareTo(t1.title);
+        }
+    };
+
+    public static Comparator<Note> ByLastUpdated = new Comparator<Note>() {
+        @Override
+        public int compare(Note note, Note t1) {
+            return t1.timestamp - note.timestamp;
+        }
+    };
+
+    public static Comparator<Note> ByLastCreated = new Comparator<Note>() {
+        @Override
+        public int compare(Note note, Note t1) {
+            return note.id - t1.id;
+        }
+    };
+
+    public static Comparator<Note> ByPinned = new Comparator<Note>() {
+        @Override
+        public int compare(Note note, Note t1) {
+            if (note.is_pinned && t1.is_pinned) {
+                return 0;
+            } else if (note.is_pinned) {
+                return -1;
+            } else if (t1.is_pinned) {
+                return 1;
+            }
+            return 0;
+        }
+    };
+
 }

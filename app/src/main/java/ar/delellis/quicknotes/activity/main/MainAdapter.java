@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import ar.delellis.quicknotes.R;
@@ -45,6 +46,13 @@ import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAdapter> implements Filterable {
+
+    public static final int SORT_BY_TITLE = 0;
+    public static final int SORT_BY_CREATED = 1;
+    public static final int SORT_BY_UPDATED = 2;
+
+    private int sortRule = SORT_BY_UPDATED;
+    private boolean firstPinned = true;
 
     private Context context;
 
@@ -58,6 +66,8 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
 
         this.notes = notes;
         this.notesAll = new ArrayList<>(notes);
+
+        performSort();
 
         this.itemClickListener = itemClickListener;
     }
@@ -84,7 +94,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         holder.shareAdapter.setItems(note.getShareWith());
         holder.shareAdapter.notifyDataSetChanged();
         holder.shareRecyclerView.setAdapter(holder.shareAdapter);
-
     }
 
     @Override
@@ -125,6 +134,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             notes.clear();
             notes.addAll((Collection<? extends Note>) filterResults.values);
+            performSort();
             notifyDataSetChanged();
         }
     };
@@ -160,6 +170,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             notes.clear();
             notes.addAll((Collection<? extends Note>) filterResults.values);
+            performSort();
             notifyDataSetChanged();
         }
     };
@@ -187,6 +198,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             notes.clear();
             notes.addAll((Collection<? extends Note>) filterResults.values);
+            performSort();
             notifyDataSetChanged();
         }
     };
@@ -214,6 +226,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             notes.clear();
             notes.addAll((Collection<? extends Note>) filterResults.values);
+            performSort();
             notifyDataSetChanged();
         }
     };
@@ -241,6 +254,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             notes.clear();
             notes.addAll((Collection<? extends Note>) filterResults.values);
+            performSort();
             notifyDataSetChanged();
         }
     };
@@ -279,6 +293,28 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         @Override
         public void onClick(View view) {
             itemClickListener.onItemClick(view, getAdapterPosition());
+        }
+    }
+
+    public void setSortRule(int sortRule) {
+        this.sortRule = sortRule;
+    }
+
+    public void setFirstPinned(boolean firstPinned) {
+        this.firstPinned = firstPinned;
+    }
+
+    private void performSort() {
+        if (sortRule == SORT_BY_TITLE) {
+            Collections.sort(notes, Note.ByTitleAZ);
+        } else if (sortRule == SORT_BY_CREATED) {
+            Collections.sort(notes, Note.ByLastCreated);
+        } else if (sortRule == SORT_BY_UPDATED) {
+            Collections.sort(notes, Note.ByLastUpdated);
+        }
+
+        if (firstPinned) {
+            Collections.sort(notes, Note.ByPinned);
         }
     }
 
