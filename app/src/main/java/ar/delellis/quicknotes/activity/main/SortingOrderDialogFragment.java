@@ -33,7 +33,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.ThemeUtils;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.DialogFragment;
 
@@ -78,7 +77,7 @@ public class SortingOrderDialogFragment extends DialogFragment {
         if (arguments == null) {
             throw new IllegalArgumentException("Arguments may not be null");
         }
-        mCurrentSortOrder = arguments.getInt(KEY_SORT_ORDER, MainAdapter.SORT_BY_TITLE);
+        mCurrentSortOrder = arguments.getInt(KEY_SORT_ORDER, NoteAdapter.SORT_BY_TITLE);
     }
 
     @Override
@@ -101,17 +100,17 @@ public class SortingOrderDialogFragment extends DialogFragment {
 
         mTaggedViews = new View[6];
         mTaggedViews[0] = view.findViewById(R.id.sortByTitleAscending);
-        mTaggedViews[0].setTag(MainAdapter.SORT_BY_TITLE);
+        mTaggedViews[0].setTag(NoteAdapter.SORT_BY_TITLE);
         mTaggedViews[1] = view.findViewById(R.id.sortByTitleAscendingText);
-        mTaggedViews[1].setTag(MainAdapter.SORT_BY_TITLE);
+        mTaggedViews[1].setTag(NoteAdapter.SORT_BY_TITLE);
         mTaggedViews[2] = view.findViewById(R.id.sortByModificationDateDescending);
-        mTaggedViews[2].setTag(MainAdapter.SORT_BY_UPDATED);
+        mTaggedViews[2].setTag(NoteAdapter.SORT_BY_UPDATED);
         mTaggedViews[3] = view.findViewById(R.id.sortByModificationDateDescendingText);
-        mTaggedViews[3].setTag(MainAdapter.SORT_BY_UPDATED);
+        mTaggedViews[3].setTag(NoteAdapter.SORT_BY_UPDATED);
         mTaggedViews[4] = view.findViewById(R.id.sortByCreationDateDescending);
-        mTaggedViews[4].setTag(MainAdapter.SORT_BY_CREATED);
+        mTaggedViews[4].setTag(NoteAdapter.SORT_BY_CREATED);
         mTaggedViews[5] = view.findViewById(R.id.sortByCreationDateDescendingText);
-        mTaggedViews[5].setTag(MainAdapter.SORT_BY_CREATED);
+        mTaggedViews[5].setTag(NoteAdapter.SORT_BY_CREATED);
 
         setupActiveOrderSelection();
     }

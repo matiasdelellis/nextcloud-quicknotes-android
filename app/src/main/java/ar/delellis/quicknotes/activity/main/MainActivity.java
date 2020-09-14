@@ -40,7 +40,6 @@ import androidx.appcompat.widget.SearchView;
 
 import android.widget.Toast;
 
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
@@ -75,44 +74,40 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     public static final String ADAPTER_KEY_ABOUT = "about";
     public static final String ADAPTER_KEY_SWITCH_ACCOUNT = "switch_account";
 
-    DrawerLayout drawerLayout;
-    private FloatingActionButton fab;
-    private RecyclerView recyclerView;
-    StaggeredGridLayoutManager layoutManager;
-    private SwipeRefreshLayout swipeRefresh;
-    private SearchView searchView;
-    private MaterialCardView homeToolbar;
+    private DrawerLayout drawerLayout;
     private Toolbar toolbar;
-    private AppBarLayout appBar;
+    private MaterialCardView homeToolbar;
+    private SearchView searchView;
+    private SwipeRefreshLayout swipeRefresh;
+    private RecyclerView recyclerView;
+    private StaggeredGridLayoutManager layoutManager;
+    private FloatingActionButton fab;
 
     private MainPresenter presenter;
-    private MainAdapter adapter;
-    private MainAdapter.ItemClickListener itemClickListener;
+    private NoteAdapter noteAdapter;
+    private NoteAdapter.ItemClickListener itemClickListener;
 
     NavigationAdapter navigationFilterAdapter;
     NavigationAdapter navigationCommonAdapter;
 
-    private List<Note> notes;
-    private List<Tag> tags;
-    private List<String> colors;
+    private List<Note> notes = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
+    private List<String> colors = new ArrayList<>();
 
-    private  ApiProvider mApi;
+    private ApiProvider mApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        swipeRefresh = findViewById(R.id.swipe_refresh);
-
         recyclerView = findViewById(R.id.recycler_view);
         layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        tags = new ArrayList<>();
-
         presenter = new MainPresenter(this);
 
+        swipeRefresh = findViewById(R.id.swipe_refresh);
         swipeRefresh.setOnRefreshListener(
                 () -> presenter.getData()
         );
@@ -133,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
                         INTENT_ADD)
         );
 
-        appBar = findViewById(R.id.appBar);
         toolbar = findViewById(R.id.toolbar);
         homeToolbar = findViewById(R.id.home_toolbar);
 
@@ -146,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
             @Override
             public boolean onQueryTextChange(String query) {
-                adapter.getFilter().filter(query);
+                noteAdapter.getFilter().filter(query);
                 return false;
             }
         });
@@ -165,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         homeToolbar.setOnClickListener(view -> updateToolbars(false));
 
         AppCompatImageView sortButton = findViewById(R.id.sort_mode);
-        sortButton.setOnClickListener(view -> openSortingOrderDialogFragment(getSupportFragmentManager(), adapter.getSortRule()));
+        sortButton.setOnClickListener(view -> openSortingOrderDialogFragment(getSupportFragmentManager(), noteAdapter.getSortRule()));
 
         drawerLayout = findViewById(R.id.drawerLayout);
         AppCompatImageButton menuButton = findViewById(R.id.menu_button);
@@ -187,15 +181,15 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
         navigationFilterAdapter = new NavigationAdapter(this, item -> {
             if (item.id.equals(ADAPTER_KEY_ALL)) {
-                adapter.getFilter().filter("");
+                noteAdapter.getFilter().filter("");
             } else if (item.id.equals(ADAPTER_KEY_PINNED)) {
-                adapter.getPinnedFilter().filter("");
+                noteAdapter.getPinnedFilter().filter("");
             } else if (item.id.equals(ADAPTER_KEY_SHARED_BY)) {
-                adapter.getIsSharedFilter().filter("");
+                noteAdapter.getIsSharedFilter().filter("");
             } else if (item.id.equals(ADAPTER_KEY_SHARED_WITH)) {
-                adapter.getSharedWithOthersFilter().filter("");
+                noteAdapter.getSharedWithOthersFilter().filter("");
             } else if (item.id.startsWith(ADAPTER_KEY_TAG_PREFIX)) {
-                adapter.getTagFilter().filter(item.label);
+                noteAdapter.getTagFilter().filter(item.label);
             }
             navigationFilterAdapter.setSelectedItem(item.id);
             drawerLayout.closeDrawer(GravityCompat.START);
@@ -302,10 +296,11 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     @Override
     public void onGetResult(List<Note> note_list) {
         runOnUiThread(() -> {
-            adapter = new MainAdapter(getApplicationContext(), note_list, itemClickListener);
-            adapter.notifyDataSetChanged();
-            recyclerView.setAdapter(adapter);
+            noteAdapter = new NoteAdapter(getApplicationContext(), note_list, itemClickListener);
+            noteAdapter.notifyDataSetChanged();
+            recyclerView.setAdapter(noteAdapter);
 
+            // Fill tags.
             tags.clear();
             for (Note note: note_list) {
                 tags.addAll(note.getTags());
@@ -314,8 +309,18 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
             tags.clear();
             tags.addAll(hTags);
 
+            // Fill colors
+            colors.clear();
+            for (Note note: note_list) {
+                colors.add(note.getColor());
+            }
+            HashSet<String> hColors = new HashSet<>(colors);
+            colors.clear();
+            colors.addAll(hColors);
+
             notes = note_list;
 
+            // Update nav bar.
             updateNavigationMenu();
         });
     }
@@ -329,16 +334,16 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     public void onSortingOrderChosen(int sortSelection) {
         AppCompatImageView sortButton = findViewById(R.id.sort_mode);
         switch (sortSelection) {
-            case MainAdapter.SORT_BY_TITLE:
+            case NoteAdapter.SORT_BY_TITLE:
                 sortButton.setImageResource(R.drawable.ic_alphabetical_asc);
                 break;
-            case MainAdapter.SORT_BY_CREATED:
-            case MainAdapter.SORT_BY_UPDATED:
+            case NoteAdapter.SORT_BY_CREATED:
+            case NoteAdapter.SORT_BY_UPDATED:
                 sortButton.setImageResource(R.drawable.ic_modification_asc);
                 break;
         }
-        adapter.setSortRule(sortSelection);
-        adapter.notifyDataSetChanged();
+        noteAdapter.setSortRule(sortSelection);
+        noteAdapter.notifyDataSetChanged();
     }
 
 }

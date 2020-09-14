@@ -45,7 +45,7 @@ import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAdapter> implements Filterable {
+public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAdapter> implements Filterable {
 
     public static final int SORT_BY_TITLE = 0;
     public static final int SORT_BY_CREATED = 1;
@@ -61,7 +61,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
 
     private ItemClickListener itemClickListener;
 
-    public MainAdapter(Context context, List<Note> notes, ItemClickListener itemClickListener) {
+    public NoteAdapter(Context context, List<Note> notes, ItemClickListener itemClickListener) {
         this.context = context;
 
         this.notes = notes;
