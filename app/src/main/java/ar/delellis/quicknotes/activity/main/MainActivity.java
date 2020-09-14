@@ -27,6 +27,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -52,6 +54,7 @@ import ar.delellis.quicknotes.activity.LoginActivity;
 import ar.delellis.quicknotes.activity.editor.EditorActivity;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.NavigationItem;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.TagNavigationItem;
+import ar.delellis.quicknotes.activity.main.SortingOrderDialogFragment.OnSortingOrderListener;
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
@@ -59,7 +62,7 @@ import ar.delellis.quicknotes.model.Tag;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class MainActivity extends AppCompatActivity implements MainView {
+public class MainActivity extends AppCompatActivity implements MainView, OnSortingOrderListener {
 
     private static final int INTENT_ADD = 100;
     private static final int INTENT_EDIT = 200;
@@ -160,6 +163,9 @@ public class MainActivity extends AppCompatActivity implements MainView {
         setupNavigationMenu();
 
         homeToolbar.setOnClickListener(view -> updateToolbars(false));
+
+        AppCompatImageView sortButton = findViewById(R.id.sort_mode);
+        sortButton.setOnClickListener(view -> openSortingOrderDialogFragment(getSupportFragmentManager(), MainAdapter.SORT_BY_TITLE));
 
         drawerLayout = findViewById(R.id.drawerLayout);
         AppCompatImageButton menuButton = findViewById(R.id.menu_button);
@@ -266,6 +272,13 @@ public class MainActivity extends AppCompatActivity implements MainView {
         startActivity(intent);
     }
 
+    private void openSortingOrderDialogFragment(FragmentManager supportFragmentManager, int sortOrder) {
+        FragmentTransaction fragmentTransaction = supportFragmentManager.beginTransaction();
+        fragmentTransaction.addToBackStack(null);
+
+        SortingOrderDialogFragment.newInstance(sortOrder).show(fragmentTransaction, SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -311,4 +324,12 @@ public class MainActivity extends AppCompatActivity implements MainView {
     public void onErrorLoading(String message) {
         runOnUiThread(() -> Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show());
     }
+
+    @Override
+    public void onSortingOrderChosen(int sortSelection) {
+        adapter.setSortRule(sortSelection);
+        adapter.notifyDataSetChanged();
+        //recyclerView.setAdapter(adapter);
+    }
+
 }

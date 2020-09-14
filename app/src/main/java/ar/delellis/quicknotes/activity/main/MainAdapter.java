@@ -298,10 +298,12 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
 
     public void setSortRule(int sortRule) {
         this.sortRule = sortRule;
+        performSort();
     }
 
     public void setFirstPinned(boolean firstPinned) {
         this.firstPinned = firstPinned;
+        performSort();
     }
 
     private void performSort() {
