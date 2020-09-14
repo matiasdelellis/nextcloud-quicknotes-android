@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         homeToolbar.setOnClickListener(view -> updateToolbars(false));
 
         AppCompatImageView sortButton = findViewById(R.id.sort_mode);
-        sortButton.setOnClickListener(view -> openSortingOrderDialogFragment(getSupportFragmentManager(), MainAdapter.SORT_BY_TITLE));
+        sortButton.setOnClickListener(view -> openSortingOrderDialogFragment(getSupportFragmentManager(), adapter.getSortRule()));
 
         drawerLayout = findViewById(R.id.drawerLayout);
         AppCompatImageButton menuButton = findViewById(R.id.menu_button);
@@ -186,13 +186,13 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         ArrayList<NavigationItem> navItems = new ArrayList<>();
 
         navigationFilterAdapter = new NavigationAdapter(this, item -> {
-            if (item.id == ADAPTER_KEY_ALL) {
+            if (item.id.equals(ADAPTER_KEY_ALL)) {
                 adapter.getFilter().filter("");
-            } else if (item.id == ADAPTER_KEY_PINNED) {
+            } else if (item.id.equals(ADAPTER_KEY_PINNED)) {
                 adapter.getPinnedFilter().filter("");
-            } else if (item.id == ADAPTER_KEY_SHARED_BY) {
+            } else if (item.id.equals(ADAPTER_KEY_SHARED_BY)) {
                 adapter.getIsSharedFilter().filter("");
-            } else if (item.id == ADAPTER_KEY_SHARED_WITH) {
+            } else if (item.id.equals(ADAPTER_KEY_SHARED_WITH)) {
                 adapter.getSharedWithOthersFilter().filter("");
             } else if (item.id.startsWith(ADAPTER_KEY_TAG_PREFIX)) {
                 adapter.getTagFilter().filter(item.label);
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         navigationMenuFilter.setAdapter(navigationFilterAdapter);
 
         navigationCommonAdapter = new NavigationAdapter(this, item -> {
-            if (item.id == ADAPTER_KEY_SWITCH_ACCOUNT) {
+            if (item.id.equals(ADAPTER_KEY_SWITCH_ACCOUNT)) {
                 switch_account();
             } else {
                 Toast.makeText(MainActivity.this, "Selected " + item.label, Toast.LENGTH_SHORT).show();
@@ -327,9 +327,18 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
     @Override
     public void onSortingOrderChosen(int sortSelection) {
+        AppCompatImageView sortButton = findViewById(R.id.sort_mode);
+        switch (sortSelection) {
+            case MainAdapter.SORT_BY_TITLE:
+                sortButton.setImageResource(R.drawable.ic_alphabetical_asc);
+                break;
+            case MainAdapter.SORT_BY_CREATED:
+            case MainAdapter.SORT_BY_UPDATED:
+                sortButton.setImageResource(R.drawable.ic_modification_asc);
+                break;
+        }
         adapter.setSortRule(sortSelection);
         adapter.notifyDataSetChanged();
-        //recyclerView.setAdapter(adapter);
     }
 
 }

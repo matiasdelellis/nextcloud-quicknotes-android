@@ -296,9 +296,17 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.RecyclerViewAd
         }
     }
 
+    public int getSortRule() {
+        return sortRule;
+    }
+
     public void setSortRule(int sortRule) {
         this.sortRule = sortRule;
         performSort();
+    }
+
+    public boolean getFirstPinned() {
+        return firstPinned;
     }
 
     public void setFirstPinned(boolean firstPinned) {
