@@ -73,6 +73,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         notifyDataSetChanged();
     }
 
+    public Note get(int position) {
+        return noteListFiltered.get(position);
+    }
+
     public int getSortRule() {
         return sortRule;
     }

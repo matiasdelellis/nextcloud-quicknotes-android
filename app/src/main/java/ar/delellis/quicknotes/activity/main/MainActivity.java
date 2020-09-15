@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     NavigationAdapter navigationFilterAdapter;
     NavigationAdapter navigationCommonAdapter;
 
-    private List<Note> notes = new ArrayList<>();
     private List<Tag> tags = new ArrayList<>();
     private List<String> colors = new ArrayList<>();
 
@@ -108,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         presenter = new MainPresenter(this);
 
         itemClickListener = ((view, position) -> {
-            Note note = notes.get(position);
+            Note note = noteAdapter.get(position);
 
             Intent intent = new Intent(this, EditorActivity.class);
             intent.putExtra("note", note);
@@ -219,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         navigationMenuCommon.setAdapter(navigationCommonAdapter);
     }
 
-    private void updateNavigationMenu() {
+    private void updateNavigationMenu(List<Note> notes) {
         ArrayList<NavigationItem> navItems = new ArrayList<>();
         NavigationItem homeNav = new NavigationItem(ADAPTER_KEY_ALL, getString(R.string.all_notes), NavigationAdapter.ICON_HOME);
         navItems.add(homeNav);
@@ -319,10 +318,8 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
             colors.clear();
             colors.addAll(hColors);
 
-            notes = note_list;
-
             // Update nav bar.
-            updateNavigationMenu();
+            updateNavigationMenu(note_list);
         });
     }
 
