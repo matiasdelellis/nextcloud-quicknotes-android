@@ -1,20 +1,76 @@
+<!--
+  ~ Nextcloud Quicknotes Android client application.
+  ~
+  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ @author Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <group android:scaleX="1.31625"
-        android:scaleY="1.31625"
-        android:translateX="32.94"
-        android:translateY="32.94">
-        <path
-            android:pathData="m28.198,25.231c-0.1035,1.5161 -1.6552,2.5392 -3.0841,2.3397 -7.2672,-0.0086 -14.535,-0.0226 -21.802,-0.0532 -1.3254,-0.0907 -2.2135,-1.2446 -2.2865,-2.4992 -0.0001,0.9567 0.0012,1.9148 0,2.8714 -0.1998,1.4317 0.7689,2.9804 2.2865,3.0841 7.2804,0.0306 14.574,-0.0086 21.855,0 1.4317,0.1998 2.9804,-0.7689 3.0841,-2.2865l-0.0532,-3.4564z"
-            android:fillColor="#fff"/>
-        <path
-            android:pathData="m3.5784,3.7486c-1.2731,-0.022 -2.396,0.8293 -2.4992,1.8611 -0.0306,5.9093 -0.0444,11.797 -0.0532,17.707 -0.1994,1.162 0.7718,2.415 2.2865,2.4992 7.2666,0.0248 14.534,0.0461 21.802,0.0532 1.429,0.1621 2.9806,-0.6293 3.0841,-1.8611 0.0265,-5.1131 0.0523,-10.254 0.0532,-15.367l-8.5611,8.5611c-0.6381,0.6381 -1.4235,0.8671 -2.2333,0.904 -0.3925,0.3212 -0.7812,0.6326 -1.2762,0.7976 -0.6713,0.2238 -1.7102,0.3104 -2.5524,-0.5318 -0.8422,-0.8422 -0.7555,-1.8811 -0.5318,-2.5524 0.165,-0.495 0.4764,-0.8837 0.7976,-1.2762 0.0369,-0.8099 0.2659,-1.5952 0.904,-2.2333l8.5611,-8.5611c-6.5796,-0.0134 -13.201,0.0063 -19.781,0z"
-            android:fillColor="#fff"/>
-        <path
-            android:pathData="m16.062,13.532c-0.4405,0.4405 -0.5553,1.0558 -0.4136,1.6168l-0.188,0.188c-0.6666,0.6666 -0.9349,1.4715 -0.6016,1.8048 0.3333,0.3333 1.1382,0.065 1.8048,-0.6016l0.188,-0.188c0.561,0.1417 1.1763,0.0269 1.6168,-0.4136l12.032,-12.032c0.6666,-0.6666 0.6666,-1.7398 0,-2.4064 -0.6666,-0.6666 -1.7398,-0.6666 -2.4064,0z"
-            android:fillColor="#fff"/>
-    </group>
+  <group android:scaleX="2.4525"
+      android:scaleY="2.4525"
+      android:translateX="-4.86"
+      android:translateY="-4.86">
+    <path
+        android:pathData="M28.7743,42.0178c-0.3205,-0.0219 -0.5958,-0.163 -0.8058,-0.373l-10.6066,-10.6066c-0.3276,-0.3276 -0.4964,-0.8229 -0.4306,-1.2947c0.0007,-0.5173 -0.0001,-1.0354 0,-1.5527l1.3519,1.3519c0.0979,0.0004 0.1957,0.0008 0.2936,0.0012l-1.314,-1.314c-0.2612,-0.2612 -0.3898,-0.6175 -0.3312,-0.9592c0.0047,-3.1958 0.0122,-6.3794 0.0288,-9.5748c0.0558,-0.5579 0.663,-1.0182 1.3514,-1.0064l0.0002,0.0002c3.558,0.0034 7.1385,-0.0072 10.6963,0l0.6719,0.6719l1.888,-1.888c0.3605,-0.3604 0.9408,-0.3604 1.3012,0l10.6066,10.6066c0.3604,0.3605 0.3604,0.9408 0,1.3012l-1.888,1.888l0.6721,0.6721c-0.0003,2.116 -0.0086,4.2407 -0.0189,6.3608c-1.5077,2.2312 -3.414,4.1709 -5.6167,5.717c-2.6172,0.0037 -5.2353,0.0093 -7.8503,-0.0016zM27.7976,28.6481l-0.2312,-0.2312c-0.0004,0.0769 -0.0008,0.1539 -0.0012,0.2308c0.0774,0.0001 0.1549,0.0003 0.2323,0.0004z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt">
+      <aapt:attr name="android:fillColor">
+        <gradient 
+            android:startY="15.20329"
+            android:startX="16.91726"
+            android:endY="42.03188"
+            android:endX="43.74649"
+            android:type="linear">
+          <item android:offset="0" android:color="#4C000000"/>
+          <item android:offset="1" android:color="#00000000"/>
+        </gradient>
+      </aapt:attr>
+    </path>
+    <path
+        android:pathData="M31.6246,28.3059c-0.056,0.8198 -0.895,1.373 -1.6677,1.2652c-3.9297,-0.0047 -7.8596,-0.0122 -11.7892,-0.0288c-0.7167,-0.049 -1.1969,-0.673 -1.2364,-1.3514c-0.0001,0.5173 0.0007,1.0354 0,1.5527c-0.108,0.7742 0.4158,1.6116 1.2364,1.6677c3.9368,0.0166 7.8807,-0.0047 11.8178,0c0.7742,0.108 1.6116,-0.4158 1.6677,-1.2364l-0.0288,-1.869z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:fillColor="#ffffff"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt"/>
+    <path
+        android:pathData="M18.3118,16.6895c-0.6884,-0.0119 -1.2956,0.4484 -1.3514,1.0064c-0.0165,3.1954 -0.024,6.3791 -0.0288,9.5748c-0.1078,0.6283 0.4173,1.3059 1.2364,1.3514c3.9293,0.0134 7.8591,0.0249 11.7892,0.0288c0.7727,0.0877 1.6117,-0.3403 1.6677,-1.0064c0.0143,-2.7648 0.0283,-5.5447 0.0288,-8.3095l-4.6293,4.6293c-0.345,0.345 -0.7697,0.4689 -1.2076,0.4888c-0.2122,0.1737 -0.4224,0.3421 -0.6901,0.4313c-0.363,0.121 -0.9248,0.1679 -1.3802,-0.2875c-0.4554,-0.4554 -0.4085,-1.0172 -0.2875,-1.3802c0.0892,-0.2677 0.2576,-0.4779 0.4313,-0.6901c0.0199,-0.4379 0.1438,-0.8626 0.4888,-1.2076l4.6293,-4.6293c-3.5578,-0.0072 -7.1383,0.0034 -10.6963,0z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:fillColor="#ffffff"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt"/>
+    <path
+        android:pathData="M25.0622,21.9798c-0.2382,0.2382 -0.3003,0.5709 -0.2236,0.8743l-0.1017,0.1017c-0.3604,0.3604 -0.5055,0.7957 -0.3253,0.9759c0.1802,0.1802 0.6155,0.0351 0.9759,-0.3253l0.1017,-0.1017c0.3033,0.0766 0.6361,0.0145 0.8743,-0.2236l6.5061,-6.5061c0.3604,-0.3604 0.3604,-0.9408 0,-1.3012c-0.3604,-0.3604 -0.9408,-0.3604 -1.3012,0z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:fillColor="#ffffff"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt"/>
+  </group>
 </vector>
