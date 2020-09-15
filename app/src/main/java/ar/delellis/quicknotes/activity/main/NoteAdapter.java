@@ -56,20 +56,39 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     private Context context;
 
-    private List<Note> notes;
-    private List<Note> notesAll;
+    private List<Note> noteList = new ArrayList<>();
+    private List<Note> noteListFiltered = new ArrayList<>();
 
     private ItemClickListener itemClickListener;
 
-    public NoteAdapter(Context context, List<Note> notes, ItemClickListener itemClickListener) {
+    public NoteAdapter(Context context, ItemClickListener itemClickListener) {
         this.context = context;
-
-        this.notes = notes;
-        this.notesAll = new ArrayList<>(notes);
-
-        performSort();
-
         this.itemClickListener = itemClickListener;
+    }
+
+    public void setNoteList(@NonNull List<Note> noteList) {
+        this.noteList = noteList;
+        this.noteListFiltered = noteList;
+        performSort();
+        notifyDataSetChanged();
+    }
+
+    public int getSortRule() {
+        return sortRule;
+    }
+
+    public void setSortRule(int sortRule) {
+        this.sortRule = sortRule;
+        performSort();
+    }
+
+    public boolean getFirstPinned() {
+        return firstPinned;
+    }
+
+    public void setFirstPinned(boolean firstPinned) {
+        this.firstPinned = firstPinned;
+        performSort();
     }
 
     @NonNull
@@ -81,7 +100,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapter holder, int position) {
-        Note note = notes.get(position);
+        Note note = noteListFiltered.get(position);
         holder.tv_title.setText(Html.fromHtml(note.getTitle().trim()));
         holder.tv_content.setText(Html.fromHtml(note.getContent().trim()));
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
@@ -98,7 +117,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     @Override
     public int getItemCount() {
-        return notes.size();
+        return noteListFiltered.size();
     }
 
     @Override
@@ -114,9 +133,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             List <Note> filteredNotes = new ArrayList<>();
 
             if (charSequence.toString().isEmpty()) {
-                filteredNotes.addAll(notesAll);
+                filteredNotes.addAll(noteList);
             } else {
-                for (Note note: notesAll) {
+                for (Note note: noteList) {
                     String query = charSequence.toString().toLowerCase();
                     if (note.getTitle().toLowerCase().contains(query)) {
                         filteredNotes.add(note);
@@ -132,8 +151,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         //Run on ui thread
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            notes.clear();
-            notes.addAll((Collection<? extends Note>) filterResults.values);
+            noteListFiltered.clear();
+            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
             performSort();
             notifyDataSetChanged();
         }
@@ -151,10 +170,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             List <Note> filteredNotes = new ArrayList<>();
 
             if (charSequence.toString().isEmpty()) {
-                filteredNotes.addAll(notesAll);
+                filteredNotes.addAll(noteList);
             } else {
                 String query = charSequence.toString();
-                for (Note note: notesAll) {
+                for (Note note: noteList) {
                     for (Tag tag: note.getTags()) {
                         if (tag.getName().equals(query)) {
                             filteredNotes.add(note);
@@ -168,8 +187,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         }
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            notes.clear();
-            notes.addAll((Collection<? extends Note>) filterResults.values);
+            noteListFiltered.clear();
+            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
             performSort();
             notifyDataSetChanged();
         }
@@ -185,7 +204,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             FilterResults filterResults = new FilterResults();
             List <Note> filteredNotes = new ArrayList<>();
 
-            for (Note note: notesAll) {
+            for (Note note: noteList) {
                 if (note.getIsShared()) {
                     filteredNotes.add(note);
                 }
@@ -196,8 +215,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         }
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            notes.clear();
-            notes.addAll((Collection<? extends Note>) filterResults.values);
+            noteListFiltered.clear();
+            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
             performSort();
             notifyDataSetChanged();
         }
@@ -213,7 +232,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             FilterResults filterResults = new FilterResults();
             List <Note> filteredNotes = new ArrayList<>();
 
-            for (Note note: notesAll) {
+            for (Note note: noteList) {
                 if (note.getShareWith().size() > 0) {
                     filteredNotes.add(note);
                 }
@@ -224,8 +243,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         }
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            notes.clear();
-            notes.addAll((Collection<? extends Note>) filterResults.values);
+            noteListFiltered.clear();
+            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
             performSort();
             notifyDataSetChanged();
         }
@@ -241,7 +260,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             FilterResults filterResults = new FilterResults();
             List <Note> filteredNotes = new ArrayList<>();
 
-            for (Note note: notesAll) {
+            for (Note note: noteList) {
                 if (note.getIsPinned()) {
                     filteredNotes.add(note);
                 }
@@ -252,8 +271,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         }
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            notes.clear();
-            notes.addAll((Collection<? extends Note>) filterResults.values);
+            noteListFiltered.clear();
+            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
             performSort();
             notifyDataSetChanged();
         }
@@ -296,35 +315,17 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         }
     }
 
-    public int getSortRule() {
-        return sortRule;
-    }
-
-    public void setSortRule(int sortRule) {
-        this.sortRule = sortRule;
-        performSort();
-    }
-
-    public boolean getFirstPinned() {
-        return firstPinned;
-    }
-
-    public void setFirstPinned(boolean firstPinned) {
-        this.firstPinned = firstPinned;
-        performSort();
-    }
-
     private void performSort() {
         if (sortRule == SORT_BY_TITLE) {
-            Collections.sort(notes, Note.ByTitleAZ);
+            Collections.sort(noteListFiltered, Note.ByTitleAZ);
         } else if (sortRule == SORT_BY_CREATED) {
-            Collections.sort(notes, Note.ByLastCreated);
+            Collections.sort(noteListFiltered, Note.ByLastCreated);
         } else if (sortRule == SORT_BY_UPDATED) {
-            Collections.sort(notes, Note.ByLastUpdated);
+            Collections.sort(noteListFiltered, Note.ByLastUpdated);
         }
 
         if (firstPinned) {
-            Collections.sort(notes, Note.ByPinned);
+            Collections.sort(noteListFiltered, Note.ByPinned);
         }
     }
 

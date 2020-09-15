@@ -107,15 +107,6 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
         presenter = new MainPresenter(this);
 
-        noteAdapter = new NoteAdapter(getApplicationContext(), notes, itemClickListener);
-        noteAdapter.notifyDataSetChanged();
-        recyclerView.setAdapter(noteAdapter);
-
-        swipeRefresh = findViewById(R.id.swipe_refresh);
-        swipeRefresh.setOnRefreshListener(
-                () -> presenter.getData()
-        );
-
         itemClickListener = ((view, position) -> {
             Note note = notes.get(position);
 
@@ -124,6 +115,14 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
             startActivityForResult(intent, INTENT_EDIT);
         });
+
+        noteAdapter = new NoteAdapter(getApplicationContext(), itemClickListener);
+        recyclerView.setAdapter(noteAdapter);
+
+        swipeRefresh = findViewById(R.id.swipe_refresh);
+        swipeRefresh.setOnRefreshListener(
+                () -> presenter.getData()
+        );
 
         fab = findViewById(R.id.add);
         fab.setOnClickListener(view ->
@@ -300,9 +299,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     @Override
     public void onGetResult(List<Note> note_list) {
         runOnUiThread(() -> {
-            noteAdapter = new NoteAdapter(getApplicationContext(), note_list, itemClickListener);
-            noteAdapter.notifyDataSetChanged();
-            recyclerView.setAdapter(noteAdapter);
+            noteAdapter.setNoteList(note_list);
 
             // Fill tags.
             tags.clear();
