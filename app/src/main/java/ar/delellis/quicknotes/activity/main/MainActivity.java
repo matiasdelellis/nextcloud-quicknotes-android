@@ -107,6 +107,10 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
         presenter = new MainPresenter(this);
 
+        noteAdapter = new NoteAdapter(getApplicationContext(), notes, itemClickListener);
+        noteAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(noteAdapter);
+
         swipeRefresh = findViewById(R.id.swipe_refresh);
         swipeRefresh.setOnRefreshListener(
                 () -> presenter.getData()
