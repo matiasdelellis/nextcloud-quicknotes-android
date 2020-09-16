@@ -69,6 +69,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     public void setNoteList(@NonNull List<Note> noteList) {
         this.noteList = noteList;
         this.noteListFiltered = noteList;
+
         performSort();
         notifyDataSetChanged();
     }
@@ -83,7 +84,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     public void setSortRule(int sortRule) {
         this.sortRule = sortRule;
+
         performSort();
+        notifyDataSetChanged();
     }
 
     public boolean getFirstPinned() {
@@ -92,7 +95,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     public void setFirstPinned(boolean firstPinned) {
         this.firstPinned = firstPinned;
+
         performSort();
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -157,6 +162,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             noteListFiltered.clear();
             noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
+
             performSort();
             notifyDataSetChanged();
         }
@@ -193,6 +199,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             noteListFiltered.clear();
             noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
+
             performSort();
             notifyDataSetChanged();
         }
@@ -221,6 +228,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             noteListFiltered.clear();
             noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
+
             performSort();
             notifyDataSetChanged();
         }
@@ -249,6 +257,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             noteListFiltered.clear();
             noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
+
             performSort();
             notifyDataSetChanged();
         }
@@ -277,6 +286,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             noteListFiltered.clear();
             noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
+
             performSort();
             notifyDataSetChanged();
         }

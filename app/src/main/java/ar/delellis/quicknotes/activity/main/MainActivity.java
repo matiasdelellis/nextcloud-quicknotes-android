@@ -29,11 +29,13 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import androidx.appcompat.widget.SearchView;
@@ -60,6 +62,9 @@ import ar.delellis.quicknotes.model.Tag;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static ar.delellis.quicknotes.activity.main.NoteAdapter.*;
+import static ar.delellis.quicknotes.activity.main.NoteAdapter.SORT_BY_TITLE;
+import static ar.delellis.quicknotes.activity.main.NoteAdapter.SORT_BY_UPDATED;
 
 public class MainActivity extends AppCompatActivity implements MainView, OnSortingOrderListener {
 
@@ -74,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     public static final String ADAPTER_KEY_ABOUT = "about";
     public static final String ADAPTER_KEY_SWITCH_ACCOUNT = "switch_account";
 
+    private SharedPreferences preferences;
+
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private MaterialCardView homeToolbar;
@@ -85,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
     private MainPresenter presenter;
     private NoteAdapter noteAdapter;
-    private NoteAdapter.ItemClickListener itemClickListener;
+    private ItemClickListener itemClickListener;
 
     NavigationAdapter navigationFilterAdapter;
     NavigationAdapter navigationCommonAdapter;
@@ -100,8 +107,14 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+        int sortRule = preferences.getInt(getString(R.string.setting_sort_by), SORT_BY_UPDATED);
+        boolean pinnedFirst = preferences.getBoolean(getString(R.string.setting_pinned_first), true);
+        boolean gridViewEnabled = preferences.getBoolean(getString(R.string.setting_grid_view_enabled), true);
+
         recyclerView = findViewById(R.id.recycler_view);
-        layoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager = new StaggeredGridLayoutManager(gridViewEnabled ? 2 : 1, StaggeredGridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
         presenter = new MainPresenter(this);
@@ -118,10 +131,11 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         noteAdapter = new NoteAdapter(getApplicationContext(), itemClickListener);
         recyclerView.setAdapter(noteAdapter);
 
+        noteAdapter.setSortRule(sortRule);
+        noteAdapter.setFirstPinned(pinnedFirst);
+
         swipeRefresh = findViewById(R.id.swipe_refresh);
-        swipeRefresh.setOnRefreshListener(
-                () -> presenter.getData()
-        );
+        swipeRefresh.setOnRefreshListener(() -> presenter.getData());
 
         fab = findViewById(R.id.add);
         fab.setOnClickListener(view ->
@@ -169,10 +183,12 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
         AppCompatImageView viewButton = findViewById(R.id.view_mode);
         viewButton.setOnClickListener(view -> {
-            int spanCount = layoutManager.getSpanCount() == 1 ? 2 : 1;
-            layoutManager.setSpanCount(spanCount);
-            viewButton.setImageResource(spanCount == 1 ? R.drawable.ic_view_module : R.drawable.ic_view_list);
+            boolean gridEnabled = layoutManager.getSpanCount() == 1;
+            onGridIconChosen(gridEnabled);
         });
+
+        updateSortingIcon(sortRule);
+        updateGridIcon(gridViewEnabled);
 
         mApi = new ApiProvider(getApplicationContext());
         presenter.getData();
@@ -330,18 +346,35 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
     @Override
     public void onSortingOrderChosen(int sortSelection) {
+        noteAdapter.setSortRule(sortSelection);
+        updateSortingIcon(sortSelection);
+
+        preferences.edit().putInt(getString(R.string.setting_sort_by), sortSelection).apply();
+    }
+
+    public void updateSortingIcon(int sortSelection) {
         AppCompatImageView sortButton = findViewById(R.id.sort_mode);
         switch (sortSelection) {
-            case NoteAdapter.SORT_BY_TITLE:
+            case SORT_BY_TITLE:
                 sortButton.setImageResource(R.drawable.ic_alphabetical_asc);
                 break;
-            case NoteAdapter.SORT_BY_CREATED:
-            case NoteAdapter.SORT_BY_UPDATED:
+            case SORT_BY_CREATED:
+            case SORT_BY_UPDATED:
                 sortButton.setImageResource(R.drawable.ic_modification_asc);
                 break;
         }
-        noteAdapter.setSortRule(sortSelection);
-        noteAdapter.notifyDataSetChanged();
+    }
+
+    public void onGridIconChosen(boolean gridEnabled) {
+        layoutManager.setSpanCount(gridEnabled ? 2 : 1);
+        updateGridIcon(gridEnabled);
+
+        preferences.edit().putBoolean(getString(R.string.setting_grid_view_enabled), gridEnabled).apply();
+    }
+
+    public void updateGridIcon(boolean gridEnabled) {
+        AppCompatImageView viewButton = findViewById(R.id.view_mode);
+        viewButton.setImageResource(gridEnabled ? R.drawable.ic_view_list : R.drawable.ic_view_module);
     }
 
 }
