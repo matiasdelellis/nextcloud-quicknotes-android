@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         noteAdapter.setFirstPinned(pinnedFirst);
 
         swipeRefresh = findViewById(R.id.swipe_refresh);
-        swipeRefresh.setOnRefreshListener(() -> presenter.getData());
+        swipeRefresh.setOnRefreshListener(() -> presenter.getNotes());
 
         fab = findViewById(R.id.add);
         fab.setOnClickListener(view ->
@@ -191,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         updateGridIcon(gridViewEnabled);
 
         mApi = new ApiProvider(getApplicationContext());
-        presenter.getData();
+        presenter.getNotes();
     }
 
     private void setupNavigationMenu() {
@@ -295,9 +295,9 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == INTENT_ADD && resultCode == RESULT_OK) {
-            presenter.getData();
+            presenter.getNotes();
         } else if (requestCode == INTENT_EDIT && resultCode == RESULT_OK) {
-            presenter.getData();
+            presenter.getNotes();
         }
     }
 

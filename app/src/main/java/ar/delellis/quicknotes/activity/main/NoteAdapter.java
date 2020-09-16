@@ -68,7 +68,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     public void setNoteList(@NonNull List<Note> noteList) {
         this.noteList = noteList;
-        this.noteListFiltered = noteList;
+        this.noteListFiltered = new ArrayList<>(noteList);
 
         performSort();
         notifyDataSetChanged();
@@ -110,6 +110,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewAdapter holder, int position) {
         Note note = noteListFiltered.get(position);
+
         holder.tv_title.setText(Html.fromHtml(note.getTitle().trim()));
         holder.tv_content.setText(Html.fromHtml(note.getContent().trim()));
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
