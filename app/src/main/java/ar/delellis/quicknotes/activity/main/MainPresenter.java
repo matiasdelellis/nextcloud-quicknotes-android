@@ -22,6 +22,7 @@
 package ar.delellis.quicknotes.activity.main;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
@@ -44,16 +45,20 @@ public class MainPresenter {
         call.enqueue(new Callback<List<Note>>() {
             @Override
             public void onResponse(@NonNull Call<List<Note>> call, @NonNull Response<List<Note>> response) {
-                view.hideLoading();
-                if (response.isSuccessful() && response.body() != null) {
-                    view.onGetResult(response.body());
-                }
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideLoading();
+                    if (response.isSuccessful() && response.body() != null) {
+                        view.onGetResult(response.body());
+                    }
+                });
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Note>> call, @NonNull Throwable t) {
-                view.hideLoading();
-                view.onErrorLoading(t.getLocalizedMessage());
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideLoading();
+                    view.onErrorLoading(t.getLocalizedMessage());
+                });
             }
         });
     }

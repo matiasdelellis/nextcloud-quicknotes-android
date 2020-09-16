@@ -313,35 +313,33 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
     @Override
     public void onGetResult(List<Note> note_list) {
-        runOnUiThread(() -> {
-            noteAdapter.setNoteList(note_list);
+        noteAdapter.setNoteList(note_list);
 
-            // Fill tags.
-            tags.clear();
-            for (Note note: note_list) {
-                tags.addAll(note.getTags());
-            }
-            HashSet<Tag> hTags = new HashSet<>(tags);
-            tags.clear();
-            tags.addAll(hTags);
+        // Fill tags.
+        tags.clear();
+        for (Note note: note_list) {
+            tags.addAll(note.getTags());
+        }
+        HashSet<Tag> hTags = new HashSet<>(tags);
+        tags.clear();
+        tags.addAll(hTags);
 
-            // Fill colors
-            colors.clear();
-            for (Note note: note_list) {
-                colors.add(note.getColor());
-            }
-            HashSet<String> hColors = new HashSet<>(colors);
-            colors.clear();
-            colors.addAll(hColors);
+        // Fill colors
+        colors.clear();
+        for (Note note: note_list) {
+            colors.add(note.getColor());
+        }
+        HashSet<String> hColors = new HashSet<>(colors);
+        colors.clear();
+        colors.addAll(hColors);
 
-            // Update nav bar.
-            updateNavigationMenu(note_list);
-        });
+        // Update nav bar.
+        updateNavigationMenu(note_list);
     }
 
     @Override
     public void onErrorLoading(String message) {
-        runOnUiThread(() -> Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show());
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
