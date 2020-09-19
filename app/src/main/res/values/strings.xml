@@ -59,4 +59,5 @@
     <string name="setting_sort_by">SETTING_SORT_BY</string>
     <string name="setting_pinned_first">SETTING_PINNED_FIRST</string>
     <string name="setting_grid_view_enabled">SETTING_GRID_VIEW_ENABLED</string>
+    <string name="shared_note">Shared note</string>
 </resources>

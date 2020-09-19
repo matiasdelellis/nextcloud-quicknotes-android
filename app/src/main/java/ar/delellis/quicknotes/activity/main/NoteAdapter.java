@@ -114,6 +114,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         holder.tv_title.setText(Html.fromHtml(note.getTitle().trim()));
         holder.tv_content.setText(Html.fromHtml(note.getContent().trim()));
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
+        holder.im_shared.setVisibility(note.getIsShared() ? View.VISIBLE : View.GONE);
         holder.im_pinned.setVisibility(note.getIsPinned() ? View.VISIBLE : View.GONE);
 
         holder.tagAdapter.setItems(note.getTags());
@@ -296,6 +297,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     class RecyclerViewAdapter extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView tv_title, tv_content;
         CardView card_item;
+        ImageView im_shared;
         ImageView im_pinned;
 
         TagAdapter tagAdapter;
@@ -312,6 +314,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             card_item = itemView.findViewById(R.id.card_item);
             tv_title = itemView.findViewById(R.id.title);
             tv_content = itemView.findViewById(R.id.content);
+            im_shared = itemView.findViewById(R.id.shared);
             im_pinned = itemView.findViewById(R.id.pinned);
 
             tagAdapter = new TagAdapter();

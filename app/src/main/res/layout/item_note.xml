@@ -58,6 +58,14 @@
             android:src="@drawable/ic_pinned"
             android:layout_alignEnd="@id/title"/>
 
+        <ImageView
+            android:id="@+id/shared"
+            android:contentDescription="@string/shared_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_shared_grey"
+            android:layout_alignEnd="@id/title"/>
+
         <TextView
             android:id="@+id/content"
             android:layout_below="@id/title"
