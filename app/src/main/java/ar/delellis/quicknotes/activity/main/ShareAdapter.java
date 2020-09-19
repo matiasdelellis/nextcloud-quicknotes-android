@@ -34,7 +34,6 @@ import java.util.List;
 
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Share;
-import ar.delellis.quicknotes.model.Tag;
 
 public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> {
 

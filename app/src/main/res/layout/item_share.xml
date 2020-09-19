@@ -30,8 +30,9 @@
     android:layout_marginRight="2dp"
     android:layout_marginTop="1dp"
     android:layout_marginBottom="1dp"
-    app:cardCornerRadius="5dp"
-    app:cardElevation="1dp">
+    app:cardCornerRadius="50dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/badge_background">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="wrap_content"
@@ -44,13 +45,15 @@
             android:contentDescription="@string/share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_share_small"
-            android:layout_gravity="center"/>
+            android:layout_marginEnd="2dp"
+            android:src="@drawable/ic_user_small"
+            android:layout_gravity="center"
+            app:tint="@color/defaultNoteTint" />
 
         <TextView
             android:id="@+id/share_user"
             android:text="@string/share"
-            android:textSize="@dimen/secondary_font_size"
+            android:textSize="@dimen/note_font_size_small"
             android:textColor="@android:color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

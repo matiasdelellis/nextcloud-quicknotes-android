@@ -29,11 +29,10 @@
 
     <color name="defaultBrand">#0082C9</color>
 
-    <color name="cursorHandles">#555566</color>
-    <color name="defaultTextHighlightBackground">#2233334a</color>
+    <color name="note_font_color_default">#202124</color>
 
-    <color name="bg_highlighted">#eee</color>
-    <color name="bg_normal">@color/primary</color>
+    <color name="badge_background">#14000000</color>
+
     <color name="bg_attention">#d40000</color>
     <color name="bg_warning">#ffcc00</color>
     <color name="fg_default">#000000</color>
@@ -48,7 +47,7 @@
     <color name="widget_fg_default">#000000</color>
     <color name="widget_fg_contrast">#ffffff</color>
 
-    <color name="category_background">@color/bg_normal</color>
+    <color name="category_background">@color/badge_background</color>
     <color name="category_border">@color/defaultBrand</color>
 
     <color name="appbar">@android:color/white</color>

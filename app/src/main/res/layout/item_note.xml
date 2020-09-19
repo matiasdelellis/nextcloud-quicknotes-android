@@ -45,8 +45,9 @@
         <TextView
             android:id="@+id/title"
             android:text="@string/enter_title"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
+            android:textSize="@dimen/note_font_size_medium"
+            android:textStyle="bold"
+            android:textColor="@color/note_font_color_default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -56,7 +57,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_pinned"
-            android:layout_alignEnd="@id/title"/>
+            android:layout_alignEnd="@id/title"
+            app:tint="@color/defaultNoteTint" />
 
         <ImageView
             android:id="@+id/shared"
@@ -64,13 +66,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_shared_grey"
-            android:layout_alignEnd="@id/title"/>
+            android:layout_alignEnd="@id/title"
+            app:tint="@color/defaultNoteTint" />
 
         <TextView
             android:id="@+id/content"
             android:layout_below="@id/title"
             android:text="@string/enter_note"
-            android:textColor="@android:color/black"
+            android:textSize="@dimen/note_font_size_normal"
+            android:textColor="@color/note_font_color_default"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"

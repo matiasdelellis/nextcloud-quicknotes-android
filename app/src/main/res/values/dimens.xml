@@ -41,11 +41,9 @@
     <!-- Buttons -->
     <dimen name="button_padding">@dimen/spacer_2x</dimen>
 
-    <dimen name="primary_font_size">16sp</dimen>
-    <dimen name="secondary_font_size">14sp</dimen>
-
     <!-- Font Sizes -->
-    <dimen name="note_font_size_small">16sp</dimen>
+    <dimen name="note_font_size_small">12sp</dimen>
+    <dimen name="note_font_size_normal">14sp</dimen>
     <dimen name="note_font_size_medium">18sp</dimen>
     <dimen name="note_font_size_large">22sp</dimen>
 
