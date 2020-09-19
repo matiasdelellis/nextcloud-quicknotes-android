@@ -25,7 +25,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class Note implements Serializable {
     @SerializedName("content") private String content;
 
     @Expose
-    @SerializedName("ispinned") private boolean is_pinned;
+    @SerializedName("isPinned") private boolean is_pinned;
 
     @Expose
     @SerializedName("color") private String color;
@@ -49,16 +48,16 @@ public class Note implements Serializable {
     @SerializedName("timestamp") private int timestamp;
 
     @Expose
-    @SerializedName("shared_with") private List<Share> share_with;
+    @SerializedName("sharedWith") private List<Share> share_with;
 
     @Expose
-    @SerializedName("is_shared") private boolean is_shared;
+    @SerializedName("sharedBy") private List<Share> share_by;
 
     @Expose
     @SerializedName("tags") private List<Tag> tags;
 
     @Expose
-    @SerializedName("attachts") private List<Attachment> attachts;
+    @SerializedName("attachments") private List<Attachment> attachments;
 
     public int getId() {
         return id;
@@ -116,12 +115,12 @@ public class Note implements Serializable {
         this.share_with = share;
     }
 
-    public boolean getIsShared() {
-        return is_shared;
+    public List<Share> getShareBy() {
+        return share_by;
     }
 
-    public void setIsShared(boolean is_shared) {
-        this.is_shared = is_shared;
+    public void setShareBy(List<Share> share) {
+        this.share_by = share;
     }
 
     public List<Tag> getTags() {
@@ -132,12 +131,16 @@ public class Note implements Serializable {
         this.tags = tags;
     }
 
-    public List<Attachment> getAttachts() {
-        return attachts;
+    public List<Attachment> getAttachtments() {
+        return attachments;
     }
 
-    public void setAttachts(List<Attachment> attachts) {
-        this.attachts = attachts;
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
+    }
+
+    public boolean getIsShared() {
+        return share_by != null && !share_by.isEmpty();
     }
 
     public static Comparator<Note> ByTitleAZ = (note, t1) -> note.title.compareTo(t1.title);
