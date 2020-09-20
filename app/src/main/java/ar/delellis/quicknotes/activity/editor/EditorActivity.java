@@ -32,7 +32,6 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -57,6 +56,7 @@ import ar.delellis.quicknotes.activity.main.ShareAdapter;
 import ar.delellis.quicknotes.activity.main.TagAdapter;
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
+import ar.delellis.quicknotes.util.ColorUtil;
 
 public class EditorActivity extends AppCompatActivity implements EditorView {
 
@@ -141,19 +141,21 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        int tintColor = this.getResources().getColor(R.color.defaultNoteTint);
+
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_editor, menu);
 
         MenuItem deleteItem = menu.findItem(R.id.delete);
         deleteItem.setVisible(note.getId() != 0 && !note.getIsShared());
-        tintMenuIcon(this, deleteItem, R.color.defaultNoteTint);
+        ColorUtil.menuItemTintColor(deleteItem, tintColor);
 
         MenuItem pinItem = menu.findItem(R.id.pin);
         pinItem.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
         pinItem.setVisible(!note.getIsShared());
-        tintMenuIcon(this, pinItem, R.color.defaultNoteTint);
+        ColorUtil.menuItemTintColor(pinItem, tintColor);
 
-        tintMenuIcon(this, menu.findItem(R.id.save), R.color.defaultNoteTint);
+        ColorUtil.menuItemTintColor(menu.findItem(R.id.save), tintColor);
 
         return true;
     }
@@ -164,7 +166,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             case R.id.pin:
                 note.setIsPinned(!note.getIsPinned());
                 item.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
-                tintMenuIcon(this, item, R.color.defaultNoteTint);
+                ColorUtil.menuItemTintColor(item, this.getResources().getColor(R.color.defaultNoteTint));
                 return true;
             case R.id.save:
                 if (note.getIsShared()) {
@@ -282,7 +284,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             int defaultColor = getResources().getColor(R.color.defaultNoteColor);
             et_content.getRootView().setBackgroundColor(defaultColor);
             palette.setSelectedColor(defaultColor);
-            note.setColor(String.format("#%06X", (0xFFFFFF & defaultColor)));
+            note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
 
             // Focus to title and edit
             et_title.requestFocus();
@@ -304,14 +306,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_content.setFocusable(false);
         palette.setVisibility(View.GONE);
         rich_toolbar.setVisibility(View.GONE);
-    }
-
-    private void tintMenuIcon(Context context, MenuItem item, int color) {
-        Drawable normalDrawable = item.getIcon();
-        Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
-        DrawableCompat.setTint(wrapDrawable,  context.getResources().getColor(color));
-
-        item.setIcon(wrapDrawable);
     }
 
     private void closeEdition () {

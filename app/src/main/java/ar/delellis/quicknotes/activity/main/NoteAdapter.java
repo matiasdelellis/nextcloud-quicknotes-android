@@ -44,6 +44,7 @@ import java.util.List;
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
+import ar.delellis.quicknotes.util.ColorUtil;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAdapter> implements Filterable {
 
@@ -55,6 +56,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     private boolean firstPinned = true;
 
     private Context context;
+    int tintColor;
 
     private List<Note> noteList = new ArrayList<>();
     private List<Note> noteListFiltered = new ArrayList<>();
@@ -64,6 +66,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     public NoteAdapter(Context context, ItemClickListener itemClickListener) {
         this.context = context;
         this.itemClickListener = itemClickListener;
+
+        this.tintColor = context.getResources().getColor(R.color.defaultNoteTint);
     }
 
     public void setNoteList(@NonNull List<Note> noteList) {
@@ -124,6 +128,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         holder.shareAdapter.setItems(note.getShareWith());
         holder.shareAdapter.notifyDataSetChanged();
         holder.shareRecyclerView.setAdapter(holder.shareAdapter);
+
+        ColorUtil.imageViewTintColor(holder.im_shared, tintColor);
+        ColorUtil.imageViewTintColor(holder.im_pinned, tintColor);
     }
 
     @Override
