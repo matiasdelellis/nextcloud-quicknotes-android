@@ -28,8 +28,6 @@ import ar.delellis.quicknotes.model.Note;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -41,12 +39,9 @@ public interface API {
     @GET("/notes")
     Call<List<Note>> getNotes();
 
-    @FormUrlEncoded
     @POST("/notes")
     Call<Note> create(
-            @Field("title") String title,
-            @Field("content") String content,
-            @Field("color") String color
+            @Body Note note
     );
 
     @PUT("/notes/{id}")

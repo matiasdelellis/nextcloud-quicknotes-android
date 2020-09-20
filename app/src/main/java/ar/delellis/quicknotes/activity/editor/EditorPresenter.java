@@ -22,6 +22,7 @@
 package ar.delellis.quicknotes.activity.editor;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
@@ -40,22 +41,26 @@ public class EditorPresenter {
     void createNote(Note note) {
         view.showProgress();
 
-        Call<Note> call = ApiProvider.getAPI().create(note.getTitle(), note.getContent(), note.getColor());
+        Call<Note> call = ApiProvider.getAPI().create(note);
         call.enqueue(new Callback<Note>() {
             @Override
             public void onResponse(Call<Note> call, Response<Note> response) {
-                view.hideProgress();
-                if (response.isSuccessful() && response.body() != null) {
-                    view.onRequestSuccess(String.format("Save new note: %s", response.body().getTitle()));
-                } else {
-                    view.onRequestError("Error");
-                }
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
+                    if (response.isSuccessful() && response.body() != null) {
+                        view.onRequestSuccess(String.format("Save new note: %s", response.body().getTitle()));
+                    } else {
+                        view.onRequestError("Error");
+                    }
+                });
             }
 
             @Override
             public void onFailure(Call<Note> call, Throwable t) {
-                view.hideProgress();
-                view.onRequestError(t.getLocalizedMessage());
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
+                    view.onRequestError(t.getLocalizedMessage());
+                });
             }
         });
     }
@@ -67,19 +72,23 @@ public class EditorPresenter {
         call.enqueue(new Callback<Note>() {
             @Override
             public void onResponse(@NonNull Call<Note> call, @NonNull Response<Note> response) {
-                view.hideProgress();
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
 
-                if (response.isSuccessful() && response.body() != null) {
-                    view.onRequestSuccess(String.format("Note '%s' saved", response.body().getTitle()));
-                } else {
-                    view.onRequestError("Error");
-                }
+                    if (response.isSuccessful() && response.body() != null) {
+                        view.onRequestSuccess(String.format("Note '%s' saved", response.body().getTitle()));
+                    } else {
+                        view.onRequestError("Error");
+                    }
+                });
             }
 
             @Override
             public void onFailure(@NonNull Call<Note> call, @NonNull Throwable t) {
-                view.hideProgress();
-                view.onRequestError(t.getLocalizedMessage());
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
+                    view.onRequestError(t.getLocalizedMessage());
+                });
             }
         });
 
@@ -92,13 +101,17 @@ public class EditorPresenter {
         call.enqueue(new Callback<Note>() {
             @Override
             public void onResponse(@NonNull Call<Note> call, @NonNull Response<Note> response) {
-                view.hideProgress();
-                view.onRequestSuccess("Note deleted...");
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
+                    view.onRequestSuccess("Note deleted...");
+                });
             }
             @Override
             public void onFailure(@NonNull Call<Note> call, @NonNull Throwable t) {
-                view.hideProgress();
-                view.onRequestError(t.getLocalizedMessage());
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
+                    view.onRequestError(t.getLocalizedMessage());
+                });
             }
         });
 

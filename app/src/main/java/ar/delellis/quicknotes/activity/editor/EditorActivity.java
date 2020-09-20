@@ -145,18 +145,14 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         inflater.inflate(R.menu.menu_editor, menu);
 
         MenuItem deleteItem = menu.findItem(R.id.delete);
-        MenuItem pinItem = menu.findItem(R.id.pin);
-        if (note.getId() != 0) {
-            deleteItem.setVisible(!note.getIsShared());
-            pinItem.setVisible(!note.getIsShared());
-            pinItem.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
-        } else {
-            deleteItem.setVisible(false);
-            pinItem.setVisible(false);
-        }
-
+        deleteItem.setVisible(note.getId() != 0 && !note.getIsShared());
         tintMenuIcon(this, deleteItem, R.color.defaultNoteTint);
+
+        MenuItem pinItem = menu.findItem(R.id.pin);
+        pinItem.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
+        pinItem.setVisible(!note.getIsShared());
         tintMenuIcon(this, pinItem, R.color.defaultNoteTint);
+
         tintMenuIcon(this, menu.findItem(R.id.save), R.color.defaultNoteTint);
 
         return true;
@@ -168,6 +164,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             case R.id.pin:
                 note.setIsPinned(!note.getIsPinned());
                 item.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
+                tintMenuIcon(this, item, R.color.defaultNoteTint);
                 return true;
             case R.id.save:
                 if (note.getIsShared()) {
@@ -249,16 +246,14 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     @Override
     public void onRequestSuccess(String message) {
-        runOnUiThread(() -> {
-            Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
-            setResult(RESULT_OK);
-            finish();
-        });
+        Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
+        setResult(RESULT_OK);
+        finish();
     }
 
     @Override
     public void onRequestError(String message) {
-        runOnUiThread(() -> Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show());
+        Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     private void setDataFromIntentExtra() {
@@ -284,8 +279,13 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             }
         } else {
             // Default color.
-            et_content.getRootView().setBackgroundColor(getResources().getColor(R.color.defaultNoteColor));
-            palette.setSelectedColor(getResources().getColor(R.color.defaultNoteColor));
+            int defaultColor = getResources().getColor(R.color.defaultNoteColor);
+            et_content.getRootView().setBackgroundColor(defaultColor);
+            palette.setSelectedColor(defaultColor);
+            note.setColor(String.format("#%06X", (0xFFFFFF & defaultColor)));
+
+            // Focus to title and edit
+            et_title.requestFocus();
             editMode();
         }
     }
