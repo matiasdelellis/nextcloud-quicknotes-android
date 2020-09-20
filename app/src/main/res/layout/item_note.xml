@@ -35,7 +35,8 @@
     app:cardElevation="1dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:foreground="?android:attr/selectableItemBackground"
+    tools:backgroundTint="@color/defaultNoteColor">
 
     <RelativeLayout
         android:padding="12dp"
@@ -44,7 +45,7 @@
 
         <TextView
             android:id="@+id/title"
-            android:text="@string/enter_title"
+            tools:text="@tools:sample/cities"
             android:textSize="@dimen/note_font_size_medium"
             android:textStyle="bold"
             android:textColor="@color/note_font_color_default"
@@ -72,7 +73,7 @@
         <TextView
             android:id="@+id/content"
             android:layout_below="@id/title"
-            android:text="@string/enter_note"
+            tools:text="@tools:sample/lorem/random"
             android:textSize="@dimen/note_font_size_normal"
             android:textColor="@color/note_font_color_default"
             android:layout_width="match_parent"
