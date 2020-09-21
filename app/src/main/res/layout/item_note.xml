@@ -43,36 +43,46 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/title"
-            tools:text="@tools:sample/cities"
-            android:textSize="@dimen/note_font_size_medium"
-            android:textStyle="bold"
-            android:textColor="@color/note_font_color_default"
+        <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <ImageView
-            android:id="@+id/pinned"
-            android:contentDescription="@string/pinned"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_pinned"
-            android:layout_alignEnd="@id/title"
-            app:tint="@color/defaultNoteTint" />
+            android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/shared"
-            android:contentDescription="@string/shared_note"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_shared_grey"
-            android:layout_alignEnd="@id/title"
-            app:tint="@color/defaultNoteTint" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/note_font_size_medium"
+                android:textColor="@color/note_font_color_default"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_weight="1"
+                tools:text="@tools:sample/lorem/random"/>
+
+            <ImageView
+                android:id="@+id/pinned"
+                android:contentDescription="@string/pinned"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_pinned"
+                app:tint="@color/defaultNoteTint" />
+
+            <ImageView
+                android:id="@+id/shared"
+                android:contentDescription="@string/shared_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_shared_grey"
+                app:tint="@color/defaultNoteTint" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/content"
-            android:layout_below="@id/title"
+            android:layout_below="@id/header"
             tools:text="@tools:sample/lorem/random"
             android:textSize="@dimen/note_font_size_normal"
             android:textColor="@color/note_font_color_default"
