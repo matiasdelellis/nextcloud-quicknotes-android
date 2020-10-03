@@ -6,16 +6,16 @@
  * @author Matias De lellis <mati86dl@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
+ * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * at your option) any later version.
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License
+ * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -52,6 +52,7 @@ import java.util.List;
 
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.activity.LoginActivity;
+import ar.delellis.quicknotes.activity.about.AboutActivity;
 import ar.delellis.quicknotes.activity.editor.EditorActivity;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.NavigationItem;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.TagNavigationItem;
@@ -219,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         navigationCommonAdapter = new NavigationAdapter(this, item -> {
             if (item.id.equals(ADAPTER_KEY_SWITCH_ACCOUNT)) {
                 switch_account();
+            } else if (item.id.equals(ADAPTER_KEY_ABOUT)) {
+                startActivity(new Intent(this, AboutActivity.class));
             } else {
                 Toast.makeText(MainActivity.this, "Selected " + item.label, Toast.LENGTH_SHORT).show();
             }
