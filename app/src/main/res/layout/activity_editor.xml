@@ -62,6 +62,8 @@
                 android:hint="@string/new_note"
                 android:minLines="5"
                 app:backgroundColor="@color/transparent"
+                app:quoteBackground="@color/defaultNoteTint"
+                app:quoteBackgroundAlpha="5%"
                 app:textColor="@color/defaultNoteTint"
                 app:bulletColor="@color/defaultNoteTint"
                 app:lineSpacingExtra="10dp"
