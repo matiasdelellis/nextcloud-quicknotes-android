@@ -52,8 +52,8 @@ import com.imagine.colorpalette.ColorPalette;
 import java.util.Objects;
 
 import ar.delellis.quicknotes.R;
-import ar.delellis.quicknotes.activity.main.ShareAdapter;
-import ar.delellis.quicknotes.activity.main.TagAdapter;
+import ar.delellis.quicknotes.shared.ShareAdapter;
+import ar.delellis.quicknotes.shared.TagAdapter;
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.util.ColorUtil;

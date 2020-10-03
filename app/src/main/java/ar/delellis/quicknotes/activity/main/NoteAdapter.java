@@ -46,6 +46,8 @@ import java.util.List;
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
+import ar.delellis.quicknotes.shared.ShareAdapter;
+import ar.delellis.quicknotes.shared.TagAdapter;
 import ar.delellis.quicknotes.util.ColorUtil;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAdapter> implements Filterable {

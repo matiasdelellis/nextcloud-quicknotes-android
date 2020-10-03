@@ -19,7 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ar.delellis.quicknotes.activity.main;
+package ar.delellis.quicknotes.shared;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,52 +33,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.delellis.quicknotes.R;
-import ar.delellis.quicknotes.model.Share;
+import ar.delellis.quicknotes.model.Tag;
 
-public class ShareAdapter extends RecyclerView.Adapter<ShareAdapter.ViewHolder> {
+public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
 
     class ViewHolder extends RecyclerView.ViewHolder {
         @NonNull
         private final View view;
 
         @NonNull
-        private final TextView user;
+        private final TextView name;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             view = itemView;
 
-            this.user = itemView.findViewById(R.id.share_user);
+            this.name = itemView.findViewById(R.id.tag_name);
         }
 
-        private void bind(@NonNull Share share) {
-            user.setText(share.getSharedUser());
+        private void bind(@NonNull Tag tag) {
+            name.setText(tag.getName());
         }
 
     }
 
     @NonNull
-    private List<Share> shares = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_share, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tag, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(shares.get(position));
+        holder.bind(tags.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return shares.size();
+        return tags.size();
     }
 
-    public void setItems(@NonNull List<Share> shares) {
-        this.shares = shares;
+    public void setItems(@NonNull List<Tag> tags) {
+        this.tags = tags;
         notifyDataSetChanged();
     }
 }

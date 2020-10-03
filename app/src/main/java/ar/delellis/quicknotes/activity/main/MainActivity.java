@@ -51,7 +51,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import ar.delellis.quicknotes.R;
-import ar.delellis.quicknotes.activity.LoginActivity;
+import ar.delellis.quicknotes.activity.login.LoginActivity;
 import ar.delellis.quicknotes.activity.about.AboutActivity;
 import ar.delellis.quicknotes.activity.editor.EditorActivity;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.NavigationItem;
