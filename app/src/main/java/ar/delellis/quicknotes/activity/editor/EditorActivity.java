@@ -261,7 +261,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     private void setDataFromIntentExtra() {
         if (note.getId() != 0) {
             et_title.setText(Html.fromHtml(note.getTitle()));
-            et_content.fromHtml(note.getContent(), true);
+            et_content.fromHtml(note.getContent().trim(), true);
             et_content.getRootView().setBackgroundColor(Color.parseColor(note.getColor()));
 
             tagAdapter.setItems(note.getTags());

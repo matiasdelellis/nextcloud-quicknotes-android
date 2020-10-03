@@ -80,16 +80,21 @@
 
         </LinearLayout>
 
-        <TextView
+        <org.wordpress.aztec.AztecText
             android:id="@+id/content"
             android:layout_below="@id/header"
-            tools:text="@tools:sample/lorem/random"
-            android:textSize="@dimen/note_font_size_normal"
-            android:textColor="@color/note_font_color_default"
-            android:layout_width="match_parent"
+            android:inputType="textNoSuggestions|textMultiLine"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            />
+            app:backgroundColor="@color/transparent"
+            app:quoteBackground="@color/defaultNoteTint"
+            app:quoteBackgroundAlpha="5%"
+            app:textColor="@color/defaultNoteTint"
+            app:bulletColor="@color/defaultNoteTint"
+            app:blockVerticalPadding="1dp"
+            tools:text="@tools:sample/lorem/random">
+        </org.wordpress.aztec.AztecText>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerShares"

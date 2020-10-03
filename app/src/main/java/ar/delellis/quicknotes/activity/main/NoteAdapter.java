@@ -36,6 +36,8 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.wordpress.aztec.AztecText;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -116,7 +118,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         Note note = noteListFiltered.get(position);
 
         holder.tv_title.setText(Html.fromHtml(note.getTitle().trim()));
-        holder.tv_content.setText(Html.fromHtml(note.getContent().trim()));
+        holder.tv_content.fromHtml(note.getContent().trim(), true);
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
         holder.im_shared.setVisibility(note.getIsShared() ? View.VISIBLE : View.GONE);
         holder.im_pinned.setVisibility(note.getIsPinned() ? View.VISIBLE : View.GONE);
@@ -302,8 +304,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     };
 
     class RecyclerViewAdapter extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView tv_title, tv_content;
         CardView card_item;
+        TextView tv_title;
+        AztecText tv_content;
         ImageView im_shared;
         ImageView im_pinned;
 
@@ -332,6 +335,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
             this.itemClickListener = itemClickListener;
             card_item.setOnClickListener(this);
+
+            tv_content.setOnClickListener(this);
         }
 
         @Override
