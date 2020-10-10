@@ -25,12 +25,8 @@
     <string name="enter_note">Enter a note…</string>
     <string name="save">Save</string>
     <string name="please_wait">Please wait…</string>
-    <string name="error">Error</string>
     <string name="enter_title">Please enter a title</string>
-    <string name="take_first_notes">Nothing here. Take your first quick notes.</string>
-    <string name="edit_note">Edit note</string>
     <string name="delete_note">Delete note</string>
-    <string name="update_note">Update Note</string>
     <string name="nextcloud_quicknotes">Nextcloud Quicknotes</string>
     <string name="list_mode">List</string>
     <string name="search_in_all">Search all notes</string>
@@ -39,7 +35,6 @@
     <string name="shared_with_you">Shared with you</string>
     <string name="choose_account">Choose account</string>
     <string name="welcome_quicknotes">Welcome to Nextcloud Quicknotes</string>
-    <string name="favorites">Favorites</string>
     <string name="switch_account">Switch account</string>
     <string name="about">About</string>
     <string name="new_note">New note</string>
@@ -48,13 +43,10 @@
     <string name="tags">Tags</string>
     <string name="tag">Tag</string>
     <string name="share">Share</string>
-    <string name="actionbar_sort">Sort</string>
     <string name="sort_by">Sort by</string>
     <string name="menu_item_sort_by_title_a_z">A - Z</string>
     <string name="menu_item_sort_by_date_newest_first">Newest first</string>
     <string name="menu_item_sort_by_date_updated_first">Updated first</string>
-    <string name="sort_by_name_ascending">A - Z</string>
-    <string name="pinned_first">Pinned first</string>
     <string name="common_cancel">Cancel</string>
     <string name="setting_sort_by">SETTING_SORT_BY</string>
     <string name="setting_pinned_first">SETTING_PINNED_FIRST</string>

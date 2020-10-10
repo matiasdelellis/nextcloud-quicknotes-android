@@ -25,9 +25,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_list_view"
-    android:background="@color/primary"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimary">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -69,7 +69,6 @@
                 android:layout_marginTop="@dimen/spacer_1hx"
                 android:layout_marginEnd="@dimen/spacer_2x"
                 android:layout_marginBottom="@dimen/spacer_1hx"
-                app:cardBackgroundColor="@color/appbar"
                 app:cardCornerRadius="@dimen/spacer_1x"
                 app:cardElevation="2dp"
                 app:strokeWidth="0dp">
@@ -150,7 +149,7 @@
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
                 app:spanCount="2"
-                tools:itemCount="3"
+                tools:itemCount="1"
                 tools:listitem="@layout/item_note">
             </androidx.recyclerview.widget.RecyclerView>
 

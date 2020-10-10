@@ -28,7 +28,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -43,8 +42,7 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
 
     @NonNull
     private final Context context;
-    @ColorInt
-    private int mainColor;
+
     @DrawableRes
     public static final int ICON_HOME = R.drawable.ic_time_grey;
     @DrawableRes
@@ -106,18 +104,14 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
         private void bind(@NonNull NavigationItem item) {
             currentItem = item;
             boolean isSelected = item.id.equals(selectedItem);
+
             name.setText(item.label);
-            if (item.icon > 0) {
-                icon.setImageDrawable(DrawableCompat.wrap(icon.getResources().getDrawable(item.icon)));
-                icon.setVisibility(View.VISIBLE);
-            } else {
-                icon.setVisibility(View.GONE);
-            }
+            icon.setImageDrawable(DrawableCompat.wrap(icon.getResources().getDrawable(item.icon)));
 
-            int textColor = isSelected ? mainColor : view.getResources().getColor(R.color.fg_default);
+            int tintColor = isSelected ? view.getResources().getColor(R.color.defaultBrand) : view.getResources().getColor(R.color.fg_default_selection);
 
-            name.setTextColor(textColor);
-            icon.setColorFilter(textColor);
+            name.setTextColor(tintColor);
+            icon.setColorFilter(tintColor);
 
             view.setSelected(isSelected);
         }
@@ -136,7 +130,6 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
 
     public NavigationAdapter(@NonNull Context context, @NonNull ClickListener clickListener) {
         this.context = context;
-        this.mainColor = R.color.defaultBrand; // TODO: Must be dynamic..
         this.clickListener = clickListener;
     }
 

@@ -46,6 +46,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
 repositories {
     // Needed for Nextcloud SSO
     maven { url "https://jitpack.io" }

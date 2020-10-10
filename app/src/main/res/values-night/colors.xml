@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Nextcloud Quicknotes Android client application.
   ~
@@ -20,23 +21,7 @@
   -->
 
 <resources>
-    <!-- Base application theme. -->
-    <style name="BaseTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
-    </style>
-
-    <style name="AppTheme" parent="BaseTheme"/>
-
-    <style name="SplashTheme" parent="BaseTheme">
-        <!-- Customize your theme here. -->
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
-    </style>
-
-    <style name="EditorTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@android:color/transparent</item>
-    </style>
-
+    <!-- Colors -->
+    <color name="fg_default_selection">#cccccc</color>
+    <color name="bg_highlighted">#2a2a2a</color>
 </resources>

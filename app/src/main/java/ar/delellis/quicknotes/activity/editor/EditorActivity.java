@@ -35,12 +35,14 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -98,6 +100,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        }
+
         ActionMenuView actionMenuView =  findViewById(R.id.rich_action_menu);
         Menu actionMenu = actionMenuView.getMenu();
         getMenuInflater().inflate(R.menu.rich_editor, actionMenu);
@@ -118,6 +124,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         // Color selection
         palette.setListener(color_hex -> {
             et_content.getRootView().setBackgroundColor(Color.parseColor(color_hex));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.parseColor(color_hex));
+            }
             note.setColor(color_hex);
         });
 
@@ -264,6 +273,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             et_content.fromHtml(note.getContent().trim(), true);
             et_content.getRootView().setBackgroundColor(Color.parseColor(note.getColor()));
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(Color.parseColor(note.getColor()));
+            }
+
             tagAdapter.setItems(note.getTags());
             tagAdapter.notifyDataSetChanged();
             tagRecyclerView.setAdapter(tagAdapter);
@@ -285,6 +298,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             et_content.getRootView().setBackgroundColor(defaultColor);
             palette.setSelectedColor(defaultColor);
             note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(defaultColor);
+            }
 
             // Focus to title and edit
             et_title.requestFocus();

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Nextcloud Quicknotes Android client application.
   ~
@@ -19,15 +20,18 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<vector
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="16dp"
-    android:height="16dp"
-    android:viewportHeight="16"
-    android:viewportWidth="16"
-    android:tint="#757575">
-  <path
-      android:fillColor="#FF000000"
-      android:pathData="m11.572,2.4a1.4286,1.4 0,0 0,-1.4286 -1.4h-4.2857c-0.7857,0 -1.4286,0.63 -1.4286,1.4v4.9l-1.4286,2.1v1.4h4.2857v3.5l0.7143,0.7 0.7143,-0.7v-3.5h4.2857v-1.4l-1.4286,-2.1z"
-      android:strokeWidth=".70711"/>
-</vector>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:left="@dimen/spacer_1x"
+    android:right="@dimen/spacer_1x">
+
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/bg_highlighted" />
+        </shape>
+    </item>
+
+    <item>
+        <shape android:shape="rectangle"/>
+    </item>
+
+</selector>

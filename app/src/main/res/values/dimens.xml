@@ -47,20 +47,6 @@
     <dimen name="note_font_size_medium">18sp</dimen>
     <dimen name="note_font_size_large">22sp</dimen>
 
-    <!-- Widgets -->
-    <dimen name="widget_margin">@dimen/spacer_1x</dimen>
-    <dimen name="widget_single_note_padding">10dp</dimen>
-
-    <dimen name="widget_note_list_hdr_padding">2dp</dimen>
-    <dimen name="widget_note_list_header_height">36dp</dimen>
-    <dimen name="widget_note_list_icon_width">30dp</dimen>
-
-    <dimen name="widget_note_list_outer_padding">4dp</dimen>
-    <dimen name="widget_note_list_inner_padding">4dp</dimen>
-
-    <dimen name="widget_note_list_fav_icon_width">26dp</dimen>
-    <dimen name="widget_note_list_fav_icon_height">20dp</dimen>
-
     <dimen name="zero">0dp</dimen>
     <dimen name="standard_margin">16dp</dimen>
     <dimen name="standard_half_margin">8dp</dimen>
