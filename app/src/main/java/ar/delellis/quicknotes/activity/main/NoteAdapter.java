@@ -46,6 +46,7 @@ import java.util.List;
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
+import ar.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.delellis.quicknotes.shared.ShareAdapter;
 import ar.delellis.quicknotes.shared.TagAdapter;
 import ar.delellis.quicknotes.util.ColorUtil;
@@ -124,6 +125,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
         holder.im_shared.setVisibility(note.getIsShared() ? View.VISIBLE : View.GONE);
         holder.im_pinned.setVisibility(note.getIsPinned() ? View.VISIBLE : View.GONE);
+
+        holder.attachmentAdapter.setItems(note.getAttachtments());
+        holder.attachmentAdapter.notifyDataSetChanged();
+        holder.attachmentRecyclerView.setAdapter(holder.attachmentAdapter);
 
         holder.tagAdapter.setItems(note.getTags());
         holder.tagAdapter.notifyDataSetChanged();
@@ -312,6 +317,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         ImageView im_shared;
         ImageView im_pinned;
 
+        AttachmentAdapter attachmentAdapter;
+        RecyclerView attachmentRecyclerView;
+
         TagAdapter tagAdapter;
         RecyclerView tagRecyclerView;
 
@@ -328,6 +336,9 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             tv_content = itemView.findViewById(R.id.content);
             im_shared = itemView.findViewById(R.id.shared);
             im_pinned = itemView.findViewById(R.id.pinned);
+
+            attachmentAdapter = new AttachmentAdapter();
+            attachmentRecyclerView = itemView.findViewById(R.id.recyclerAttachments);
 
             tagAdapter = new TagAdapter();
             tagRecyclerView = itemView.findViewById(R.id.recyclerTags);

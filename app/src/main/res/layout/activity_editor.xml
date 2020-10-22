@@ -35,13 +35,22 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="20dp">
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerAttachments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:scrollbars="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_attachment">
+            </androidx.recyclerview.widget.RecyclerView>
 
             <EditText
                 android:id="@+id/title"
+                android:layout_below="@id/recyclerAttachments"
                 android:inputType="textCapSentences"
                 android:hint="@string/to_do"
                 android:autofillHints="@string/to_do"

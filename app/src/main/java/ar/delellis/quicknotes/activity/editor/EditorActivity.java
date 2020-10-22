@@ -54,6 +54,7 @@ import com.imagine.colorpalette.ColorPalette;
 import java.util.Objects;
 
 import ar.delellis.quicknotes.R;
+import ar.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.delellis.quicknotes.shared.ShareAdapter;
 import ar.delellis.quicknotes.shared.TagAdapter;
 import ar.delellis.quicknotes.api.ApiProvider;
@@ -66,6 +67,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     ProgressDialog progressDialog;
 
     protected ApiProvider mApi;
+
+    AttachmentAdapter attachmentAdapter;
+    RecyclerView attachmentRecyclerView;
 
     EditText et_title;
     AztecText et_content;
@@ -110,6 +114,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         actionMenuView.setOnMenuItemClickListener(item -> OnMenuItemClick(item));
 
         mApi = new ApiProvider(getApplicationContext());
+
+        attachmentAdapter = new AttachmentAdapter();
+        attachmentRecyclerView = findViewById(R.id.recyclerAttachments);
 
         et_title = findViewById(R.id.title);
         et_content = findViewById(R.id.content);
@@ -269,6 +276,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
     private void setDataFromIntentExtra() {
         if (note.getId() != 0) {
+            attachmentAdapter.setItems(note.getAttachtments());
+            attachmentAdapter.notifyDataSetChanged();
+            attachmentRecyclerView.setAdapter(attachmentAdapter);
+
             et_title.setText(Html.fromHtml(note.getTitle()));
             et_content.fromHtml(note.getContent().trim(), true);
             et_content.getRootView().setBackgroundColor(Color.parseColor(note.getColor()));
