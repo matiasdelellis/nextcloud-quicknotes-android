@@ -25,8 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.ActionMenuView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,6 +42,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import org.wordpress.aztec.AztecText;
@@ -81,7 +81,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     RecyclerView shareRecyclerView;
 
     ColorPalette palette;
-    Toolbar rich_toolbar;
+    HorizontalScrollView rich_toolbar;
 
     Note note = new Note();
 
@@ -108,11 +108,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
 
-        ActionMenuView actionMenuView =  findViewById(R.id.rich_action_menu);
-        Menu actionMenu = actionMenuView.getMenu();
-        getMenuInflater().inflate(R.menu.rich_editor, actionMenu);
-        actionMenuView.setOnMenuItemClickListener(item -> OnMenuItemClick(item));
-
         mApi = new ApiProvider(getApplicationContext());
 
         attachmentAdapter = new AttachmentAdapter();
@@ -121,6 +116,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_title = findViewById(R.id.title);
         et_content = findViewById(R.id.content);
         palette = findViewById(R.id.palette);
+        rich_toolbar = findViewById(R.id.rich_toolbar);
 
         tagAdapter = new TagAdapter();
         tagRecyclerView = findViewById(R.id.recyclerTags);
@@ -136,9 +132,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             }
             note.setColor(color_hex);
         });
-
-        rich_toolbar = findViewById(R.id.rich_toolbar);
-        rich_toolbar.setTitle(null);
+        initToolbar();
 
         // Create progress dialog.
         progressDialog = new ProgressDialog(this);
@@ -224,32 +218,27 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         }
     }
 
-    public boolean OnMenuItemClick(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.bold:
-                et_content.toggleFormatting(AztecTextFormat.FORMAT_BOLD);
-                return true;
-            case R.id.italic:
-                et_content.toggleFormatting(AztecTextFormat.FORMAT_ITALIC);
-                return true;
-            case R.id.underline:
-                et_content.toggleFormatting(AztecTextFormat.FORMAT_UNDERLINE);
-                return true;
-            case R.id.strike:
-                et_content.toggleFormatting(AztecTextFormat.FORMAT_STRIKETHROUGH);
-                return true;
-            case R.id.quote:
-                et_content.toggleFormatting(AztecTextFormat.FORMAT_QUOTE);
-                return true;
-            case R.id.ordered_list:
-                et_content.toggleFormatting(AztecTextFormat.FORMAT_ORDERED_LIST);
-                return true;
-            case R.id.unordered_list:
-                et_content.toggleFormatting(AztecTextFormat.FORMAT_UNORDERED_LIST);
-                return true;
-            default:
-                return false;
-        }
+    public void initToolbar() {
+        ImageButton button = findViewById(R.id.action_bold);
+        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_BOLD));
+
+        button = findViewById(R.id.action_italic);
+        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_ITALIC));
+
+        button = findViewById(R.id.action_underline);
+        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_UNDERLINE));
+
+        button = findViewById(R.id.action_strike);
+        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_STRIKETHROUGH));
+
+        button = findViewById(R.id.action_quote);
+        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_QUOTE));
+
+        button = findViewById(R.id.action_numbered_list);
+        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_ORDERED_LIST));
+
+        button = findViewById(R.id.action_bulleted_list);
+        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_UNORDERED_LIST));
     }
 
     @Override

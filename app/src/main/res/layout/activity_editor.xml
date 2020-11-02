@@ -123,21 +123,15 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <androidx.appcompat.widget.Toolbar
+    <HorizontalScrollView
         android:id="@+id/rich_toolbar"
-        android:layout_height="48dp"
-        android:background="@color/colorAquaHaze"
         android:layout_width="match_parent"
-        android:gravity="center_vertical|start"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:scrollbars="none"
         android:layout_gravity="bottom">
 
-        <androidx.appcompat.widget.ActionMenuView
-            android:id="@+id/rich_action_menu"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start">
-        </androidx.appcompat.widget.ActionMenuView>
-
-    </androidx.appcompat.widget.Toolbar>
+        <include layout="@layout/editor_toolbar" />
+    </HorizontalScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

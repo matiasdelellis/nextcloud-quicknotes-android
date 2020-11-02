@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Nextcloud Quicknotes Android client application.
+  ~
+  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ @author Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:fadingEdge="horizontal"
+    android:fadingEdgeLength="24dp"
+    android:requiresFadingEdge="horizontal"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/action_bold"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="32dp"
+        android:maxWidth="32dp"
+        android:src="@drawable/ic_format_bold_black_24dp"
+        android:contentDescription="@string/format_bar_description_bold"/>
+    <ImageButton
+        android:id="@+id/action_italic"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="24dp"
+        android:maxWidth="24dp"
+        android:src="@drawable/ic_format_italic_black_24dp"
+        android:contentDescription="@string/format_bar_description_italic"/>
+    <ImageButton
+        android:id="@+id/action_underline"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="24dp"
+        android:maxWidth="24dp"
+        android:src="@drawable/ic_format_underlined_black_24dp"
+        android:contentDescription="@string/format_bar_description_underline"/>
+    <ImageButton
+        android:id="@+id/action_strike"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="24dp"
+        android:maxWidth="24dp"
+        android:src="@drawable/ic_format_strikethrough_black_24dp"
+        android:contentDescription="@string/format_bar_description_strike"/>
+    <ImageButton
+        android:id="@+id/action_quote"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="24dp"
+        android:maxWidth="24dp"
+        android:src="@drawable/ic_format_quote_black_24dp"
+        android:contentDescription="@string/format_bar_description_quote"/>
+    <ImageButton
+        android:id="@+id/action_bulleted_list"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="24dp"
+        android:maxWidth="24dp"
+        android:src="@drawable/ic_format_list_bulleted_black_24dp"
+        android:contentDescription="@string/format_bar_description_list"/>
+    <ImageButton
+        android:id="@+id/action_numbered_list"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="24dp"
+        android:maxWidth="24dp"
+        android:src="@drawable/ic_format_list_numbered_black_24dp"
+        android:contentDescription="@string/format_bar_description_list"/>
+
+</LinearLayout>
