@@ -49,11 +49,15 @@ import android.widget.Toast;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import ar.delellis.quicknotes.R;
+import ar.delellis.quicknotes.activity.tags.TagsActivity;
+import ar.delellis.quicknotes.model.Tag;
 import ar.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.delellis.quicknotes.shared.ShareAdapter;
 import ar.delellis.quicknotes.shared.TagAdapter;
@@ -63,6 +67,8 @@ import ar.delellis.quicknotes.util.ColorUtil;
 import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class EditorActivity extends AppCompatActivity implements EditorView {
+
+    private static final int INTENT_TAGS = 100;
 
     EditorPresenter presenter;
     ProgressDialog progressDialog;
@@ -84,6 +90,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     HorizontalScrollView rich_toolbar;
 
     Note note = new Note();
+    private List<Tag> tags = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +142,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         if (intent.hasExtra("note")) {
             note = (Note) Objects.requireNonNull(intent.getSerializableExtra("note"));
         }
+
+        tags = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tags"));
+
 
         setDataFromIntentExtra();
     }
@@ -233,6 +243,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         button = findViewById(R.id.action_note_color);
         button.setOnClickListener(view -> showColorPicker());
+
+        button = findViewById(R.id.action_tags);
+        button.setOnClickListener(view -> showTagsSelection());
     }
 
     @Override
@@ -255,6 +268,13 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     @Override
     public void onRequestError(String message) {
         Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void showTagsSelection() {
+        Intent intent = new Intent(this, TagsActivity.class);
+        intent.putExtra("tags", (Serializable) tags);
+        intent.putExtra("tagSelection", (Serializable) note.getTags());
+        startActivityForResult(intent, INTENT_TAGS);
     }
 
     private void showColorPicker() {
@@ -344,4 +364,17 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         setResult(RESULT_CANCELED);
         finish();
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == INTENT_TAGS && resultCode == RESULT_OK) {
+            List<Tag> tagSelection = (List<Tag>) Objects.requireNonNull(data.getSerializableExtra("tagSelection"));
+            tagAdapter.setItems(tagSelection);
+            tagAdapter.notifyDataSetChanged();
+
+            note.setTags(tagSelection);
+        }
+    }
+
 }

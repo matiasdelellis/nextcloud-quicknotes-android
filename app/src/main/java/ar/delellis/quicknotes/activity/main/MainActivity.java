@@ -46,6 +46,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     NavigationAdapter navigationCommonAdapter;
 
     private List<Tag> tags = new ArrayList<>();
+
     private List<String> colors = new ArrayList<>();
 
     private ApiProvider mApi;
@@ -125,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
             Intent intent = new Intent(this, EditorActivity.class);
             intent.putExtra("note", note);
+            intent.putExtra("tags", (Serializable) tags);
 
             startActivityForResult(intent, INTENT_EDIT);
         });
