@@ -33,9 +33,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
-public interface API {
-    String mApiEndpoint = "/index.php/apps/quicknotes/api/v1";
-
+public interface QuicknotesApi {
     @GET("/notes")
     Call<List<Note>> getNotes();
 

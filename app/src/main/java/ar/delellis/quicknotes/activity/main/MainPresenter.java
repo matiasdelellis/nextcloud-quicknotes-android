@@ -41,7 +41,7 @@ public class MainPresenter {
 
     public void getNotes() {
         view.showLoading();
-        Call<List<Note>> call = ApiProvider.getAPI().getNotes();
+        Call<List<Note>> call = ApiProvider.getQuicknotesAPI().getNotes();
         call.enqueue(new Callback<List<Note>>() {
             @Override
             public void onResponse(@NonNull Call<List<Note>> call, @NonNull Response<List<Note>> response) {

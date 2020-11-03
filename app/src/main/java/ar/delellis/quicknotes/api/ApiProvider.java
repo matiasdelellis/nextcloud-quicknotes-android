@@ -34,18 +34,22 @@ import com.nextcloud.android.sso.model.SingleSignOnAccount;
 
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 import retrofit2.NextcloudRetrofitApiBuilder;
 
 public class ApiProvider {
     private final String TAG = ApiProvider.class.getCanonicalName();
 
+    private static final String QUICKNOTES_API_ENDPOINT = "/index.php/apps/quicknotes/api/v1";
+
     @NonNull
     protected Context context;
-    protected static API mApi;
+    protected static QuicknotesApi quicknotesApi;
 
     protected static String ssoAccountName;
 
-    public ApiProvider(Context context) {
+    public ApiProvider(@NotNull Context context) {
         this.context = context;
         initSsoApi(new NextcloudAPI.ApiConnectedListener() {
             @Override
@@ -66,14 +70,14 @@ public class ApiProvider {
             NextcloudAPI nextcloudAPI = new NextcloudAPI(context, ssoAccount, new GsonBuilder().create(), callback);
 
             ssoAccountName = ssoAccount.name;
-            mApi = new NextcloudRetrofitApiBuilder(nextcloudAPI, API.mApiEndpoint).create(API.class);
+            quicknotesApi = new NextcloudRetrofitApiBuilder(nextcloudAPI, QUICKNOTES_API_ENDPOINT).create(QuicknotesApi.class);
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
             Log.d(TAG, "setAccout() called with: ex = [" + e + "]");
         }
     }
 
-    public static API getAPI() {
-        return mApi;
+    public static QuicknotesApi getQuicknotesAPI() {
+        return quicknotesApi;
     }
 
     public static String getAccountName() {

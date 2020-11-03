@@ -24,6 +24,8 @@ package ar.delellis.quicknotes.activity.editor;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.jetbrains.annotations.NotNull;
+
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
 import retrofit2.Call;
@@ -41,10 +43,10 @@ public class EditorPresenter {
     void createNote(Note note) {
         view.showProgress();
 
-        Call<Note> call = ApiProvider.getAPI().create(note);
+        Call<Note> call = ApiProvider.getQuicknotesAPI().create(note);
         call.enqueue(new Callback<Note>() {
             @Override
-            public void onResponse(Call<Note> call, Response<Note> response) {
+            public void onResponse(@NotNull Call<Note> call, @NotNull Response<Note> response) {
                 ((AppCompatActivity) view).runOnUiThread(() -> {
                     view.hideProgress();
                     if (response.isSuccessful() && response.body() != null) {
@@ -56,7 +58,7 @@ public class EditorPresenter {
             }
 
             @Override
-            public void onFailure(Call<Note> call, Throwable t) {
+            public void onFailure(@NotNull Call<Note> call, @NotNull Throwable t) {
                 ((AppCompatActivity) view).runOnUiThread(() -> {
                     view.hideProgress();
                     view.onRequestError(t.getLocalizedMessage());
@@ -68,7 +70,7 @@ public class EditorPresenter {
     void updateNote(Note note) {
         view.showProgress();
 
-        Call<Note> call = ApiProvider.getAPI().updateNote(note.getId(), note);
+        Call<Note> call = ApiProvider.getQuicknotesAPI().updateNote(note.getId(), note);
         call.enqueue(new Callback<Note>() {
             @Override
             public void onResponse(@NonNull Call<Note> call, @NonNull Response<Note> response) {
@@ -97,7 +99,7 @@ public class EditorPresenter {
     void deleteNote(int id) {
         view.showProgress();
 
-        Call<Note> call = ApiProvider.getAPI().deleteNote(id);
+        Call<Note> call = ApiProvider.getQuicknotesAPI().deleteNote(id);
         call.enqueue(new Callback<Note>() {
             @Override
             public void onResponse(@NonNull Call<Note> call, @NonNull Response<Note> response) {
