@@ -49,8 +49,8 @@ import android.widget.Toast;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 
-import com.imagine.colorpalette.ColorPalette;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import ar.delellis.quicknotes.R;
@@ -60,6 +60,7 @@ import ar.delellis.quicknotes.shared.TagAdapter;
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.util.ColorUtil;
+import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class EditorActivity extends AppCompatActivity implements EditorView {
 
@@ -80,7 +81,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     ShareAdapter shareAdapter;
     RecyclerView shareRecyclerView;
 
-    ColorPalette palette;
     HorizontalScrollView rich_toolbar;
 
     Note note = new Note();
@@ -115,7 +115,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         et_title = findViewById(R.id.title);
         et_content = findViewById(R.id.content);
-        palette = findViewById(R.id.palette);
         rich_toolbar = findViewById(R.id.rich_toolbar);
 
         tagAdapter = new TagAdapter();
@@ -124,14 +123,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         shareAdapter = new ShareAdapter();
         shareRecyclerView = findViewById(R.id.recyclerShares);
 
-        // Color selection
-        palette.setListener(color_hex -> {
-            et_content.getRootView().setBackgroundColor(Color.parseColor(color_hex));
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor(color_hex));
-            }
-            note.setColor(color_hex);
-        });
         initToolbar();
 
         // Create progress dialog.
@@ -239,6 +230,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         button = findViewById(R.id.action_bulleted_list);
         button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_UNORDERED_LIST));
+
+        button = findViewById(R.id.action_note_color);
+        button.setOnClickListener(view -> showColorPicker());
     }
 
     @Override
@@ -263,6 +257,30 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
+    private void showColorPicker() {
+        String[] colors = getResources().getStringArray(R.array.pallete_colors);
+        ArrayList<String> palette_colors = new ArrayList<>(Arrays.asList(colors));
+
+        ColorPicker colorPicker = new ColorPicker(this);
+        colorPicker.setColors(palette_colors);
+        colorPicker.setTitle(getString(R.string.select_note_color));
+        colorPicker.setDefaultColorButton(Color.parseColor(note.getColor()));
+        colorPicker.setRoundColorButton(true);
+        colorPicker.disableDefaultButtons(true);
+        colorPicker.setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
+            @Override
+            public void setOnFastChooseColorListener(int position, int color) {
+                note.setColor(ColorUtil.getRGBColorFromInt(color));
+                tintActivityColor(color);
+            }
+            @Override
+            public void onCancel() {
+                //
+            }
+        });
+        colorPicker.show();
+    }
+
     private void setDataFromIntentExtra() {
         if (note.getId() != 0) {
             attachmentAdapter.setItems(note.getAttachtments());
@@ -271,11 +289,8 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
             et_title.setText(Html.fromHtml(note.getTitle()));
             et_content.fromHtml(note.getContent().trim(), true);
-            et_content.getRootView().setBackgroundColor(Color.parseColor(note.getColor()));
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(Color.parseColor(note.getColor()));
-            }
+            tintActivityColor(Color.parseColor(note.getColor()));
 
             tagAdapter.setItems(note.getTags());
             tagAdapter.notifyDataSetChanged();
@@ -285,8 +300,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             shareAdapter.notifyDataSetChanged();
             shareRecyclerView.setAdapter(shareAdapter);
 
-            palette.setSelectedColor(note.getColor());
-
             if (note.getIsShared()) {
                 readMode();
             } else {
@@ -295,13 +308,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         } else {
             // Default color.
             int defaultColor = getResources().getColor(R.color.defaultNoteColor);
-            et_content.getRootView().setBackgroundColor(defaultColor);
-            palette.setSelectedColor(defaultColor);
-            note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
+            tintActivityColor(defaultColor);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(defaultColor);
-            }
+            // Add color to note.
+            note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
 
             // Focus to title and edit
             et_title.requestFocus();
@@ -312,7 +322,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     private void editMode() {
         et_title.setFocusableInTouchMode(true);
         et_content.setFocusableInTouchMode(true);
-        palette.setVisibility(View.VISIBLE);
         rich_toolbar.setVisibility(View.VISIBLE);
     }
 
@@ -321,8 +330,14 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         et_content.setFocusableInTouchMode(false);
         et_title.setFocusable(false);
         et_content.setFocusable(false);
-        palette.setVisibility(View.GONE);
         rich_toolbar.setVisibility(View.GONE);
+    }
+
+    private void tintActivityColor(int noteColor) {
+        et_content.getRootView().setBackgroundColor(noteColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(noteColor);
+        }
     }
 
     private void closeEdition () {

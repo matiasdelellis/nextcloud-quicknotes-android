@@ -59,7 +59,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "androidx.preference:preference:1.1.1"
 
     testImplementation 'junit:junit:4.13'
@@ -68,13 +68,13 @@ dependencies {
 
     // Retrofif2
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.1'
 
     // Wordpress mobile html editor
     api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:v1.3.44')
 
     //Palette
-    implementation 'com.github.MuhammedRefaat:ColorPalette:1.4'
+    implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
 
     // Nextcloud SSO
     implementation "com.github.nextcloud:Android-SingleSignOn:0.5.3"

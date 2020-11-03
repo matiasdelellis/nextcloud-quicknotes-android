@@ -110,15 +110,6 @@
                 tools:itemCount="3">
             </androidx.recyclerview.widget.RecyclerView>
 
-            <com.imagine.colorpalette.ColorPalette
-                android:id="@+id/palette"
-                android:layout_below="@+id/recyclerTags"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </com.imagine.colorpalette.ColorPalette>
-
         </RelativeLayout>
 
     </androidx.core.widget.NestedScrollView>

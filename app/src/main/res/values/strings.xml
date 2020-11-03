@@ -52,6 +52,8 @@
     <string name="setting_pinned_first">SETTING_PINNED_FIRST</string>
     <string name="setting_grid_view_enabled">SETTING_GRID_VIEW_ENABLED</string>
     <string name="shared_note">Shared note</string>
+    <string name="attachment_thumbnail">Attachment thumbnail</string>
+    <string name="select_note_color">Select the note color</string>
 
     <!-- URLs -->
     <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes</string>
@@ -73,6 +75,5 @@
     <string name="about_app_license_title">App license</string>
     <string name="about_app_license">This application is licensed under the GNU GENERAL PUBLIC LICENSE v3+.</string>
     <string name="about_app_license_button">View license</string>
-    <string name="attachment_thumbnail">Attachment thumbnail</string>
 
 </resources>
