@@ -75,5 +75,6 @@
     <string name="about_app_license_title">App license</string>
     <string name="about_app_license">This application is licensed under the GNU GENERAL PUBLIC LICENSE v3+.</string>
     <string name="about_app_license_button">View license</string>
+    <string name="note_color">Note color</string>
 
 </resources>
