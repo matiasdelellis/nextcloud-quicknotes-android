@@ -190,9 +190,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
                 note.setContent(et_content.toFormattedHtml().trim());
 
                 if (note.getTitle().isEmpty()) {
-                    et_title.setError(getString(R.string.enter_title));
+                    et_title.setError(getString(R.string.must_enter_title));
                 } else if (note.getContent().isEmpty()) {
-                    et_content.setError(getString(R.string.enter_note));
+                    et_content.setError(getString(R.string.must_enter_content));
                 } else {
                     if (note.getId() == 0)
                         presenter.createNote(note);

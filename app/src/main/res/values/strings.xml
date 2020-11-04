@@ -20,40 +20,63 @@
   -->
 
 <resources>
-    <string name="app_name">Quicknotes</string>
-    <string name="to_do">To do</string>
-    <string name="enter_note">Enter a note…</string>
+    // Main app
+    <string name="app_name">Quick notes</string>
+    <string name="nextcloud_quicknotes">Nextcloud Quick notes</string>
+
+    // Login activity
+    <string name="welcome_quicknotes">Welcome to Nextcloud Quick notes</string>
+    <string name="choose_account">Choose account</string>
+
+    // Common strings
+    <string name="title">Title</string>
+    <string name="note">Note</string>
+    <string name="tag">Tag</string>
+    <string name="tags">Tags</string>
     <string name="save">Save</string>
-    <string name="please_wait">Please wait…</string>
-    <string name="enter_title">Please enter a title</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="share">Share</string>
+    <string name="clean_filter">Clean filter</string>
+    <string name="shared_note">Shared note</string>
+    <string name="pin_note">Pin note</string>
+    <string name="attachment_thumbnail">Attachment thumbnail</string>
+    <string name="change_sort">Change sort</string>
+    <string name="change_view">Change view</string>
+    <string name="new_note">New note</string>
     <string name="delete_note">Delete note</string>
-    <string name="nextcloud_quicknotes">Nextcloud Quicknotes</string>
-    <string name="list_mode">List</string>
+
+    // Notes activity
+    <string name="please_wait">Please wait…</string>
     <string name="search_in_all">Search all notes</string>
+
+    // Sidebar filters
     <string name="all_notes">All notes</string>
+    <string name="pinned">Pinned</string>
     <string name="shared_with_others">Shared with others</string>
     <string name="shared_with_you">Shared with you</string>
-    <string name="choose_account">Choose account</string>
-    <string name="welcome_quicknotes">Welcome to Nextcloud Quicknotes</string>
-    <string name="switch_account">Switch account</string>
     <string name="about">About</string>
-    <string name="new_note">New note</string>
-    <string name="pin_note">Pin note</string>
-    <string name="pinned">Pinned</string>
-    <string name="tags">Tags</string>
-    <string name="tag">Tag</string>
-    <string name="share">Share</string>
+    <string name="switch_account">Switch account</string>
+
+    // Sort dialog
     <string name="sort_by">Sort by</string>
     <string name="menu_item_sort_by_title_a_z">A - Z</string>
     <string name="menu_item_sort_by_date_newest_first">Newest first</string>
     <string name="menu_item_sort_by_date_updated_first">Updated first</string>
-    <string name="common_cancel">Cancel</string>
+
+    // Note editor.
+    <string name="must_enter_title">Please enter a title</string>
+    <string name="must_enter_content">You must enter a content to the note</string>
+    <string name="note_color">Note color</string>
+    <string name="select_note_color">Select the note color</string>
+
+    // Tag editor
+    <string name="create_tag">Create Tag “%1$s”</string>
+    <string name="enter_tag_name">Enter the name of the tag</string>
+
+    // Preferences
     <string name="setting_sort_by">SETTING_SORT_BY</string>
     <string name="setting_pinned_first">SETTING_PINNED_FIRST</string>
     <string name="setting_grid_view_enabled">SETTING_GRID_VIEW_ENABLED</string>
-    <string name="shared_note">Shared note</string>
-    <string name="attachment_thumbnail">Attachment thumbnail</string>
-    <string name="select_note_color">Select the note color</string>
 
     <!-- URLs -->
     <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes</string>
@@ -75,9 +98,5 @@
     <string name="about_app_license_title">App license</string>
     <string name="about_app_license">This application is licensed under the GNU GENERAL PUBLIC LICENSE v3+.</string>
     <string name="about_app_license_button">View license</string>
-    <string name="note_color">Note color</string>
-    <string name="create_tag">Create Tag “%1$s”</string>
-    <string name="enter_tag_name">Enter the name of the tag</string>
-    <string name="clean_filter">Clean filter</string>
 
 </resources>

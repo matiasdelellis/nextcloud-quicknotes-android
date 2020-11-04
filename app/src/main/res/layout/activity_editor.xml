@@ -50,16 +50,17 @@
 
             <EditText
                 android:id="@+id/editor_title"
-                android:layout_below="@id/editor_recyclerAttachments"
-                android:inputType="textCapSentences"
-                android:hint="@string/to_do"
-                android:autofillHints="@string/to_do"
-                android:textSize="25sp"
-                android:textColor="@color/defaultNoteTint"
-                android:textColorHint="@color/defaultNoteHintTint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:backgroundTint="@color/defaultNoteHintTint">
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="12dp"
+                android:layout_below="@id/editor_recyclerAttachments"
+                android:hint="@string/title"
+                android:inputType="textCapSentences"
+                android:importantForAutofill="no"
+                android:textSize="@dimen/note_font_size_large"
+                android:textColor="@color/defaultNoteTint"
+                app:backgroundTint="@color/transparent">
             </EditText>
 
             <org.wordpress.aztec.AztecText
@@ -67,11 +68,12 @@
                 android:layout_below="@id/editor_title"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:padding="8dp"
+                android:layout_marginHorizontal="18dp"
                 android:scrollbars="vertical"
                 android:gravity="top|start"
-                android:hint="@string/new_note"
+                android:hint="@string/note"
                 android:minLines="5"
+                android:textSize="@dimen/note_font_size_medium"
                 app:backgroundColor="@color/transparent"
                 app:quoteBackground="@color/defaultNoteTint"
                 app:quoteBackgroundAlpha="5%"
@@ -79,8 +81,8 @@
                 app:bulletColor="@color/defaultNoteTint"
                 app:lineSpacingExtra="10dp"
                 app:blockVerticalPadding="1dp"
-                app:backgroundTint="@color/defaultNoteHintTint"
-                app:textColorHint="@color/defaultNoteHintTint">
+                app:backgroundTint="?android:attr/textColorHint"
+                app:textColorHint="?android:attr/textColorHint">
             </org.wordpress.aztec.AztecText>
 
             <androidx.recyclerview.widget.RecyclerView

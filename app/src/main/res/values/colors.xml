@@ -37,11 +37,5 @@
     <!-- Default colors of note -->
     <color name="defaultNoteColor">#F7EB96</color>
     <color name="defaultNoteTint">#202124</color>
-    <color name="defaultNoteHintTint">#1A202124</color>
-
-    <!-- Text Format Toolbar -->
-    <color name="colorBoulder">#757575</color>
-    <color name="colorSilver">#CCCCCC</color>
-    <color name="colorAquaHaze">#F4F6F9</color>
 
 </resources>
