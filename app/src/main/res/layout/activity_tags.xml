@@ -34,14 +34,60 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:contentInsetStartWithNavigation="0dp"
-        app:navigationIcon="@drawable/ic_back_grey"
-        app:titleMarginStart="0dp"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:contentInsetStartWithNavigation="0dp"
+            app:navigationIcon="@drawable/ic_back_grey"
+            app:titleMarginStart="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/tag_search"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:lines="1"
+                    android:hint="@string/enter_tag_name"
+                    android:inputType="textCapSentences"
+                    android:background="@android:color/transparent"
+                    android:importantForAutofill="no" />
+
+                <ImageButton
+                    android:id="@+id/ic_filter_clear"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_gravity="center_vertical|end"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/clean_filter"
+                    android:tint="?attr/colorAccent"
+                    android:src="@drawable/ic_baseline_clear_24" />
+
+            </LinearLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
     </com.google.android.material.appbar.AppBarLayout>
+
+    <TextView
+        android:id="@+id/create_tag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="@string/create_tag"
+        android:ellipsize="end"
+        app:drawableTint="@color/defaultBrand"
+        app:drawableStartCompat="@drawable/ic_add">
+    </TextView>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

@@ -25,18 +25,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Tag;
 
-public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapter.ViewHolder> {
+public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapter.ViewHolder> implements Filterable {
 
     class ViewHolder extends RecyclerView.ViewHolder {
         @NonNull
@@ -62,9 +65,9 @@ public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapte
             checkBox.setOnClickListener(view -> {
                 CheckBox box = (CheckBox) view;
                 if (box.isChecked()) {
-                    addSelectedTag(tag);
+                    tagSelection.add(tag);
                 } else {
-                    removeSelectedTag(tag);
+                    tagSelection.remove(tag);
                 }
             });
         }
@@ -72,6 +75,9 @@ public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapte
 
     @NonNull
     private List<Tag> tags = new ArrayList<>();
+
+    @NonNull
+    private List<Tag> tagsFiltered = new ArrayList<>();
 
     @NonNull
     private List<Tag> tagSelection = new ArrayList<>();
@@ -85,34 +91,27 @@ public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(tags.get(position));
+        holder.bind(tagsFiltered.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return tags.size();
+        return tagsFiltered.size();
     }
 
     public void setTags(@NonNull List<Tag> tags) {
         this.tags = tags;
+        this.tagsFiltered = new ArrayList<>(tags);
         notifyDataSetChanged();
     }
 
-    private boolean isSelected(Tag bindTag) {
-        for (Tag tag: tagSelection) {
-            if (tag.getId() == bindTag.getId()) {
+    public boolean tagExists(String tagName) {
+        for (Tag tag: tagsFiltered) {
+            if (tag.getName().toLowerCase().equals(tagName.toLowerCase())) {
                 return true;
             }
         }
         return false;
-    }
-
-    private void addSelectedTag(Tag tag) {
-        tagSelection.add(tag);
-    }
-
-    private void removeSelectedTag(Tag tag) {
-        tagSelection.remove(tag);
     }
 
     public void setTagSelection(@NonNull List<Tag> tagSelection) {
@@ -122,6 +121,53 @@ public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapte
 
     public List<Tag> getTagSelection() {
         return tagSelection;
+    }
+
+    public void insertTagSelection(Tag tag) {
+        tags.add(tag);
+        tagsFiltered.add(tag);
+        tagSelection.add(tag);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            FilterResults filterResults = new FilterResults();
+            List <Tag> filteredTags = new ArrayList<>();
+            if (charSequence.toString().isEmpty()) {
+                filteredTags.addAll(tags);
+            } else {
+                for (Tag tag: tags) {
+                    String query = charSequence.toString().toLowerCase();
+                    if (tag.getName().toLowerCase().contains(query)) {
+                        filteredTags.add(tag);
+                    }
+                }
+            }
+            filterResults.values = filteredTags;
+            return filterResults;
+        }
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            tagsFiltered.clear();
+            tagsFiltered.addAll((Collection<? extends Tag>) filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
+
+    private boolean isSelected(Tag bindTag) {
+        for (Tag tag: tagSelection) {
+            if (tag.getId() == bindTag.getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
