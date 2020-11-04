@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
             startActivityForResult(intent, INTENT_EDIT);
         });
 
-        noteAdapter = new NoteAdapter(getApplicationContext(), itemClickListener);
+        noteAdapter = new NoteAdapter(this, itemClickListener);
         recyclerView.setAdapter(noteAdapter);
 
         noteAdapter.setSortRule(sortRule);
@@ -142,11 +142,11 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         swipeRefresh.setOnRefreshListener(() -> presenter.getNotes());
 
         fab = findViewById(R.id.add);
-        fab.setOnClickListener(view ->
-                startActivityForResult(
-                        new Intent(this, EditorActivity.class),
-                        INTENT_ADD)
-        );
+        fab.setOnClickListener(view -> {
+            Intent intent = new Intent(this, EditorActivity.class);
+            intent.putExtra("tags", (Serializable) tags);
+            startActivityForResult(intent, INTENT_ADD);
+        });
 
         toolbar = findViewById(R.id.toolbar);
         homeToolbar = findViewById(R.id.home_toolbar);

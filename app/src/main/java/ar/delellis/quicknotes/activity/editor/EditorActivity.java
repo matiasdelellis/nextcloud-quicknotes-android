@@ -36,6 +36,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -90,7 +91,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     HorizontalScrollView rich_toolbar;
 
     Note note = new Note();
+
     private List<Tag> tags = new ArrayList<>();
+    private List<Tag> tagSelection = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +147,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         }
 
         tags = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tags"));
-
 
         setDataFromIntentExtra();
     }
@@ -273,7 +275,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     private void showTagsSelection() {
         Intent intent = new Intent(this, TagsActivity.class);
         intent.putExtra("tags", (Serializable) tags);
-        intent.putExtra("tagSelection", (Serializable) note.getTags());
+        intent.putExtra("tagSelection", (Serializable) tagSelection);
         startActivityForResult(intent, INTENT_TAGS);
     }
 
@@ -312,7 +314,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
             tintActivityColor(Color.parseColor(note.getColor()));
 
-            tagAdapter.setItems(note.getTags());
+            tagSelection = note.getTags();
+
+            tagAdapter.setItems(tagSelection);
             tagAdapter.notifyDataSetChanged();
             tagRecyclerView.setAdapter(tagAdapter);
 
@@ -336,6 +340,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             // Focus to title and edit
             et_title.requestFocus();
             editMode();
+
+            shareRecyclerView.setAdapter(shareAdapter);
+            tagRecyclerView.setAdapter(tagAdapter);
         }
     }
 
@@ -369,11 +376,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == INTENT_TAGS && resultCode == RESULT_OK) {
-            List<Tag> tagSelection = (List<Tag>) Objects.requireNonNull(data.getSerializableExtra("tagSelection"));
+            tagSelection = (List<Tag>) Objects.requireNonNull(data.getSerializableExtra("tagSelection"));
+            note.setTags(tagSelection);
             tagAdapter.setItems(tagSelection);
             tagAdapter.notifyDataSetChanged();
-
-            note.setTags(tagSelection);
         }
     }
 

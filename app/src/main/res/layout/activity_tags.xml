@@ -68,7 +68,6 @@
                     android:layout_gravity="center_vertical|end"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/clean_filter"
-                    android:tint="?attr/colorAccent"
                     android:src="@drawable/ic_baseline_clear_24" />
 
             </LinearLayout>
