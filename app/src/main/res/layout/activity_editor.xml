@@ -38,7 +38,7 @@
             android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerAttachments"
+                android:id="@+id/editor_recyclerAttachments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -49,8 +49,8 @@
             </androidx.recyclerview.widget.RecyclerView>
 
             <EditText
-                android:id="@+id/title"
-                android:layout_below="@id/recyclerAttachments"
+                android:id="@+id/editor_title"
+                android:layout_below="@id/editor_recyclerAttachments"
                 android:inputType="textCapSentences"
                 android:hint="@string/to_do"
                 android:autofillHints="@string/to_do"
@@ -63,8 +63,8 @@
             </EditText>
 
             <org.wordpress.aztec.AztecText
-                android:id="@+id/content"
-                android:layout_below="@id/title"
+                android:id="@+id/editor_content"
+                android:layout_below="@id/editor_title"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:padding="8dp"
@@ -84,8 +84,8 @@
             </org.wordpress.aztec.AztecText>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerShares"
-                android:layout_below="@+id/content"
+                android:id="@+id/editor_recyclerShares"
+                android:layout_below="@+id/editor_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
@@ -97,9 +97,9 @@
             </androidx.recyclerview.widget.RecyclerView>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerTags"
-                android:layout_below="@+id/content"
-                android:layout_toEndOf="@+id/recyclerShares"
+                android:id="@+id/editor_recyclerTags"
+                android:layout_below="@+id/editor_content"
+                android:layout_toEndOf="@+id/editor_recyclerShares"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -115,7 +115,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <HorizontalScrollView
-        android:id="@+id/rich_toolbar"
+        android:id="@+id/editor_rich_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

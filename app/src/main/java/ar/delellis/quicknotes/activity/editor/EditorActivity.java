@@ -36,7 +36,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -121,17 +120,17 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         mApi = new ApiProvider(getApplicationContext());
 
         attachmentAdapter = new AttachmentAdapter();
-        attachmentRecyclerView = findViewById(R.id.recyclerAttachments);
+        attachmentRecyclerView = findViewById(R.id.editor_recyclerAttachments);
 
-        et_title = findViewById(R.id.title);
-        et_content = findViewById(R.id.content);
-        rich_toolbar = findViewById(R.id.rich_toolbar);
+        et_title = findViewById(R.id.editor_title);
+        et_content = findViewById(R.id.editor_content);
+        rich_toolbar = findViewById(R.id.editor_rich_toolbar);
 
         tagAdapter = new TagAdapter();
-        tagRecyclerView = findViewById(R.id.recyclerTags);
+        tagRecyclerView = findViewById(R.id.editor_recyclerTags);
 
         shareAdapter = new ShareAdapter();
-        shareRecyclerView = findViewById(R.id.recyclerShares);
+        shareRecyclerView = findViewById(R.id.editor_recyclerShares);
 
         initToolbar();
 

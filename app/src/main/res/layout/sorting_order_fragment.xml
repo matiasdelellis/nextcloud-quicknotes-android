@@ -28,7 +28,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/header"
+        android:id="@+id/sort_header"
         style="@style/Base.DialogWindowTitle.AppCompat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

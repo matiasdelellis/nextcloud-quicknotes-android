@@ -24,7 +24,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/card_item"
+    android:id="@+id/item_note"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="4dp"
@@ -44,7 +44,7 @@
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerAttachments"
+            android:id="@+id/item_recyclerAttachments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -55,22 +55,24 @@
         </androidx.recyclerview.widget.RecyclerView>
 
         <LinearLayout
-            android:id="@+id/body"
+            android:id="@+id/item_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/header"
+                android:id="@+id/item_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/item_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
                     android:textSize="@dimen/note_font_size_medium"
                     android:textColor="@color/note_font_color_default"
                     android:textStyle="bold"
@@ -81,7 +83,7 @@
                     tools:text="@tools:sample/lorem/random"/>
 
                 <ImageView
-                    android:id="@+id/pinned"
+                    android:id="@+id/item_pinned"
                     android:contentDescription="@string/pinned"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -89,7 +91,7 @@
                     app:tint="@color/defaultNoteTint" />
 
                 <ImageView
-                    android:id="@+id/shared"
+                    android:id="@+id/item_shared"
                     android:contentDescription="@string/shared_note"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -99,11 +101,14 @@
             </LinearLayout>
 
             <org.wordpress.aztec.AztecText
-                android:id="@+id/content"
+                android:id="@+id/item_content"
                 android:inputType="textNoSuggestions|textMultiLine"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="2dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:textSize="@dimen/note_font_size_normal"
                 app:backgroundColor="@color/transparent"
                 app:quoteBackground="@color/defaultNoteTint"
                 app:quoteBackgroundAlpha="5%"
@@ -115,7 +120,7 @@
             </org.wordpress.aztec.AztecText>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerShares"
+                android:id="@+id/item_recyclerShares"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
@@ -127,7 +132,7 @@
             </androidx.recyclerview.widget.RecyclerView>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerTags"
+                android:id="@+id/item_recyclerTags"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="visible"

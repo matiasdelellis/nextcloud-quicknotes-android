@@ -331,20 +331,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         RecyclerViewAdapter(@NonNull View itemView, ItemClickListener itemClickListener) {
             super(itemView);
 
-            card_item = itemView.findViewById(R.id.card_item);
-            tv_title = itemView.findViewById(R.id.title);
-            tv_content = itemView.findViewById(R.id.content);
-            im_shared = itemView.findViewById(R.id.shared);
-            im_pinned = itemView.findViewById(R.id.pinned);
+            card_item = itemView.findViewById(R.id.item_note);
+            tv_title = itemView.findViewById(R.id.item_title);
+            tv_content = itemView.findViewById(R.id.item_content);
+            im_shared = itemView.findViewById(R.id.item_shared);
+            im_pinned = itemView.findViewById(R.id.item_pinned);
 
             attachmentAdapter = new AttachmentAdapter();
-            attachmentRecyclerView = itemView.findViewById(R.id.recyclerAttachments);
+            attachmentRecyclerView = itemView.findViewById(R.id.item_recyclerAttachments);
 
             tagAdapter = new TagAdapter();
-            tagRecyclerView = itemView.findViewById(R.id.recyclerTags);
+            tagRecyclerView = itemView.findViewById(R.id.item_recyclerTags);
 
             shareAdapter = new ShareAdapter();
-            shareRecyclerView = itemView.findViewById(R.id.recyclerShares);
+            shareRecyclerView = itemView.findViewById(R.id.item_recyclerShares);
 
             this.itemClickListener = itemClickListener;
             card_item.setOnClickListener(this);
