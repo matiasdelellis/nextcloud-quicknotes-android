@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -32,8 +33,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import org.jetbrains.annotations.NotNull;
+
 import ar.delellis.quicknotes.BuildConfig;
 import ar.delellis.quicknotes.R;
+import ar.delellis.quicknotes.api.ApiProvider;
+import ar.delellis.quicknotes.model.Capabilities;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AboutActivity extends AppCompatActivity {
     @Override
@@ -41,15 +49,32 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
+        findViewById(R.id.about_nextcloud_version).setVisibility(View.GONE);
+        findViewById(R.id.about_quicknotes_version).setVisibility(View.GONE);
+
         fillAboutActivity();
+
+        Call<Capabilities> call = ApiProvider.getNextcloudServerApi().getCapabilities();
+        call.enqueue(new Callback<Capabilities>() {
+            @Override
+            public void onResponse(@NotNull Call<Capabilities> call, @NotNull Response<Capabilities> response) {
+                AboutActivity.this.runOnUiThread(() -> {
+                    if (response.body() != null)
+                        fillCapabilities(response.body());
+                });
+            }
+            @Override
+            public void onFailure(@NotNull Call<Capabilities> call, @NotNull Throwable t) {
+            }
+        });
     }
 
     private void fillAboutActivity () {
@@ -70,6 +95,16 @@ public class AboutActivity extends AppCompatActivity {
         TextView tvIssues = findViewById(R.id.about_issues);
         tvIssues.setText(Html.fromHtml(getString(R.string.about_issues, getString(R.string.url_issues))));
         tvIssues.setOnClickListener(view -> openUtl(getString(R.string.url_issues)));
+    }
+
+    private void fillCapabilities(Capabilities capabilities) {
+        TextView tvVersion = findViewById(R.id.about_nextcloud_version);
+        tvVersion.setText(Html.fromHtml(getString(R.string.about_nextcloud_version, "v" + capabilities.getNextcloudVersion())));
+        tvVersion.setVisibility(View.VISIBLE);
+
+        tvVersion = findViewById(R.id.about_quicknotes_version);
+        tvVersion.setText(Html.fromHtml(getString(R.string.about_quicknotes_version, "v" + capabilities.getQuicknotesVersion())));
+        tvVersion.setVisibility(View.VISIBLE);
     }
 
     @Override

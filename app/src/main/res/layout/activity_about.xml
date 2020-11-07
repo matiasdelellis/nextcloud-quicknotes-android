@@ -59,7 +59,7 @@
                 style="?android:attr/listSeparatorTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/about_version_title"/>
+                android:text="@string/about_versions_title"/>
 
             <TextView
                 android:id="@+id/about_version"
@@ -70,25 +70,20 @@
                 android:text="@string/about_version"/>
 
             <TextView
-                style="?android:attr/listSeparatorTextViewStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/about_app_license_title"/>
-
-            <TextView
+                android:id="@+id/about_nextcloud_version"
                 style="?android:attr/editTextPreferenceStyle"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/about_app_license" />
+                android:text="@string/about_nextcloud_version"/>
 
-            <Button
-                android:id="@+id/about_app_license_button"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/about_quicknotes_version"
+                style="?android:attr/editTextPreferenceStyle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/about_app_license_button"
-                app:backgroundTint="@color/defaultBrand"
-                style="@style/Widget.AppCompat.Button.Colored"/>
+                android:padding="10dp"
+                android:text="@string/about_quicknotes_version"/>
 
             <TextView
                 style="?android:attr/listSeparatorTextViewStyle"
@@ -144,6 +139,28 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:text="@string/about_issues" />
+
+            <TextView
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/about_app_license_title"/>
+
+            <TextView
+                style="?android:attr/editTextPreferenceStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="@string/about_app_license" />
+
+            <Button
+                android:id="@+id/about_app_license_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/about_app_license_button"
+                app:backgroundTint="@color/defaultBrand"
+                style="@style/Widget.AppCompat.Button.Colored"/>
+
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>

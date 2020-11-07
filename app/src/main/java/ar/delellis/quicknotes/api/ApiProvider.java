@@ -36,18 +36,18 @@ import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 
+import ar.delellis.quicknotes.api.helper.GsonConfig;
 import retrofit2.NextcloudRetrofitApiBuilder;
 
 public class ApiProvider {
     private final String TAG = ApiProvider.class.getCanonicalName();
 
-    private static final String QUICKNOTES_API_ENDPOINT = "/index.php/apps/quicknotes/api/v1";
-
     @NonNull
     protected Context context;
-    protected static QuicknotesApi quicknotesApi;
 
-    protected static String ssoAccountName;
+    protected static QuicknotesAPI quicknotesAPI;
+
+    protected static NextcloudServerApi nextcloudServerApi;
 
     public ApiProvider(@NotNull Context context) {
         this.context = context;
@@ -67,21 +67,21 @@ public class ApiProvider {
     public void initSsoApi(final NextcloudAPI.ApiConnectedListener callback) {
         try {
             SingleSignOnAccount ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(context);
-            NextcloudAPI nextcloudAPI = new NextcloudAPI(context, ssoAccount, new GsonBuilder().create(), callback);
+            NextcloudAPI nextcloudAPI = new NextcloudAPI(context, ssoAccount, new GsonConfig().create(), callback);
 
-            ssoAccountName = ssoAccount.name;
-            quicknotesApi = new NextcloudRetrofitApiBuilder(nextcloudAPI, QUICKNOTES_API_ENDPOINT).create(QuicknotesApi.class);
+            quicknotesAPI = new NextcloudRetrofitApiBuilder(nextcloudAPI, QuicknotesAPI.API_ENDPOINT).create(QuicknotesAPI.class);
+            nextcloudServerApi = new NextcloudRetrofitApiBuilder(nextcloudAPI, NextcloudServerApi.NC_API_ENDPOINT).create(NextcloudServerApi.class);
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
             Log.d(TAG, "setAccout() called with: ex = [" + e + "]");
         }
     }
 
-    public static QuicknotesApi getQuicknotesAPI() {
-        return quicknotesApi;
+    public static QuicknotesAPI getQuicknotesAPI() {
+        return quicknotesAPI;
     }
 
-    public static String getAccountName() {
-        return ssoAccountName;
+    public static NextcloudServerApi getNextcloudServerApi() {
+        return nextcloudServerApi;
     }
 
 }

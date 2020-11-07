@@ -85,8 +85,10 @@
     <string name="url_translations" translatable="false">https://www.transifex.com/matias/quicknotes/</string>
 
     <!-- About -->
-    <string name="about_version_title">Version</string>
-    <string name="about_version">You are currently using &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_versions_title">Versions</string>
+    <string name="about_version">You are currently using Nextcloud Quick notes &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_nextcloud_version">Your server is currently using Nextcloud &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_quicknotes_version">Your server is currently using Quick notes &lt;strong>%1$s&lt;/strong></string>
     <string name="about_developers_title">Developers</string>
     <string name="about_developers" translatable="false">Matias De lellis</string>
     <string name="about_source_title">Source code</string>

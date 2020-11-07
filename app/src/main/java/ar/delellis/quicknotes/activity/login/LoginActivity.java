@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Button;
@@ -44,11 +45,11 @@ import com.nextcloud.android.sso.ui.UiExceptionManager;
 
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.activity.main.MainActivity;
-import ar.delellis.quicknotes.api.ApiProvider;
 
 public class LoginActivity extends AppCompatActivity {
 
-    protected ApiProvider mApi;
+    private static final String TAG = LoginActivity.class.getCanonicalName();
+
     protected ProgressBar progress;
     protected Button button;
 
@@ -65,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
             progress.setVisibility(View.VISIBLE);
             openAccountChooser();
         });
+
 
         try {
             ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(getApplicationContext());
@@ -118,9 +120,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void accountAccessDone() {
-        Context l_context = getApplicationContext();
-        mApi = new ApiProvider(l_context);
-
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
 

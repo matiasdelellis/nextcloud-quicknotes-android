@@ -21,35 +21,13 @@
 
 package ar.delellis.quicknotes.api;
 
-import java.util.List;
-
-import ar.delellis.quicknotes.model.Note;
-
+import ar.delellis.quicknotes.model.Capabilities;
 import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
 
-public interface QuicknotesApi {
-    @GET("/notes")
-    Call<List<Note>> getNotes();
+public interface NextcloudServerApi {
+    String NC_API_ENDPOINT = "/ocs/v2.php/";
 
-    @POST("/notes")
-    Call<Note> create(
-            @Body Note note
-    );
-
-    @PUT("/notes/{id}")
-    Call<Note> updateNote(
-            @Path("id") int id,
-            @Body Note note
-    );
-
-    @DELETE("/notes/{id}")
-    Call<Note> deleteNote(
-            @Path("id") int id
-    );
+    @GET("cloud/capabilities?format=json")
+    Call<Capabilities> getCapabilities();
 }
