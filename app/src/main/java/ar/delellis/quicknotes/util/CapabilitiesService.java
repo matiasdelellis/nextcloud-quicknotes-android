@@ -51,10 +51,9 @@ public class CapabilitiesService {
     private Context context;
     IResponseCallback responseCallback;
 
-    public CapabilitiesService(Context context, IResponseCallback responseCallback) {
+    public CapabilitiesService(Context context) {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         this.context = context;
-        this.responseCallback = responseCallback;
     }
 
     public boolean isInitialized() {
@@ -62,7 +61,9 @@ public class CapabilitiesService {
         return (lastEtag != null && !lastEtag.equals(FAKE_ETAG));
     }
 
-    public void refresh() {
+    public void refresh(IResponseCallback responseCallback) {
+        this.responseCallback = responseCallback;
+
         String lastEtag = preferences.getString(context.getString(R.string.cache_capabilities_etag), FAKE_ETAG);
         ApiProvider.getNextcloudServerApi().getCapabilities(lastEtag)
                 .subscribeOn(Schedulers.newThread())

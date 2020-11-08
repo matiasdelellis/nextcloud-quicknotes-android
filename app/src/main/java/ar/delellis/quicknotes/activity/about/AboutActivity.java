@@ -57,7 +57,12 @@ public class AboutActivity extends AppCompatActivity {
 
         fillAboutActivity();
 
-        capabilitiesService = new CapabilitiesService(this, new IResponseCallback() {
+        capabilitiesService = new CapabilitiesService(this);
+        if (capabilitiesService.isInitialized()) {
+            fillCapabilities(capabilitiesService.getCapabilities());
+        }
+
+        capabilitiesService.refresh(new IResponseCallback() {
             @Override
             public void onComplete() {
                 fillCapabilities(capabilitiesService.getCapabilities());
@@ -67,12 +72,6 @@ public class AboutActivity extends AppCompatActivity {
                 throwable.printStackTrace();
             }
         });
-
-        if (capabilitiesService.isInitialized()) {
-            fillCapabilities(capabilitiesService.getCapabilities());
-        }
-
-        capabilitiesService.refresh();
     }
 
     private void fillAboutActivity () {

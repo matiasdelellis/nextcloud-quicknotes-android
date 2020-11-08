@@ -81,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
         }
     }
+
     private void openAccountChooser() {
         try {
             AccountImporter.pickNewAccount(this);
@@ -127,7 +128,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private void accountAccessDone() {
         ApiProvider mApi = new ApiProvider(getApplicationContext());
-        capabilitiesService = new CapabilitiesService(this, new IResponseCallback() {
+        capabilitiesService = new CapabilitiesService(this);
+
+        capabilitiesService.refresh(new IResponseCallback() {
             @Override
             public void onComplete() {
                 Capabilities capabilities = capabilitiesService.getCapabilities();
@@ -153,6 +156,5 @@ public class LoginActivity extends AppCompatActivity {
                 throwable.printStackTrace();
             }
         });
-        capabilitiesService.refresh();
     }
 }
