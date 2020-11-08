@@ -85,6 +85,10 @@
     <string name="cache_quicknotes_version">cache_quicknotes_version</string>
     <string name="cache_quicknotes_api_version">cache_quicknotes_api_version</string>
 
+    // Common errors.
+    <string name="error_not_installed">We could not determine the version of the server side Quick notes app. Please make sure it is installed and enabled.</string>
+    <string name="error_maintenance_mode">The server is currently in maintenance mode. Please contact your administrator or try later again.</string>
+
     <!-- URLs -->
     <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes</string>
     <string name="url_issues" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes/issues/new/choose</string>

@@ -32,7 +32,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.tags.TagsActivity"/>
+
         <activity android:name=".activity.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,10 +48,17 @@
             android:name=".activity.editor.EditorActivity"
             android:launchMode="singleTask"
             android:theme="@style/EditorTheme" />
+        <activity android:name=".activity.tags.TagsActivity"/>
         <activity
             android:name=".activity.about.AboutActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity
+            android:name=".activity.error.ErrorActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme">
+        </activity>
     </application>
 
 </manifest>
