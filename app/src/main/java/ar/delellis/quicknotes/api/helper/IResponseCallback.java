@@ -19,18 +19,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ar.delellis.quicknotes.api;
+package ar.delellis.quicknotes.api.helper;
 
-import com.nextcloud.android.sso.api.ParsedResponse;
+public abstract class IResponseCallback {
+    public IResponseCallback() {
+    }
 
-import ar.delellis.quicknotes.model.Capabilities;
-import retrofit2.http.GET;
-import io.reactivex.Observable;
-import retrofit2.http.Header;
+    public abstract void onComplete();
 
-public interface NextcloudServerApi {
-    String NC_API_ENDPOINT = "/ocs/v2.php/";
-
-    @GET("cloud/capabilities?format=json")
-    Observable<ParsedResponse<Capabilities>> getCapabilities(@Header("If-None-Match") String eTag);
+    public abstract void onError(Throwable throwable);
 }

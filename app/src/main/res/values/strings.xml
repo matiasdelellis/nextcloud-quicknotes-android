@@ -78,6 +78,13 @@
     <string name="setting_pinned_first">SETTING_PINNED_FIRST</string>
     <string name="setting_grid_view_enabled">SETTING_GRID_VIEW_ENABLED</string>
 
+    // Capabilities cached on preferences
+    <string name="cache_capabilities_etag">cache_capabilities_etag</string>
+    <string name="cache_maintenance_enabled">cache_maintenance_enabled</string>
+    <string name="cache_nextcloud_version">cache_nextcloud_version</string>
+    <string name="cache_quicknotes_version">cache_quicknotes_version</string>
+    <string name="cache_quicknotes_api_version">cache_quicknotes_api_version</string>
+
     <!-- URLs -->
     <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes</string>
     <string name="url_issues" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes/issues/new/choose</string>

@@ -24,6 +24,8 @@ package ar.delellis.quicknotes.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 
 public class Capabilities implements Serializable {
@@ -37,7 +39,7 @@ public class Capabilities implements Serializable {
     @SerializedName("nextcloudVersion") private String nextcloudVersion;
 
     @Expose
-    @SerializedName("nextcloudVersion") private boolean maintenanceEnabled;
+    @SerializedName("maintenanceEnabled") private boolean maintenanceEnabled;
 
     public Capabilities() {
 
@@ -74,4 +76,16 @@ public class Capabilities implements Serializable {
     public void setMaintenanceEnabled(boolean maintenanceEnabled) {
         this.maintenanceEnabled = maintenanceEnabled;
     }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "Capabilities {" +
+                "quicknotes-version='" + quicknotesVersion + '\'' +
+                ", quicknotes-api-version='" + quicknotesApiVersion + '\'' +
+                ", nextcloud-version='" + nextcloudVersion + '\'' +
+                ", maintenance-enabled='" + maintenanceEnabled + '\'' +
+                '}';
+    }
+
 }

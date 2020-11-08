@@ -33,17 +33,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import org.jetbrains.annotations.NotNull;
-
 import ar.delellis.quicknotes.BuildConfig;
 import ar.delellis.quicknotes.R;
-import ar.delellis.quicknotes.api.ApiProvider;
+import ar.delellis.quicknotes.api.helper.IResponseCallback;
 import ar.delellis.quicknotes.model.Capabilities;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import ar.delellis.quicknotes.util.CapabilitiesService;
 
 public class AboutActivity extends AppCompatActivity {
+    private CapabilitiesService capabilitiesService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,27 +55,30 @@ public class AboutActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        findViewById(R.id.about_nextcloud_version).setVisibility(View.GONE);
-        findViewById(R.id.about_quicknotes_version).setVisibility(View.GONE);
-
         fillAboutActivity();
 
-        Call<Capabilities> call = ApiProvider.getNextcloudServerApi().getCapabilities();
-        call.enqueue(new Callback<Capabilities>() {
+        capabilitiesService = new CapabilitiesService(this, new IResponseCallback() {
             @Override
-            public void onResponse(@NotNull Call<Capabilities> call, @NotNull Response<Capabilities> response) {
-                AboutActivity.this.runOnUiThread(() -> {
-                    if (response.body() != null)
-                        fillCapabilities(response.body());
-                });
+            public void onComplete() {
+                fillCapabilities(capabilitiesService.getCapabilities());
             }
             @Override
-            public void onFailure(@NotNull Call<Capabilities> call, @NotNull Throwable t) {
+            public void onError(Throwable throwable) {
+                throwable.printStackTrace();
             }
         });
+
+        if (capabilitiesService.isInitialized()) {
+            fillCapabilities(capabilitiesService.getCapabilities());
+        }
+
+        capabilitiesService.refresh();
     }
 
     private void fillAboutActivity () {
+        findViewById(R.id.about_nextcloud_version).setVisibility(View.GONE);
+        findViewById(R.id.about_quicknotes_version).setVisibility(View.GONE);
+
         TextView tvVersion = findViewById(R.id.about_version);
         tvVersion.setText(Html.fromHtml(getString(R.string.about_version, "v" + BuildConfig.VERSION_NAME)));
 
