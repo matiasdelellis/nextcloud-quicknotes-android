@@ -27,7 +27,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Button;
@@ -36,9 +35,7 @@ import com.nextcloud.android.sso.AccountImporter;
 import com.nextcloud.android.sso.api.NextcloudAPI;
 import com.nextcloud.android.sso.exceptions.AccountImportCancelledException;
 import com.nextcloud.android.sso.exceptions.AndroidGetAccountsPermissionNotGranted;
-import com.nextcloud.android.sso.exceptions.NextcloudFilesAppAccountNotFoundException;
 import com.nextcloud.android.sso.exceptions.NextcloudFilesAppNotInstalledException;
-import com.nextcloud.android.sso.exceptions.NoCurrentAccountSelectedException;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
 import com.nextcloud.android.sso.model.SingleSignOnAccount;
 import com.nextcloud.android.sso.ui.UiExceptionManager;
@@ -72,14 +69,6 @@ public class LoginActivity extends AppCompatActivity {
             progress.setVisibility(View.VISIBLE);
             openAccountChooser();
         });
-
-
-        try {
-            ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(getApplicationContext());
-            SingleAccountHelper.setCurrentAccount(getApplicationContext(), ssoAccount.name);
-            accountAccessDone();
-        } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
-        }
     }
 
     private void openAccountChooser() {

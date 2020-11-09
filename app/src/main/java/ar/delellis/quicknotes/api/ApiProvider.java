@@ -25,7 +25,6 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.GsonBuilder;
 import com.nextcloud.android.sso.api.NextcloudAPI;
 import com.nextcloud.android.sso.exceptions.NextcloudFilesAppAccountNotFoundException;
 import com.nextcloud.android.sso.exceptions.NoCurrentAccountSelectedException;

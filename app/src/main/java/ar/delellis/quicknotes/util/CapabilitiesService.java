@@ -40,6 +40,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static java.net.HttpURLConnection.HTTP_NOT_MODIFIED;
+import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
 public class CapabilitiesService {
     private static final String TAG = CapabilitiesService.class.getCanonicalName();
@@ -123,6 +124,12 @@ public class CapabilitiesService {
                 NextcloudHttpRequestFailedException requestFailedException = (NextcloudHttpRequestFailedException) e;
                 if (requestFailedException.getStatusCode() == HTTP_NOT_MODIFIED) {
                     Log.d(TAG, "onError HTTP_NOT_MODIFIED");
+                    responseCallback.onComplete();
+                } else if (requestFailedException.getStatusCode() == HTTP_UNAVAILABLE) {
+                    Log.d(TAG, "onError HTTP_UNAVAILABLE");
+                    // Retrofit don't handle response when 503. Save Fake capabilities response.
+                    preferences.edit().putString(context.getString(R.string.cache_capabilities_etag), String.valueOf(System.currentTimeMillis())).apply();
+                    preferences.edit().putBoolean(context.getString(R.string.cache_maintenance_enabled), true).apply();
                     responseCallback.onComplete();
                 }
             } else {
