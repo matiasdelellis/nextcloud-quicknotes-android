@@ -52,6 +52,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import ar.delellis.quicknotes.R;
+import ar.delellis.quicknotes.activity.error.ErrorActivity;
 import ar.delellis.quicknotes.activity.login.LoginActivity;
 import ar.delellis.quicknotes.activity.about.AboutActivity;
 import ar.delellis.quicknotes.activity.editor.EditorActivity;
@@ -59,8 +60,11 @@ import ar.delellis.quicknotes.activity.main.NavigationAdapter.NavigationItem;
 import ar.delellis.quicknotes.activity.main.NavigationAdapter.TagNavigationItem;
 import ar.delellis.quicknotes.activity.main.SortingOrderDialogFragment.OnSortingOrderListener;
 import ar.delellis.quicknotes.api.ApiProvider;
+import ar.delellis.quicknotes.api.helper.IResponseCallback;
+import ar.delellis.quicknotes.model.Capabilities;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
+import ar.delellis.quicknotes.util.CapabilitiesService;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -344,8 +348,36 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     }
 
     @Override
-    public void onErrorLoading(String message) {
-        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+    public void onErrorLoading(String errorMessage) {
+        CapabilitiesService capabilitiesService = new CapabilitiesService(this);
+        capabilitiesService.refresh(new IResponseCallback() {
+            @Override
+            public void onComplete() {
+                Capabilities capabilities = capabilitiesService.getCapabilities();
+                if (capabilities.isMaintenanceEnabled()) {
+                    Intent intent = new Intent(MainActivity.this, ErrorActivity.class);
+                    intent.putExtra("errorMessage", getString(R.string.error_maintenance_mode));
+                    startActivity(intent);
+                    finish();
+                } else if (capabilities.getQuicknotesVersion().isEmpty()) {
+                    Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
+                    intent.putExtra("errorMessage", getString(R.string.error_not_installed));
+                    startActivity(intent);
+                    finish();
+                } else {
+                    String errorDetail = !errorMessage.isEmpty() ? errorMessage : getString(R.string.error_unknown);
+                    Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
+                    intent.putExtra("errorMessage", errorDetail);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        });
     }
 
     @Override

@@ -50,23 +50,24 @@ public class ApiProvider {
 
     public ApiProvider(@NotNull Context context) {
         this.context = context;
-        initSsoApi(new NextcloudAPI.ApiConnectedListener() {
-            @Override
-            public void onConnected() {
-                // Ignore..
-            }
 
-            @Override
-            public void onError(Exception ex) {
-                // Ignore...
-            }
-        });
+        initSsoApi();
     }
 
-    public void initSsoApi(final NextcloudAPI.ApiConnectedListener callback) {
+    public void initSsoApi() {
         try {
             SingleSignOnAccount ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(context);
-            NextcloudAPI nextcloudAPI = new NextcloudAPI(context, ssoAccount, new GsonConfig().create(), callback);
+            NextcloudAPI nextcloudAPI = new NextcloudAPI(context, ssoAccount, new GsonConfig().create(), new NextcloudAPI.ApiConnectedListener() {
+                @Override
+                public void onConnected() {
+                    // Ignore..
+                }
+
+                @Override
+                public void onError(Exception ex) {
+                    // Ignore...
+                }
+            });
 
             quicknotesAPI = new NextcloudRetrofitApiBuilder(nextcloudAPI, QuicknotesAPI.API_ENDPOINT).create(QuicknotesAPI.class);
             nextcloudServerApi = new NextcloudRetrofitApiBuilder(nextcloudAPI, NextcloudServerApi.NC_API_ENDPOINT).create(NextcloudServerApi.class);

@@ -31,18 +31,10 @@ import com.nextcloud.android.sso.exceptions.NoCurrentAccountSelectedException;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
 import com.nextcloud.android.sso.model.SingleSignOnAccount;
 
-import ar.delellis.quicknotes.R;
-import ar.delellis.quicknotes.activity.error.ErrorActivity;
 import ar.delellis.quicknotes.activity.login.LoginActivity;
 import ar.delellis.quicknotes.activity.main.MainActivity;
-import ar.delellis.quicknotes.api.ApiProvider;
-import ar.delellis.quicknotes.api.helper.IResponseCallback;
-import ar.delellis.quicknotes.model.Capabilities;
-import ar.delellis.quicknotes.util.CapabilitiesService;
 
 public class SplashscreenActivity extends AppCompatActivity {
-
-    CapabilitiesService capabilitiesService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,42 +43,14 @@ public class SplashscreenActivity extends AppCompatActivity {
         try {
             SingleSignOnAccount ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(getApplicationContext());
             SingleAccountHelper.setCurrentAccount(getApplicationContext(), ssoAccount.name);
-            launchMainActivity();
+
+            Intent intent = new Intent(SplashscreenActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
         }
-    }
-
-    private void launchMainActivity () {
-        ApiProvider mApi = new ApiProvider(getApplicationContext());
-        capabilitiesService = new CapabilitiesService(this);
-        capabilitiesService.refresh(new IResponseCallback() {
-            @Override
-            public void onComplete() {
-                Capabilities capabilities = capabilitiesService.getCapabilities();
-                if (capabilities.isMaintenanceEnabled()) {
-                    Intent intent = new Intent(SplashscreenActivity.this, ErrorActivity.class);
-                    intent.putExtra("errorMessage", getString(R.string.error_maintenance_mode));
-                    startActivity(intent);
-                    finish();
-                } else if (capabilities.getQuicknotesVersion().isEmpty()) {
-                    Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
-                    intent.putExtra("errorMessage", getString(R.string.error_not_installed));
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Intent intent = new Intent(SplashscreenActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
     }
 }

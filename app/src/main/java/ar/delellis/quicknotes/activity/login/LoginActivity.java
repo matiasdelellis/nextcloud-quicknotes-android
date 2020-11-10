@@ -41,22 +41,12 @@ import com.nextcloud.android.sso.model.SingleSignOnAccount;
 import com.nextcloud.android.sso.ui.UiExceptionManager;
 
 import ar.delellis.quicknotes.R;
-import ar.delellis.quicknotes.activity.error.ErrorActivity;
 import ar.delellis.quicknotes.activity.main.MainActivity;
-import ar.delellis.quicknotes.api.ApiProvider;
-import ar.delellis.quicknotes.api.helper.IResponseCallback;
-import ar.delellis.quicknotes.model.Capabilities;
-import ar.delellis.quicknotes.util.CapabilitiesService;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = LoginActivity.class.getCanonicalName();
-
     protected ProgressBar progress;
     protected Button button;
-
-    protected SingleSignOnAccount ssoAccount;
-    private CapabilitiesService capabilitiesService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +91,10 @@ public class LoginActivity extends AppCompatActivity {
                     Context l_context = getApplicationContext();
                     SingleAccountHelper.setCurrentAccount(l_context, account.name);
 
-                    accountAccessDone();
+                    /* Open main view. */
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
             });
         } catch (AccountImportCancelledException e) {
@@ -113,37 +106,5 @@ public class LoginActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         AccountImporter.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    private void accountAccessDone() {
-        ApiProvider mApi = new ApiProvider(getApplicationContext());
-        capabilitiesService = new CapabilitiesService(this);
-
-        capabilitiesService.refresh(new IResponseCallback() {
-            @Override
-            public void onComplete() {
-                Capabilities capabilities = capabilitiesService.getCapabilities();
-                if (capabilities.getQuicknotesVersion().isEmpty()) {
-                    Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
-                    intent.putExtra("errorMessage", getString(R.string.error_not_installed));
-                    startActivity(intent);
-                    finish();
-                } else if (capabilities.isMaintenanceEnabled()) {
-                    Intent intent = new Intent(LoginActivity.this, ErrorActivity.class);
-                    intent.putExtra("errorMessage", getString(R.string.error_maintenance_mode));
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-
-            @Override
-            public void onError(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
     }
 }
