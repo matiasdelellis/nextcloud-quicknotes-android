@@ -21,13 +21,17 @@
 
 package ar.delellis.quicknotes.activity.editor;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.jetbrains.annotations.NotNull;
 
 import ar.delellis.quicknotes.api.ApiProvider;
+import ar.delellis.quicknotes.model.Attachment;
 import ar.delellis.quicknotes.model.Note;
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -116,6 +120,27 @@ public class EditorPresenter {
                 });
             }
         });
-
     }
+
+    void uploadAttachment(MultipartBody.Part filePart) {
+        view.showProgress();
+
+        Call<Attachment> call = ApiProvider.getQuicknotesAPI().uploadAttachment(filePart);
+        call.enqueue(new Callback<Attachment>() {
+            @Override
+            public void onResponse(Call<Attachment> call, Response<Attachment> response) {
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
+                });
+            }
+            @Override
+            public void onFailure(Call<Attachment> call, Throwable t) {
+                ((AppCompatActivity) view).runOnUiThread(() -> {
+                    view.hideProgress();
+                    view.onRequestError(t.getLocalizedMessage());
+                });
+            }
+        });
+    }
+
 }

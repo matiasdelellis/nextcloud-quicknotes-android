@@ -35,7 +35,6 @@ import ar.delellis.quicknotes.activity.login.LoginActivity;
 import ar.delellis.quicknotes.activity.main.MainActivity;
 
 public class SplashscreenActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -110,6 +110,15 @@
         android:src="@drawable/ic_tag_grey"
         android:contentDescription="@string/tags"/>
     <ImageButton
+        android:id="@+id/action_attach"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent"
+        android:maxHeight="24dp"
+        android:maxWidth="24dp"
+        android:src="@drawable/ic_attach_file"
+        android:contentDescription="@string/tags"/>
+    <ImageButton
         android:id="@+id/action_share"
         android:layout_width="48dp"
         android:layout_height="48dp"

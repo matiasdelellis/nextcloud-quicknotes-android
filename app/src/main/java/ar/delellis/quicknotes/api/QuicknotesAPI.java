@@ -23,14 +23,18 @@ package ar.delellis.quicknotes.api;
 
 import java.util.List;
 
+import ar.delellis.quicknotes.model.Attachment;
 import ar.delellis.quicknotes.model.Note;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface QuicknotesAPI {
@@ -54,4 +58,11 @@ public interface QuicknotesAPI {
     Call<Note> deleteNote(
             @Path("id") int id
     );
+
+    @Multipart
+    @POST("/attachments")
+    Call<Attachment> uploadAttachment(
+            @Part MultipartBody.Part file
+    );
+
 }

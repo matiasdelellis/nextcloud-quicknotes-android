@@ -22,17 +22,21 @@
 package ar.delellis.quicknotes.activity.editor;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
@@ -49,6 +53,7 @@ import android.widget.Toast;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,11 +69,24 @@ import ar.delellis.quicknotes.shared.TagAdapter;
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.util.ColorUtil;
+import ar.delellis.quicknotes.util.FileUtils;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import petrov.kristiyan.colorpicker.ColorPicker;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.M;
+import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
+
 public class EditorActivity extends AppCompatActivity implements EditorView {
+    private final String TAG = EditorActivity.class.getCanonicalName();
 
     private static final int INTENT_TAGS = 100;
+
+    private static final int REQUEST_CODE_ADD_FILE = 1;
+    private static final int REQUEST_CODE_ADD_FILE_PERMISSION = 2;
 
     EditorPresenter presenter;
     ProgressDialog progressDialog;
@@ -245,6 +263,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         button = findViewById(R.id.action_note_color);
         button.setOnClickListener(view -> showColorPicker());
 
+        button = findViewById(R.id.action_attach);
+        button.setOnClickListener(view -> pickFile());
+
         button = findViewById(R.id.action_tags);
         button.setOnClickListener(view -> showTagsSelection());
     }
@@ -300,6 +321,31 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             }
         });
         colorPicker.show();
+    }
+
+    public void pickFile() {
+        if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
+            requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_CODE_ADD_FILE_PERMISSION);
+        } else {
+            startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .setType("*/*"), REQUEST_CODE_ADD_FILE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ADD_FILE_PERMISSION:
+                if (ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED) {
+                    pickFile();
+                } else {
+                    Toast.makeText(this, "R.string.cannot_upload_files_without_permission", Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private void setDataFromIntentExtra() {
@@ -372,13 +418,43 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == INTENT_TAGS && resultCode == RESULT_OK) {
-            tagSelection = (List<Tag>) Objects.requireNonNull(data.getSerializableExtra("tagSelection"));
-            note.setTags(tagSelection);
-            tagAdapter.setItems(tagSelection);
-            tagAdapter.notifyDataSetChanged();
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case INTENT_TAGS:
+                if (resultCode == RESULT_OK) {
+                    tagSelection = (List<Tag>) Objects.requireNonNull(data.getSerializableExtra("tagSelection"));
+                    note.setTags(tagSelection);
+                    tagAdapter.setItems(tagSelection);
+                    tagAdapter.notifyDataSetChanged();
+                }
+                break;
+            case REQUEST_CODE_ADD_FILE: {
+                if (resultCode == RESULT_OK) {
+                    if (data == null) {
+                        return;
+                    }
+
+                    final Uri fileUri = data.getData();
+                    if (fileUri == null) {
+                        return;
+                    }
+
+                    if (!ContentResolver.SCHEME_CONTENT.equals(fileUri.getScheme())) {
+                        return;
+                    }
+
+                    File file = FileUtils.getFile(this, fileUri);
+
+                    RequestBody requestBody = RequestBody.create(MediaType.parse(getContentResolver().getType(fileUri)), file);
+                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+
+                    presenter.uploadAttachment(filePart);
+                }
+                break;
+            }
+            default: {
+                super.onActivityResult(requestCode, resultCode, data);
+            }
         }
     }
 
