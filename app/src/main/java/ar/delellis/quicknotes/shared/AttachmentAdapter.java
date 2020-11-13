@@ -87,4 +87,10 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
         this.attachments = attachments;
         notifyDataSetChanged();
     }
+
+    public void addItem(Attachment attachment) {
+        this.attachments.add(attachment);
+        notifyDataSetChanged();
+    }
+
 }

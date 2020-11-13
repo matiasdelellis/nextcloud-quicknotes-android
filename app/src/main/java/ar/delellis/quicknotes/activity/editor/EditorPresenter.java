@@ -21,8 +21,6 @@
 
 package ar.delellis.quicknotes.activity.editor;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -128,13 +126,14 @@ public class EditorPresenter {
         Call<Attachment> call = ApiProvider.getQuicknotesAPI().uploadAttachment(filePart);
         call.enqueue(new Callback<Attachment>() {
             @Override
-            public void onResponse(Call<Attachment> call, Response<Attachment> response) {
+            public void onResponse(@NotNull Call<Attachment> call, @NotNull Response<Attachment> response) {
                 ((AppCompatActivity) view).runOnUiThread(() -> {
                     view.hideProgress();
+                    view.addAttachment(response.body());
                 });
             }
             @Override
-            public void onFailure(Call<Attachment> call, Throwable t) {
+            public void onFailure(@NotNull Call<Attachment> call, @NotNull Throwable t) {
                 ((AppCompatActivity) view).runOnUiThread(() -> {
                     view.hideProgress();
                     view.onRequestError(t.getLocalizedMessage());

@@ -21,9 +21,12 @@
 
 package ar.delellis.quicknotes.activity.editor;
 
+import ar.delellis.quicknotes.model.Attachment;
+
 public interface EditorView {
     void showProgress();
     void hideProgress();
     void onRequestSuccess(String message);
     void onRequestError(String message);
+    void addAttachment(Attachment attachment);
 }

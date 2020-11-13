@@ -62,6 +62,7 @@ import java.util.Objects;
 
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.activity.tags.TagsActivity;
+import ar.delellis.quicknotes.model.Attachment;
 import ar.delellis.quicknotes.model.Tag;
 import ar.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.delellis.quicknotes.shared.ShareAdapter;
@@ -278,6 +279,11 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     @Override
     public void hideProgress() {
         progressDialog.dismiss();
+    }
+
+    @Override
+    public void addAttachment(Attachment attachment){
+        attachmentAdapter.addItem(attachment);
     }
 
     @Override
