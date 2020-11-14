@@ -89,6 +89,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     private static final int REQUEST_CODE_ADD_FILE = 1;
     private static final int REQUEST_CODE_ADD_FILE_PERMISSION = 2;
 
+    private static final String KEY_ACTION_VIEW_FILE_ID = "KEY_FILE_ID";
+    private static final String KEY_ACTION_VIEW_ACCOUNT = "KEY_ACCOUNT";
+
     EditorPresenter presenter;
     ProgressDialog progressDialog;
 
@@ -140,6 +143,14 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         attachmentAdapter = new AttachmentAdapter();
         attachmentRecyclerView = findViewById(R.id.editor_recyclerAttachments);
+        attachmentAdapter.setOnClickListener(view -> {
+            int position = attachmentRecyclerView.getChildAdapterPosition(view);
+            Attachment attachment = attachmentAdapter.get(position);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(attachment.getDeepLinkUrl()));
+            intent.putExtra(KEY_ACTION_VIEW_FILE_ID, attachment.getFileId());
+            intent.putExtra(KEY_ACTION_VIEW_ACCOUNT, ApiProvider.getUsername());
+            startActivity(intent);
+        });
 
         et_title = findViewById(R.id.editor_title);
         et_content = findViewById(R.id.editor_content);

@@ -45,6 +45,9 @@ public class Attachment implements Serializable {
     @Expose
     @SerializedName("redirect_url") private String redirect_url;
 
+    @Expose
+    @SerializedName("deep_link_url") private String deep_link_url;
+
     public int getId() {
         return id;
     }
@@ -89,7 +92,15 @@ public class Attachment implements Serializable {
         return redirect_url;
     }
 
-    public void setRedirect_url(String redirect_url) {
+    public void setRedirectUrl(String redirect_url) {
         this.redirect_url = redirect_url;
+    }
+
+    public String getDeepLinkUrl() {
+        return deep_link_url;
+    }
+
+    public void setDeepLinkUrl(String deep_link_url) {
+        this.deep_link_url = deep_link_url;
     }
 }

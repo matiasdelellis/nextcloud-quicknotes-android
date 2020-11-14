@@ -330,6 +330,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
         RecyclerViewAdapter(@NonNull View itemView, ItemClickListener itemClickListener) {
             super(itemView);
+            this.itemClickListener = itemClickListener;
 
             card_item = itemView.findViewById(R.id.item_note);
             tv_title = itemView.findViewById(R.id.item_title);
@@ -346,10 +347,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             shareAdapter = new ShareAdapter();
             shareRecyclerView = itemView.findViewById(R.id.item_recyclerShares);
 
-            this.itemClickListener = itemClickListener;
             card_item.setOnClickListener(this);
-
             tv_content.setOnClickListener(this);
+
+            attachmentAdapter.setOnClickListener(this);
         }
 
         @Override

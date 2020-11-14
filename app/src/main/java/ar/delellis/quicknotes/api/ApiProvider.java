@@ -48,6 +48,8 @@ public class ApiProvider {
 
     protected static NextcloudServerApi nextcloudServerApi;
 
+    protected static String username;
+
     public ApiProvider(@NotNull Context context) {
         this.context = context;
 
@@ -71,6 +73,8 @@ public class ApiProvider {
 
             quicknotesAPI = new NextcloudRetrofitApiBuilder(nextcloudAPI, QuicknotesAPI.API_ENDPOINT).create(QuicknotesAPI.class);
             nextcloudServerApi = new NextcloudRetrofitApiBuilder(nextcloudAPI, NextcloudServerApi.NC_API_ENDPOINT).create(NextcloudServerApi.class);
+
+            username = ssoAccount.name;
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
             Log.d(TAG, "setAccout() called with: ex = [" + e + "]");
         }
@@ -84,4 +88,7 @@ public class ApiProvider {
         return nextcloudServerApi;
     }
 
+    public static String getUsername() {
+        return username;
+    }
 }
