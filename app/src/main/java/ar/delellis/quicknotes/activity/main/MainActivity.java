@@ -41,8 +41,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import androidx.appcompat.widget.SearchView;
 
-import android.widget.Toast;
-
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
@@ -52,6 +50,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import ar.delellis.quicknotes.BuildConfig;
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.activity.error.ErrorActivity;
 import ar.delellis.quicknotes.activity.login.LoginActivity;
@@ -241,7 +240,8 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         });
 
         navItems.add(new NavigationItem(ADAPTER_KEY_ABOUT, getString(R.string.about), NavigationAdapter.ICON_INFO));
-        navItems.add(new NavigationItem(ADAPTER_KEY_DONATE, getString(R.string.donate), NavigationAdapter.ICON_FAVORITE));
+        if (!BuildConfig.FLAVOR.equals("play"))
+            navItems.add(new NavigationItem(ADAPTER_KEY_DONATE, getString(R.string.donate), NavigationAdapter.ICON_FAVORITE));
         navItems.add(new NavigationItem(ADAPTER_KEY_SWITCH_ACCOUNT, getString(R.string.switch_account), NavigationAdapter.ICON_LOGOUT));
         navigationCommonAdapter.setItems(navItems);
 
