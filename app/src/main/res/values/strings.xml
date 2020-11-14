@@ -20,15 +20,15 @@
   -->
 
 <resources>
-    // Main app
+    <!-- Main app -->
     <string name="app_name">Quick notes</string>
     <string name="nextcloud_quicknotes">Nextcloud Quick notes</string>
 
-    // Login activity
+    <!-- Login activity -->
     <string name="welcome_quicknotes">Welcome to Nextcloud Quick notes</string>
     <string name="choose_account">Choose account</string>
 
-    // Common strings
+    <!-- Common strings -->
     <string name="title">Title</string>
     <string name="note">Note</string>
     <string name="tag">Tag</string>
@@ -45,11 +45,11 @@
     <string name="new_note">New note</string>
     <string name="delete_note">Delete note</string>
 
-    // Notes activity
+    <!-- Notes activity -->
     <string name="please_wait">Please wait…</string>
     <string name="search_in_all">Search all notes</string>
 
-    // Sidebar filters
+    <!-- Sidebar filters -->
     <string name="all_notes">All notes</string>
     <string name="pinned">Pinned</string>
     <string name="shared_with_others">Shared with others</string>
@@ -58,44 +58,25 @@
     <string name="donate">Donate</string>
     <string name="switch_account">Switch account</string>
 
-    // Sort dialog
+    <!-- Sort dialog -->
     <string name="sort_by">Sort by</string>
     <string name="menu_item_sort_by_title_a_z">A - Z</string>
     <string name="menu_item_sort_by_date_newest_first">Newest first</string>
     <string name="menu_item_sort_by_date_updated_first">Updated first</string>
 
-    // Note editor.
+    <!-- Note editor -->
     <string name="must_enter_title">Please enter a title</string>
     <string name="must_enter_content">You must enter a content to the note</string>
     <string name="note_color">Note color</string>
     <string name="select_note_color">Select the note color</string>
 
-    // Tag editor
+    <!-- Tag editor -->
     <string name="create_tag">Create Tag “%1$s”</string>
     <string name="enter_tag_name">Enter the name of the tag</string>
 
-    // Preferences
-    <string name="setting_sort_by">SETTING_SORT_BY</string>
-    <string name="setting_pinned_first">SETTING_PINNED_FIRST</string>
-    <string name="setting_grid_view_enabled">SETTING_GRID_VIEW_ENABLED</string>
-
-    // Capabilities cached on preferences
-    <string name="cache_capabilities_etag">cache_capabilities_etag</string>
-    <string name="cache_maintenance_enabled">cache_maintenance_enabled</string>
-    <string name="cache_nextcloud_version">cache_nextcloud_version</string>
-    <string name="cache_quicknotes_version">cache_quicknotes_version</string>
-    <string name="cache_quicknotes_api_version">cache_quicknotes_api_version</string>
-
-    // Common errors.
+    <!-- Common errors -->
     <string name="error_not_installed">We could not determine the version of the server side Quick notes app. Please make sure it is installed and enabled.</string>
     <string name="error_maintenance_mode">The server is currently in maintenance mode. Please contact your administrator or try later again.</string>
-
-    <!-- URLs -->
-    <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes-android</string>
-    <string name="url_issues" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes-android/issues/new/choose</string>
-    <string name="url_license" translatable="false">https://raw.githubusercontent.com/matiasdelellis/nextcloud-quicknotes-android/master/LICENSE</string>
-    <string name="url_donate" translatable="false">https://github.com/matiasdelellis/quicknotes/wiki/Donate</string>
-    <string name="url_translations" translatable="false">https://www.transifex.com/matias/quicknotes/</string>
 
     <!-- About -->
     <string name="about_versions_title">Versions</string>
@@ -114,5 +95,24 @@
     <string name="about_app_license">This application is licensed under the GNU GENERAL PUBLIC LICENSE v3+.</string>
     <string name="about_app_license_button">View license</string>
     <string name="error_unknown">An unknown error occurred</string>
+
+    <!-- Preferences -->
+    <string name="setting_sort_by" translatable="false">SETTING_SORT_BY</string>
+    <string name="setting_pinned_first" translatable="false">SETTING_PINNED_FIRST</string>
+    <string name="setting_grid_view_enabled" translatable="false">SETTING_GRID_VIEW_ENABLED</string>
+
+    <!-- Capabilities cached on preferences -->
+    <string name="cache_capabilities_etag" translatable="false">cache_capabilities_etag</string>
+    <string name="cache_maintenance_enabled" translatable="false">cache_maintenance_enabled</string>
+    <string name="cache_nextcloud_version" translatable="false">cache_nextcloud_version</string>
+    <string name="cache_quicknotes_version" translatable="false">cache_quicknotes_version</string>
+    <string name="cache_quicknotes_api_version" translatable="false">cache_quicknotes_api_version</string>
+
+    <!-- URLs -->
+    <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes-android</string>
+    <string name="url_issues" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes-android/issues/new/choose</string>
+    <string name="url_license" translatable="false">https://raw.githubusercontent.com/matiasdelellis/nextcloud-quicknotes-android/master/LICENSE</string>
+    <string name="url_donate" translatable="false">https://github.com/matiasdelellis/quicknotes/wiki/Donate</string>
+    <string name="url_translations" translatable="false">https://www.transifex.com/matias/quicknotes/</string>
 
 </resources>
