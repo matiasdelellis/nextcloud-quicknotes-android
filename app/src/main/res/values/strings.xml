@@ -55,6 +55,7 @@
     <string name="shared_with_others">Shared with others</string>
     <string name="shared_with_you">Shared with you</string>
     <string name="about">About</string>
+    <string name="donate">Donate</string>
     <string name="switch_account">Switch account</string>
 
     // Sort dialog
@@ -90,9 +91,10 @@
     <string name="error_maintenance_mode">The server is currently in maintenance mode. Please contact your administrator or try later again.</string>
 
     <!-- URLs -->
-    <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes</string>
-    <string name="url_issues" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes/issues/new/choose</string>
-    <string name="url_license" translatable="false">https://raw.githubusercontent.com/matiasdelellis/nextcloud-quicknotes/master/LICENSE</string>
+    <string name="url_source" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes-android</string>
+    <string name="url_issues" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes-android/issues/new/choose</string>
+    <string name="url_license" translatable="false">https://raw.githubusercontent.com/matiasdelellis/nextcloud-quicknotes-android/master/LICENSE</string>
+    <string name="url_donate" translatable="false">https://github.com/matiasdelellis/quicknotes/wiki/Donate</string>
     <string name="url_translations" translatable="false">https://www.transifex.com/matias/quicknotes/</string>
 
     <!-- About -->

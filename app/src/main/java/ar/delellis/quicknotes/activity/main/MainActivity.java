@@ -36,6 +36,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import androidx.appcompat.widget.SearchView;
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     public static final String ADAPTER_KEY_SHARED_WITH = "shared_with";
     public static final String ADAPTER_KEY_TAG_PREFIX = "tag:";
     public static final String ADAPTER_KEY_ABOUT = "about";
+    public static final String ADAPTER_KEY_DONATE = "donate";
     public static final String ADAPTER_KEY_SWITCH_ACCOUNT = "switch_account";
 
     private SharedPreferences preferences;
@@ -225,16 +227,21 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         navigationMenuFilter.setAdapter(navigationFilterAdapter);
 
         navigationCommonAdapter = new NavigationAdapter(this, item -> {
-            if (item.id.equals(ADAPTER_KEY_SWITCH_ACCOUNT)) {
-                switch_account();
-            } else if (item.id.equals(ADAPTER_KEY_ABOUT)) {
-                startActivity(new Intent(this, AboutActivity.class));
-            } else {
-                Toast.makeText(MainActivity.this, "Selected " + item.label, Toast.LENGTH_SHORT).show();
+            switch (item.id) {
+                case ADAPTER_KEY_ABOUT:
+                    startActivity(new Intent(this, AboutActivity.class));
+                    break;
+                case ADAPTER_KEY_DONATE:
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_donate))));
+                    break;
+                case ADAPTER_KEY_SWITCH_ACCOUNT:
+                    switch_account();
+                    break;
             }
         });
 
         navItems.add(new NavigationItem(ADAPTER_KEY_ABOUT, getString(R.string.about), NavigationAdapter.ICON_INFO));
+        navItems.add(new NavigationItem(ADAPTER_KEY_DONATE, getString(R.string.donate), NavigationAdapter.ICON_FAVORITE));
         navItems.add(new NavigationItem(ADAPTER_KEY_SWITCH_ACCOUNT, getString(R.string.switch_account), NavigationAdapter.ICON_LOGOUT));
         navigationCommonAdapter.setItems(navItems);
 

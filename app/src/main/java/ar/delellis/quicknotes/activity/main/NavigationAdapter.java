@@ -52,6 +52,8 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
     @DrawableRes
     public static final int ICON_SHARED = R.drawable.ic_shared_grey;
     @DrawableRes
+    public static final int ICON_FAVORITE = R.drawable.ic_favorite;
+    @DrawableRes
     public static final int ICON_INFO = R.drawable.ic_info_grey;
     @DrawableRes
     public static final int ICON_LOGOUT = R.drawable.ic_logout_grey;
