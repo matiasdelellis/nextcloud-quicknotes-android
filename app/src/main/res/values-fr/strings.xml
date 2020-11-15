@@ -1,0 +1,98 @@
+<!--
+  ~ Nextcloud Quicknotes Android client application.
+  ~
+  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ @author Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <!-- Main app -->
+    <string name="app_name">Notes rapides</string>
+    <string name="nextcloud_quicknotes">Nextcloud Notes rapides</string>
+
+    <!-- Login activity -->
+    <string name="welcome_quicknotes">Bienvenue sur Nextcloud Notes rapides</string>
+    <string name="choose_account">Choisir un compte</string>
+
+    <!-- Common strings -->
+    <string name="title">Titre</string>
+    <string name="note">Note</string>
+    <string name="tag">Étiquette</string>
+    <string name="tags">Étiquettes</string>
+    <string name="save">Enregistrer</string>
+    <string name="common_cancel">Annuler</string>
+    <string name="share">Partager</string>
+    <string name="clean_filter">Enlever le filtre</string>
+    <string name="shared_note">Note partagée</string>
+    <string name="pin_note">Épingler la note</string>
+    <string name="attachment_thumbnail">Pièce jointe</string>
+    <string name="change_sort">Modifier le tri</string>
+    <string name="change_view">Modifier la vue</string>
+    <string name="new_note">Nouvelle note</string>
+    <string name="delete_note">Supprimer la note</string>
+
+    <!-- Notes activity -->
+    <string name="please_wait">Veuillez patienter...</string>
+    <string name="search_in_all">Rechercher toutes les notes</string>
+
+    <!-- Sidebar filters -->
+    <string name="all_notes">Toutes les notes</string>
+    <string name="pinned">Épinglées</string>
+    <string name="shared_with_others">Partagé avec d’autres</string>
+    <string name="shared_with_you">Partagé avec vous</string>
+    <string name="about">À propos</string>
+    <string name="donate">Faire un don</string>
+    <string name="switch_account">Changer de compte</string>
+
+    <!-- Sort dialog -->
+    <string name="sort_by">Trier par</string>
+    <string name="menu_item_sort_by_title_a_z">A - Z</string>
+    <string name="menu_item_sort_by_date_newest_first">Le plus récent en premier</string>
+    <string name="menu_item_sort_by_date_updated_first">Mise à jour en premier</string>
+
+    <!-- Note editor -->
+    <string name="must_enter_title">Veuillez saisir un titre</string>
+    <string name="must_enter_content">Vous devez insérer un contenu à cette note</string>
+    <string name="note_color">Couleur de la note</string>
+    <string name="select_note_color">Choisissez la couleur de la note</string>
+
+    <!-- Tag editor -->
+    <string name="create_tag">Créer une étiquette “%1$s”</string>
+    <string name="enter_tag_name">Entrer le nom de l’étiquette</string>
+
+    <!-- Common errors -->
+    <string name="error_not_installed">Nous n\'avons pas pu déterminer la version de l\'application Notes rapides sur le serveur. Veuillez vous assurer qu\'elle est installée et activée.</string>
+    <string name="error_maintenance_mode">Le serveur est actuellement en mode de maintenance. Veuillez contacter votre administrateur ou réessayer plus tard.</string>
+
+    <!-- About -->
+    <string name="about_versions_title">Versions</string>
+    <string name="about_version">Vous utilisez actuellement Nextcloud Notes rapides &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_nextcloud_version">Votre serveur utilise actuellement Nextcloud &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_quicknotes_version">Votre serveur utilise actuellement Notes rapides &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_developers_title">Développeurs</string>
+    <string name="about_source_title">Code source</string>
+    <string name="about_source">Ce projet est hébergé sur Github : &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_issues_title">Problèmes</string>
+    <string name="about_issues">Vous pouvez signaler les bogues, les propositions d\'amélioration et les demandes de fonctionnalités sur le traqueur de problèmes Github : &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_translations_title">Traductions</string>
+    <string name="about_translate">Rejoignez l’équipe de Notes rapides sur Transifex et aidez-nous à traduire cette application : &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_app_license_title">Licence de l’application</string>
+    <string name="about_app_license">Cette application est sous licence GNU GENERAL PUBLIC LICENSE v3+.</string>
+    <string name="about_app_license_button">Voir la licence</string>
+    <string name="error_unknown">Une erreur inconnue s’est produite</string>
+
+    </resources>

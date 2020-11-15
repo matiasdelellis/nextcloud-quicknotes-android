@@ -1,0 +1,98 @@
+<!--
+  ~ Nextcloud Quicknotes Android client application.
+  ~
+  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ @author Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <!-- Main app -->
+    <string name="app_name">Kurznotizen</string>
+    <string name="nextcloud_quicknotes">Nextcloud Kurznotizen</string>
+
+    <!-- Login activity -->
+    <string name="welcome_quicknotes">Willkommen bei Nextcloud Kurznotizen</string>
+    <string name="choose_account">Kontoauswahl</string>
+
+    <!-- Common strings -->
+    <string name="title">Titel</string>
+    <string name="note">Notiz</string>
+    <string name="tag">Rubrik</string>
+    <string name="tags">Rubriken</string>
+    <string name="save">Speichern</string>
+    <string name="common_cancel">Abbrechen</string>
+    <string name="share">Teilen</string>
+    <string name="clean_filter">Filter löschen</string>
+    <string name="shared_note">Geteilte Notiz</string>
+    <string name="pin_note">Notiz anpinnen</string>
+    <string name="attachment_thumbnail">Anhangvorschau</string>
+    <string name="change_sort">Sortierung ändern</string>
+    <string name="change_view">Ansicht ändern</string>
+    <string name="new_note">Neue Notiz</string>
+    <string name="delete_note">Lösche Notiz</string>
+
+    <!-- Notes activity -->
+    <string name="please_wait">Bitte warten...</string>
+    <string name="search_in_all">Durchsuche alle Notizen</string>
+
+    <!-- Sidebar filters -->
+    <string name="all_notes">Alle Notizen</string>
+    <string name="pinned">Angepinnt</string>
+    <string name="shared_with_others">Geteilt mit anderen</string>
+    <string name="shared_with_you">Geteilt mit Dir</string>
+    <string name="about">Über</string>
+    <string name="donate">Spenden</string>
+    <string name="switch_account">Wechsle Konto</string>
+
+    <!-- Sort dialog -->
+    <string name="sort_by">Sortiert nach</string>
+    <string name="menu_item_sort_by_title_a_z">A-Z</string>
+    <string name="menu_item_sort_by_date_newest_first">Neueste zuerst</string>
+    <string name="menu_item_sort_by_date_updated_first">zuletzt geändert zuerst</string>
+
+    <!-- Note editor -->
+    <string name="must_enter_title">Bitte Titel eingeben</string>
+    <string name="must_enter_content">Es muss ein Inhalt eingegeben werden.</string>
+    <string name="note_color">Notizfarbe</string>
+    <string name="select_note_color">Wähle die Notizfarbe aus</string>
+
+    <!-- Tag editor -->
+    <string name="create_tag">Erzeuge Rubrik \"%1$s\"</string>
+    <string name="enter_tag_name">Geben Sie die Rubrikbezeichnung ein</string>
+
+    <!-- Common errors -->
+    <string name="error_not_installed">Wir konnten die Version der Kurznotizen-App nicht ermitteln. Bitte stellen Sie sicher, dass die App installiert und aktiviert ist.</string>
+    <string name="error_maintenance_mode">Der Server ist aktuell im Wartungsmodus. Bitte kontaktieren Sie den Administrator oder versuchen es später erneut.</string>
+
+    <!-- About -->
+    <string name="about_versions_title">Versionen</string>
+    <string name="about_version">Sie benutzen aktuell Kurznotizen &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_nextcloud_version">Ihr Server benutzt aktuell Nextcloud &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_quicknotes_version">Ihr Server benutzt aktuell Kurznotizen &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_developers_title">Entwickler</string>
+    <string name="about_source_title">Quellcode</string>
+    <string name="about_source">Dieses Projekt wird auf Github gehostet: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_issues_title">Fehler</string>
+    <string name="about_issues">Sie können Fehler, Verbesserungsvorschläge und Features in Github erfassen: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_translations_title">Übersetzungen</string>
+    <string name="about_translate">Treten Sie dem Kurznotizen Team auf Transifex bei und helfen Sie uns, die App zu übersetzen: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_app_license_title">Applizenz</string>
+    <string name="about_app_license">Diese Anwendung ist lizenziert unter der GNU GENERAL PUBLIC LICENSE v3+</string>
+    <string name="about_app_license_button">Lizenz anzeigen</string>
+    <string name="error_unknown">Ein unbekannter Fehler ist aufgetreten</string>
+
+    </resources>

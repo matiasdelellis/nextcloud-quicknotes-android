@@ -1,0 +1,98 @@
+<!--
+  ~ Nextcloud Quicknotes Android client application.
+  ~
+  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ @author Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <!-- Main app -->
+    <string name="app_name">Szybkie notatki</string>
+    <string name="nextcloud_quicknotes">Szybkie notatki Nextcloud</string>
+
+    <!-- Login activity -->
+    <string name="welcome_quicknotes">Witamy w Szybkich notatkach Nextcloud</string>
+    <string name="choose_account">Wybierz konto</string>
+
+    <!-- Common strings -->
+    <string name="title">Tytuł</string>
+    <string name="note">Notatka</string>
+    <string name="tag">Etykieta</string>
+    <string name="tags">Etykiety</string>
+    <string name="save">Zapisz</string>
+    <string name="common_cancel">Anuluj</string>
+    <string name="share">Udostępnij</string>
+    <string name="clean_filter">Wyczyść filtr</string>
+    <string name="shared_note">Udostępniona notatka</string>
+    <string name="pin_note">Przypnij notatkę</string>
+    <string name="attachment_thumbnail">Miniaturka załącznika</string>
+    <string name="change_sort">Zmień sortowanie</string>
+    <string name="change_view">Zmień widok</string>
+    <string name="new_note">Nowa notatka</string>
+    <string name="delete_note">Usuń notatkę</string>
+
+    <!-- Notes activity -->
+    <string name="please_wait">Proszę czekać…</string>
+    <string name="search_in_all">Przeszukaj notatki</string>
+
+    <!-- Sidebar filters -->
+    <string name="all_notes">Notatki</string>
+    <string name="pinned">Przypięte</string>
+    <string name="shared_with_others">Udostępnione innym</string>
+    <string name="shared_with_you">Udostępnione Tobie</string>
+    <string name="about">O aplikacji</string>
+    <string name="donate">Darowizna</string>
+    <string name="switch_account">Przełącz konto</string>
+
+    <!-- Sort dialog -->
+    <string name="sort_by">Sortuj według</string>
+    <string name="menu_item_sort_by_title_a_z">A - Z</string>
+    <string name="menu_item_sort_by_date_newest_first">Od najnowszych</string>
+    <string name="menu_item_sort_by_date_updated_first">Od zaktualizowanych</string>
+
+    <!-- Note editor -->
+    <string name="must_enter_title">Wpisz tytuł</string>
+    <string name="must_enter_content">Musisz wprowadzić treść do notatki</string>
+    <string name="note_color">Kolor notatki</string>
+    <string name="select_note_color">Wybierz kolor notatki</string>
+
+    <!-- Tag editor -->
+    <string name="create_tag">Utwórz etykietę ”%1$s”</string>
+    <string name="enter_tag_name">Wpisz nazwę etykiety</string>
+
+    <!-- Common errors -->
+    <string name="error_not_installed">Nie mogliśmy określić wersji aplikacji Szybkie notatki po stronie serwera. Upewnij się, że jest zainstalowana i włączona.</string>
+    <string name="error_maintenance_mode">Serwer jest obecnie w trybie konserwacji. Skontaktuj się z administratorem lub spróbuj ponownie później.</string>
+
+    <!-- About -->
+    <string name="about_versions_title">Wersje</string>
+    <string name="about_version">Obecnie korzystasz z usługi Szybkie notatki  Nextcloud &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_nextcloud_version">Twój serwer korzysta obecnie z Nextcloud &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_quicknotes_version">Twój serwer korzysta obecnie z Szybkich notatek &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_developers_title">Deweloperzy</string>
+    <string name="about_source_title">Kod źródłowy</string>
+    <string name="about_source">Projekt jest hostowany na GitHub: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_issues_title">Problemy</string>
+    <string name="about_issues">Możesz zgłaszać błędy, propozycje ulepszeń i prośby o funkcje w liście problemów na GitHub: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_translations_title">Tłumaczenia</string>
+    <string name="about_translate">Dołącz do zespołu Nextcloud na Transifex i pomóż nam przetłumaczyć tę aplikację: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
+    <string name="about_app_license_title">Licencja aplikacji</string>
+    <string name="about_app_license">Aplikacja jest na licencji GNU GENERAL PUBLIC LICENSE v3+.</string>
+    <string name="about_app_license_button">Wyświetl licencję</string>
+    <string name="error_unknown">Wystąpił nieznany błąd</string>
+
+    </resources>
