@@ -47,4 +47,8 @@ public class ColorUtil {
     public static String getRGBColorFromInt (@ColorInt int color) {
         return String.format("#%06X", (0xFFFFFF & color));
     }
+
+    public static String getRGBAColorFromInt (@ColorInt int color) {
+        return String.format("#%08X", color);
+    }
 }

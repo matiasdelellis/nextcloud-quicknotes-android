@@ -37,5 +37,6 @@
     <!-- Default colors of note -->
     <color name="defaultNoteColor">#F7EB96</color>
     <color name="defaultNoteTint">#202124</color>
+    <color name="defaultNoteHint">#61000000</color>
 
 </resources>

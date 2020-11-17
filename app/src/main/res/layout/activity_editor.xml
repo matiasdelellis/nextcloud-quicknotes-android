@@ -60,6 +60,7 @@
                 android:importantForAutofill="no"
                 android:textSize="@dimen/note_font_size_large"
                 android:textColor="@color/defaultNoteTint"
+                android:textColorHint="@color/defaultNoteHint"
                 app:backgroundTint="@color/transparent">
             </EditText>
 
@@ -75,14 +76,13 @@
                 android:minLines="5"
                 android:textSize="@dimen/note_font_size_medium"
                 app:backgroundColor="@color/transparent"
-                app:quoteBackground="@color/defaultNoteTint"
-                app:quoteBackgroundAlpha="5%"
                 app:textColor="@color/defaultNoteTint"
                 app:bulletColor="@color/defaultNoteTint"
+                app:textColorHint="@color/defaultNoteHint"
+                app:quoteBackground="@color/defaultNoteTint"
+                app:quoteBackgroundAlpha="5%"
                 app:lineSpacingExtra="10dp"
-                app:blockVerticalPadding="1dp"
-                app:backgroundTint="?android:attr/textColorHint"
-                app:textColorHint="?android:attr/textColorHint">
+                app:blockVerticalPadding="1dp">
             </org.wordpress.aztec.AztecText>
 
             <androidx.recyclerview.widget.RecyclerView
