@@ -61,13 +61,12 @@
 
     <!-- Sort dialog -->
     <string name="sort_by">Sort by</string>
-    <string name="menu_item_sort_by_title_a_z">A - Z</string>
+    <string name="menu_item_sort_by_title_a_z">By title</string>
     <string name="menu_item_sort_by_date_newest_first">Newest first</string>
     <string name="menu_item_sort_by_date_updated_first">Updated first</string>
 
     <!-- Note editor -->
     <string name="must_enter_title">Please enter a title</string>
-    <string name="must_enter_content">You must enter a content to the note</string>
     <string name="note_color">Note color</string>
     <string name="select_note_color">Select the note color</string>
 
@@ -78,6 +77,7 @@
     <!-- Common errors -->
     <string name="error_not_installed">We could not determine the version of the server side Quick notes app. Please make sure it is installed and enabled.</string>
     <string name="error_maintenance_mode">The server is currently in maintenance mode. Please contact your administrator or try later again.</string>
+    <string name="error_unknown">An unknown error occurred</string>
 
     <!-- About -->
     <string name="about_versions_title">Versions</string>
@@ -95,7 +95,6 @@
     <string name="about_app_license_title">App license</string>
     <string name="about_app_license">This application is licensed under the GNU GENERAL PUBLIC LICENSE v3+.</string>
     <string name="about_app_license_button">View license</string>
-    <string name="error_unknown">An unknown error occurred</string>
 
     <!-- Preferences -->
     <string name="setting_sort_by" translatable="false">SETTING_SORT_BY</string>
@@ -114,6 +113,6 @@
     <string name="url_issues" translatable="false">https://github.com/matiasdelellis/nextcloud-quicknotes-android/issues/new/choose</string>
     <string name="url_license" translatable="false">https://raw.githubusercontent.com/matiasdelellis/nextcloud-quicknotes-android/master/LICENSE</string>
     <string name="url_donate" translatable="false">https://github.com/matiasdelellis/quicknotes/wiki/Donate</string>
-    <string name="url_translations" translatable="false">https://www.transifex.com/matias/quicknotes/</string>
+    <string name="url_translations" translatable="false">https://www.transifex.com/matias/nextcloud-quicknotes-android/</string>
 
 </resources>

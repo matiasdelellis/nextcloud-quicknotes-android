@@ -123,13 +123,14 @@ public class SortingOrderDialogFragment extends DialogFragment {
             if (mCurrentSortOrder != (int) view.getTag()) {
                 continue;
             }
+            int tintColor =  view.getResources().getColor(R.color.fg_default_selection);
             if (view instanceof ImageButton) {
                 Drawable normalDrawable = ((ImageButton) view).getDrawable();
                 Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
-                DrawableCompat.setTint(wrapDrawable, this.getResources().getColor(R.color.defaultNoteTint));
+                DrawableCompat.setTint(wrapDrawable, tintColor);
             }
             if (view instanceof TextView) {
-                ((TextView)view).setTextColor(this.getResources().getColor(R.color.defaultNoteTint));
+                ((TextView)view).setTextColor(tintColor);
                 ((TextView)view).setTypeface(Typeface.DEFAULT_BOLD);
             }
         }
