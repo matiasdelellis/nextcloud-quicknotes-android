@@ -93,6 +93,9 @@ dependencies {
     // Wordpress mobile html editor
     api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:v1.3.44')
 
+    // Parse and clean HTML tags.
+    implementation 'org.jsoup:jsoup:1.13.1'
+
     //Palette
     implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
 

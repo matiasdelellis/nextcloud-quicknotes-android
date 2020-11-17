@@ -23,7 +23,6 @@ package ar.delellis.quicknotes.activity.main;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +49,7 @@ import ar.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.delellis.quicknotes.shared.ShareAdapter;
 import ar.delellis.quicknotes.shared.TagAdapter;
 import ar.delellis.quicknotes.util.ColorUtil;
+import ar.delellis.quicknotes.util.HtmlUtil;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAdapter> implements Filterable {
 
@@ -120,8 +120,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     public void onBindViewHolder(@NonNull RecyclerViewAdapter holder, int position) {
         Note note = noteListFiltered.get(position);
 
-        holder.tv_title.setText(Html.fromHtml(note.getTitle().trim()));
-        holder.tv_content.fromHtml(note.getContent().trim(), true);
+        holder.tv_title.setText(HtmlUtil.cleanString(note.getTitle()));
+        holder.tv_content.fromHtml(HtmlUtil.cleanHtml(note.getContent()), true);
         holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
         holder.im_shared.setVisibility(note.getIsShared() ? View.VISIBLE : View.GONE);
         holder.im_pinned.setVisibility(note.getIsPinned() ? View.VISIBLE : View.GONE);
@@ -162,11 +162,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             if (charSequence.toString().isEmpty()) {
                 filteredNotes.addAll(noteList);
             } else {
+                String query = charSequence.toString().toLowerCase();
                 for (Note note: noteList) {
-                    String query = charSequence.toString().toLowerCase();
-                    if (note.getTitle().toLowerCase().contains(query)) {
+                    if (HtmlUtil.cleanString(note.getTitle()).contains(query)) {
                         filteredNotes.add(note);
-                    } else if (note.getContent().toLowerCase().contains(query)) {
+                    } else if (HtmlUtil.cleanString(note.getContent()).contains(query)) {
                         filteredNotes.add(note);
                     }
                 }

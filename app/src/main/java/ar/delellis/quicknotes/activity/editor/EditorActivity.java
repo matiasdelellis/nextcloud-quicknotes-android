@@ -39,7 +39,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -71,6 +70,7 @@ import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.util.ColorUtil;
 import ar.delellis.quicknotes.util.FileUtils;
+import ar.delellis.quicknotes.util.HtmlUtil;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -215,14 +215,13 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
                     closeEdition();
                     return true;
                 }
-                // Update note from view.
-                note.setTitle(et_title.getText().toString().trim());
-                note.setContent(et_content.toFormattedHtml().trim());
+
+                // Clean html from view and update note to save.
+                note.setTitle(HtmlUtil.cleanString(et_title.getText().toString()));
+                note.setContent(HtmlUtil.cleanHtml(et_content.toFormattedHtml()));
 
                 if (note.getTitle().isEmpty()) {
                     et_title.setError(getString(R.string.must_enter_title));
-                } else if (note.getContent().isEmpty()) {
-                    et_content.setError(getString(R.string.must_enter_content));
                 } else {
                     if (note.getId() == 0)
                         presenter.createNote(note);
@@ -371,8 +370,8 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             attachmentAdapter.notifyDataSetChanged();
             attachmentRecyclerView.setAdapter(attachmentAdapter);
 
-            et_title.setText(Html.fromHtml(note.getTitle()));
-            et_content.fromHtml(note.getContent().trim(), true);
+            et_title.setText(HtmlUtil.cleanString(note.getTitle()));
+            et_content.fromHtml(HtmlUtil.cleanHtml(note.getContent()), true);
 
             tintActivityColor(Color.parseColor(note.getColor()));
 
