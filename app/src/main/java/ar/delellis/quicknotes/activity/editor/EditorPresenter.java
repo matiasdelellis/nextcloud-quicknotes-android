@@ -21,11 +21,14 @@
 
 package ar.delellis.quicknotes.activity.editor;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.jetbrains.annotations.NotNull;
 
+import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Attachment;
 import ar.delellis.quicknotes.model.Note;
@@ -51,10 +54,11 @@ public class EditorPresenter {
             public void onResponse(@NotNull Call<Note> call, @NotNull Response<Note> response) {
                 ((AppCompatActivity) view).runOnUiThread(() -> {
                     view.hideProgress();
+                    Context context = ((AppCompatActivity) view).getApplicationContext();
                     if (response.isSuccessful() && response.body() != null) {
-                        view.onRequestSuccess(String.format("Save new note: %s", response.body().getTitle()));
+                        view.onRequestSuccess(context.getString(R.string.note_saved, response.body().getTitle()));
                     } else {
-                        view.onRequestError("Error");
+                        view.onRequestError(context.getString(R.string.error_saving_note));
                     }
                 });
             }
@@ -78,11 +82,11 @@ public class EditorPresenter {
             public void onResponse(@NonNull Call<Note> call, @NonNull Response<Note> response) {
                 ((AppCompatActivity) view).runOnUiThread(() -> {
                     view.hideProgress();
-
+                    Context context = ((AppCompatActivity) view).getApplicationContext();
                     if (response.isSuccessful() && response.body() != null) {
-                        view.onRequestSuccess(String.format("Note '%s' saved", response.body().getTitle()));
+                        view.onRequestSuccess(context.getString(R.string.note_saved, response.body().getTitle()));
                     } else {
-                        view.onRequestError("Error");
+                        view.onRequestError(context.getString(R.string.error_saving_note));
                     }
                 });
             }
@@ -107,7 +111,8 @@ public class EditorPresenter {
             public void onResponse(@NonNull Call<Note> call, @NonNull Response<Note> response) {
                 ((AppCompatActivity) view).runOnUiThread(() -> {
                     view.hideProgress();
-                    view.onRequestSuccess("Note deleted...");
+                    Context context = ((AppCompatActivity) view).getApplicationContext();
+                    view.onRequestSuccess(context.getString(R.string.note_deleted));
                 });
             }
             @Override

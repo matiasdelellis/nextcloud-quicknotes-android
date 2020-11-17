@@ -34,6 +34,7 @@
     <string name="tag">Tag</string>
     <string name="tags">Tags</string>
     <string name="save">Save</string>
+    <string name="common_yes">Yes</string>
     <string name="common_cancel">Cancel</string>
     <string name="share">Share</string>
     <string name="clean_filter">Clean filter</string>
@@ -49,6 +50,8 @@
     <!-- Notes activity -->
     <string name="please_wait">Please wait…</string>
     <string name="search_in_all">Search all notes</string>
+    <string name="note_saved">Note “%1$s” saved</string>
+    <string name="note_deleted">Note deleted</string>
 
     <!-- Sidebar filters -->
     <string name="all_notes">All notes</string>
@@ -69,6 +72,8 @@
     <string name="must_enter_title">Please enter a title</string>
     <string name="note_color">Note color</string>
     <string name="select_note_color">Select the note color</string>
+    <string name="sure_want_delete">Are you sure you want to delete the note?</string>
+    <string name="need_permission_to_attach">Can not attach new files without permission</string>
 
     <!-- Tag editor -->
     <string name="create_tag">Create Tag “%1$s”</string>
@@ -78,6 +83,8 @@
     <string name="error_not_installed">We could not determine the version of the server side Quick notes app. Please make sure it is installed and enabled.</string>
     <string name="error_maintenance_mode">The server is currently in maintenance mode. Please contact your administrator or try later again.</string>
     <string name="error_unknown">An unknown error occurred</string>
+    <string name="error_deleting_note">There was an error deleting the note</string>
+    <string name="error_saving_note">There was an error saving the note</string>
 
     <!-- About -->
     <string name="about_versions_title">Versions</string>

@@ -237,12 +237,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
             case R.id.delete:
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
                 alertDialog.setTitle(getString(R.string.delete_note));
-                alertDialog.setMessage("Are you sure you want to delete the note?");
-                alertDialog.setNegativeButton("Yes", (dialog, wich) -> {
+                alertDialog.setMessage(R.string.sure_want_delete);
+                alertDialog.setNegativeButton(R.string.common_yes, (dialog, wich) -> {
                     dialog.dismiss();
                     presenter.deleteNote(note.getId());
                 });
-                alertDialog.setPositiveButton("Cancel", ((dialog, which) -> dialog.dismiss()));
+                alertDialog.setPositiveButton(R.string.common_cancel, ((dialog, which) -> dialog.dismiss()));
                 alertDialog.show();
                 return true;
             case android.R.id.home:
@@ -361,7 +361,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
                 if (ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED) {
                     pickFile();
                 } else {
-                    Toast.makeText(this, "R.string.cannot_upload_files_without_permission", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
                 }
                 break;
             default:
