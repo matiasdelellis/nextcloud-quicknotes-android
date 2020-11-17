@@ -34,12 +34,14 @@
     <string name="tag">Etiqueta</string>
     <string name="tags">Etiquetas</string>
     <string name="save">Guardar</string>
+    <string name="common_yes">Si</string>
     <string name="common_cancel">Cancelar</string>
     <string name="share">Compartir</string>
     <string name="clean_filter">Limpiar filtro</string>
     <string name="shared_note">Nota compartida</string>
     <string name="pin_note">Fijar nota</string>
     <string name="attachment_thumbnail">Miniatura del adjunto</string>
+    <string name="delete_attachment">Eliminar adjunto</string>
     <string name="change_sort">Cambiar orden</string>
     <string name="change_view">Cambiar vista</string>
     <string name="new_note">Nueva nota</string>
@@ -48,6 +50,8 @@
     <!-- Notes activity -->
     <string name="please_wait">Por favor espera…</string>
     <string name="search_in_all">Buscar todas las notas</string>
+    <string name="note_saved">Nota “%1$s” guardada</string>
+    <string name="note_deleted">Nota eliminada</string>
 
     <!-- Sidebar filters -->
     <string name="all_notes">Todas las notas</string>
@@ -60,14 +64,16 @@
 
     <!-- Sort dialog -->
     <string name="sort_by">Ordenar por</string>
+    <string name="menu_item_sort_by_title_a_z">Por titulo</string>
     <string name="menu_item_sort_by_date_newest_first">Más nuevas primero</string>
     <string name="menu_item_sort_by_date_updated_first">Actualizadas primero</string>
 
     <!-- Note editor -->
     <string name="must_enter_title">Por favor, introduzca un título</string>
-    <string name="must_enter_content">Debes ingresar un contenido a la nota</string>
     <string name="note_color">Color de la nota</string>
     <string name="select_note_color">Seleccione el color de la nota</string>
+    <string name="sure_want_delete">¿Estás seguro de que quieres eliminar la nota?</string>
+    <string name="need_permission_to_attach">No se pueden adjuntar archivos nuevos sin permiso</string>
 
     <!-- Tag editor -->
     <string name="create_tag">Crear etiqueta “%1$s”</string>
@@ -76,18 +82,24 @@
     <!-- Common errors -->
     <string name="error_not_installed">No pudimos determinar la versión de la aplicación Notas Rapidas del lado del servidor. Asegúrese de que esté instalado y habilitado.</string>
     <string name="error_maintenance_mode">El servidor se encuentra actualmente en modo de mantenimiento. Comuníquese con su administrador o inténtelo más tarde.</string>
+    <string name="error_unknown">Un error desconocido ocurrió</string>
+    <string name="error_deleting_note">Se produjo un error al eliminar la nota</string>
+    <string name="error_saving_note">Hubo un error al guardar la nota</string>
 
     <!-- About -->
     <string name="about_versions_title">Versiones</string>
     <string name="about_version">Actualmente estás usando Notas Rápidas de Nextcloud &lt;strong>%1$s&lt;/strong></string>
     <string name="about_nextcloud_version">Su servidor está usando actualmente Nextcloud &lt;strong>%1$s&lt;/strong></string>
+    <string name="about_quicknotes_version">Su servidor está utilizando Notas rápidas &lt;strong>%1$s&lt;/strong></string>
     <string name="about_developers_title">Desarrolladores</string>
     <string name="about_source_title">Código fuente</string>
+    <string name="about_source">Este proyecto está alojado en GitHub: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
     <string name="about_issues_title">Problemas</string>
+    <string name="about_issues">Puedes informar errores, propuestas de mejora y solicitudes de funciones en el rastreador de problemas de GitHub: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
     <string name="about_translations_title">Traducciones</string>
+    <string name="about_translate">Únase al equipo de Quicknotes en Transifex y ayúdenos a traducir esta aplicación: &lt;a href=\"%1$s\">%1$s&lt;/a></string>
     <string name="about_app_license_title">Licencia de la aplicación</string>
     <string name="about_app_license">Esta aplicación tiene la licencia GNU GENERAL PUBLIC LICENSE v3 +.</string>
     <string name="about_app_license_button">Ver licencia</string>
-    <string name="error_unknown">Un error desconocido ocurrió</string>
 
     </resources>
