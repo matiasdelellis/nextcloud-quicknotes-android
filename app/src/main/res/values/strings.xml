@@ -40,6 +40,7 @@
     <string name="shared_note">Shared note</string>
     <string name="pin_note">Pin note</string>
     <string name="attachment_thumbnail">Attachment thumbnail</string>
+    <string name="delete_attachment">Delete attachment</string>
     <string name="change_sort">Change sort</string>
     <string name="change_view">Change view</string>
     <string name="new_note">New note</string>

@@ -350,7 +350,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
             card_item.setOnClickListener(this);
             tv_content.setOnClickListener(this);
 
-            attachmentAdapter.setOnClickListener(this);
+            attachmentAdapter.setOnImageClickListener(position -> this.onClick(itemView));
         }
 
         @Override

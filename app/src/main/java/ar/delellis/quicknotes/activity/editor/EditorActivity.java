@@ -143,13 +143,18 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
 
         attachmentAdapter = new AttachmentAdapter();
         attachmentRecyclerView = findViewById(R.id.editor_recyclerAttachments);
-        attachmentAdapter.setOnClickListener(view -> {
-            int position = attachmentRecyclerView.getChildAdapterPosition(view);
+
+        attachmentAdapter.setOnImageClickListener(position -> {
             Attachment attachment = attachmentAdapter.get(position);
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(attachment.getDeepLinkUrl()));
             intent.putExtra(KEY_ACTION_VIEW_FILE_ID, attachment.getFileId());
             intent.putExtra(KEY_ACTION_VIEW_ACCOUNT, ApiProvider.getUsername());
             startActivity(intent);
+        });
+
+        attachmentAdapter.setOnDeleteClickListener(position -> {
+            Attachment attachment = attachmentAdapter.get(position);
+            attachmentAdapter.removeItem(attachment);
         });
 
         et_title = findViewById(R.id.editor_title);

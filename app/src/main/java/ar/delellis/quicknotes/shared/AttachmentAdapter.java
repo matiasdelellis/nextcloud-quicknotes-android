@@ -24,6 +24,7 @@ package ar.delellis.quicknotes.shared;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -37,12 +38,10 @@ import java.util.List;
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.model.Attachment;
 
-public class AttachmentAdapter
-        extends RecyclerView.Adapter<AttachmentAdapter.ViewHolder>
-        implements View.OnClickListener {
+public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.ViewHolder>{
 
-    private View.OnClickListener onClickListener;
-    private View.OnClickListener onDeleteClickListener;
+    private ImageItemClickListener imageItemClickListener;
+    private DeleteItemClickListener deleteItemClickListener;
 
     class ViewHolder extends RecyclerView.ViewHolder {
         @NonNull
@@ -51,11 +50,25 @@ public class AttachmentAdapter
         @NonNull
         private final ImageView ivThumbnail;
 
+        @NonNull
+        private final ImageButton imDelete;
+
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             view = itemView;
 
-            this.ivThumbnail = itemView.findViewById(R.id.thumbnail);
+            this.ivThumbnail = itemView.findViewById(R.id.attachment_thumbnail);
+            this.ivThumbnail.setOnClickListener(v -> {
+                int itemIndex = getAdapterPosition();
+                imageItemClickListener.onImageItemClick(itemIndex);
+            });
+
+            this.imDelete = itemView.findViewById(R.id.delete_attachment);
+            this.imDelete.setVisibility(deleteItemClickListener == null ? View.GONE : View.VISIBLE);
+            this.imDelete.setOnClickListener(v -> {
+                int itemIndex = getAdapterPosition();
+                deleteItemClickListener.onDeleteItemClick(itemIndex);
+            });
         }
 
         private void bind(@NonNull Attachment attachment) {
@@ -73,25 +86,12 @@ public class AttachmentAdapter
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_attachment, parent, false);
-        v.setOnClickListener(this);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(attachments.get(position));
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (onClickListener == null)
-            return;
-
-        onClickListener.onClick(view);
-    }
-
-    public void setOnClickListener(View.OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
     }
 
     @Override
@@ -109,8 +109,29 @@ public class AttachmentAdapter
         notifyDataSetChanged();
     }
 
+    public void removeItem(Attachment attachment) {
+        this.attachments.remove(attachment);
+        notifyDataSetChanged();
+    }
+
     public Attachment get(int position) {
         return this.attachments.get(position);
+    }
+
+    public void setOnImageClickListener(ImageItemClickListener onImageClickListener) {
+        this.imageItemClickListener = onImageClickListener;
+    }
+
+    public interface ImageItemClickListener {
+        void onImageItemClick(int position);
+    }
+
+    public void setOnDeleteClickListener(DeleteItemClickListener onDeleteClickListener) {
+        this.deleteItemClickListener = onDeleteClickListener;
+    }
+
+    public interface DeleteItemClickListener {
+        void onDeleteItemClick(int position);
     }
 
 }

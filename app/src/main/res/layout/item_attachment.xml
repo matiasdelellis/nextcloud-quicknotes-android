@@ -25,18 +25,35 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/attachment_item"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/thumbnail"
-        android:contentDescription="@string/attachment_thumbnail"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:visibility="visible"
-        android:scaleType="fitXY"
-        tools:srcCompat="@tools:sample/backgrounds/scenic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/attachment_thumbnail"
+            android:contentDescription="@string/attachment_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            android:scaleType="fitXY"
+            tools:srcCompat="@tools:sample/backgrounds/scenic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/delete_attachment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/spacer_1x"
+            android:src="@drawable/ic_delete_grey"
+            android:background="@null"
+            android:contentDescription="@string/delete_attachment" />
+
+    </RelativeLayout>
 
 </ar.delellis.quicknotes.shared.SquareFrameLayout>
