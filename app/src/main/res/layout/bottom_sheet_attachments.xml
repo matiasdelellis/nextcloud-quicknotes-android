@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Nextcloud Quicknotes Android client application.
+  ~
+  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ @author Matias De lellis <mati86dl@gmail.com>
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/sort_header"
+        style="@style/Base.DialogWindowTitle.AppCompat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:text="@string/attach_to_note"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/takeAPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@color/transparent"
+                android:paddingStart="@dimen/standard_padding"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:contentDescription="@string/menu_item_sort_by_title_a_z"
+                android:src="@drawable/ic_attach_photo" />
+
+            <TextView
+                android:id="@+id/takeAPhotoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:paddingStart="@dimen/zero"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:singleLine="true"
+                android:text="@string/take_a_photo"
+                android:textSize="@dimen/two_line_primary_text_size"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_half_margin">
+
+            <ImageButton
+                android:id="@+id/addImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@color/transparent"
+                android:contentDescription="@string/menu_item_sort_by_date_newest_first"
+                android:paddingStart="@dimen/standard_padding"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:src="@drawable/ic_attach_gallery" />
+
+            <TextView
+                android:id="@+id/addImageText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:paddingStart="@dimen/zero"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:singleLine="true"
+                android:text="@string/add_image"
+                android:textSize="@dimen/two_line_primary_text_size" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_half_margin"
+            android:layout_marginBottom="@dimen/standard_margin">
+
+            <ImageButton
+                android:id="@+id/addFile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@color/transparent"
+                android:paddingStart="@dimen/standard_padding"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:contentDescription="@string/menu_item_sort_by_date_updated_first"
+                android:src="@drawable/ic_attach_file" />
+
+            <TextView
+                android:id="@+id/addFileText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:paddingStart="@dimen/zero"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:singleLine="true"
+                android:text="@string/add_file"
+                android:textSize="@dimen/two_line_primary_text_size" />
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>

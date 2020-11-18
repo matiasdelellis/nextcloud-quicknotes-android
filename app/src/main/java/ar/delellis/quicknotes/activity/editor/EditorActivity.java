@@ -80,8 +80,11 @@ import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.M;
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
+import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_FILE;
+import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_IMAGE;
+import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_PHOTO;
 
-public class EditorActivity extends AppCompatActivity implements EditorView {
+public class EditorActivity extends AppCompatActivity implements EditorView, AttachBottomSheetDialog.OnAttachOptionListener {
     private final String TAG = EditorActivity.class.getCanonicalName();
 
     private static final int INTENT_TAGS = 100;
@@ -280,7 +283,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         button.setOnClickListener(view -> showColorPicker());
 
         button = findViewById(R.id.action_attach);
-        button.setOnClickListener(view -> pickFile());
+        button.setOnClickListener(view -> showAttachOptions());
 
         button = findViewById(R.id.action_tags);
         button.setOnClickListener(view -> showTagsSelection());
@@ -297,7 +300,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     }
 
     @Override
-    public void addAttachment(Attachment attachment){
+    public void addAttachment(Attachment attachment) {
         attachmentAdapter.addItem(attachment);
     }
 
@@ -311,6 +314,24 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
     @Override
     public void onRequestError(String message) {
         Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAttachOptionSelection(int attachOption) {
+        switch (attachOption) {
+            case ATTACH_ADD_FILE:
+                pickFile();
+                break;
+            case ATTACH_ADD_IMAGE:
+            case ATTACH_TAKE_PHOTO:
+            default:
+                Toast.makeText(EditorActivity.this, "It is not yet implemented", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showAttachOptions() {
+        AttachBottomSheetDialog attachBottomSheetDialog = new AttachBottomSheetDialog();
+        attachBottomSheetDialog.show(getSupportFragmentManager(), "AttachBottomSheetDialog");
     }
 
     private void showTagsSelection() {
@@ -433,7 +454,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView {
         }
     }
 
-    private void closeEdition () {
+    private void closeEdition() {
         setResult(RESULT_CANCELED);
         finish();
     }
