@@ -27,6 +27,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +40,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -53,13 +55,16 @@ import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import ar.delellis.quicknotes.BuildConfig;
 import ar.delellis.quicknotes.R;
+import ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.OnAttachOptionListener;
 import ar.delellis.quicknotes.activity.tags.TagsActivity;
 import ar.delellis.quicknotes.model.Attachment;
 import ar.delellis.quicknotes.model.Tag;
@@ -76,21 +81,23 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import petrov.kristiyan.colorpicker.ColorPicker;
 
+import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.M;
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_FILE;
-import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_IMAGE;
 import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_PHOTO;
 
-public class EditorActivity extends AppCompatActivity implements EditorView, AttachBottomSheetDialog.OnAttachOptionListener {
+public class EditorActivity extends AppCompatActivity implements EditorView, OnAttachOptionListener {
     private final String TAG = EditorActivity.class.getCanonicalName();
 
-    private static final int INTENT_TAGS = 100;
+    private static final int REQUEST_CODE_EDIT_TAGS = 100;
+    private static final int REQUEST_CODE_ADD_FILE = 101;
+    private static final int REQUEST_CODE_IMAGE_CAPTURE = 102;
 
-    private static final int REQUEST_CODE_ADD_FILE = 1;
-    private static final int REQUEST_CODE_ADD_FILE_PERMISSION = 2;
+    private static final int REQUEST_CODE_ADD_FILE_PERMISSION = 200;
+    private static final int REQUEST_CODE_ADD_CAMERA_PERMISSION = 201;
 
     private static final String KEY_ACTION_VIEW_FILE_ID = "KEY_FILE_ID";
     private static final String KEY_ACTION_VIEW_ACCOUNT = "KEY_ACCOUNT";
@@ -118,6 +125,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
 
     private List<Tag> tags = new ArrayList<>();
     private List<Tag> tagSelection = new ArrayList<>();
+
+    // Temporary file to capture the images from the camera
+    private File tempPhotoCamera = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -301,6 +311,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
 
     @Override
     public void addAttachment(Attachment attachment) {
+        if (tempPhotoCamera != null) {
+            tempPhotoCamera.delete();
+            tempPhotoCamera = null;
+        }
         attachmentAdapter.addItem(attachment);
     }
 
@@ -322,10 +336,11 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
             case ATTACH_ADD_FILE:
                 pickFile();
                 break;
-            case ATTACH_ADD_IMAGE:
             case ATTACH_TAKE_PHOTO:
+                takePhoto();
+                break;
             default:
-                Toast.makeText(EditorActivity.this, "It is not yet implemented", Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 
@@ -338,7 +353,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
         Intent intent = new Intent(this, TagsActivity.class);
         intent.putExtra("tags", (Serializable) tags);
         intent.putExtra("tagSelection", (Serializable) tagSelection);
-        startActivityForResult(intent, INTENT_TAGS);
+        startActivityForResult(intent, REQUEST_CODE_EDIT_TAGS);
     }
 
     private void showColorPicker() {
@@ -365,6 +380,29 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
         colorPicker.show();
     }
 
+    private void takePhoto() {
+        if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, CAMERA) != PERMISSION_GRANTED) {
+            requestPermissions(new String[]{CAMERA}, REQUEST_CODE_ADD_CAMERA_PERMISSION);
+            return;
+        }
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            try {
+                tempPhotoCamera = File.createTempFile("IMG_CAMERA_", ".jpg", getCacheDir());
+            } catch (IOException e) {
+                tempPhotoCamera = null;
+            }
+
+            if (tempPhotoCamera == null)
+                return;
+
+            Uri photoURI = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", tempPhotoCamera);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
+        }
+    }
+
     public void pickFile() {
         if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
             requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_CODE_ADD_FILE_PERMISSION);
@@ -381,6 +419,13 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
             case REQUEST_CODE_ADD_FILE_PERMISSION:
                 if (ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED) {
                     pickFile();
+                } else {
+                    Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
+                }
+                break;
+            case REQUEST_CODE_ADD_CAMERA_PERMISSION:
+                if (ContextCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED) {
+                    takePhoto();
                 } else {
                     Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
                 }
@@ -462,7 +507,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         switch (requestCode) {
-            case INTENT_TAGS:
+            case REQUEST_CODE_EDIT_TAGS:
                 if (resultCode == RESULT_OK) {
                     tagSelection = (List<Tag>) Objects.requireNonNull(data.getSerializableExtra("tagSelection"));
                     note.setTags(tagSelection);
@@ -470,7 +515,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
                     tagAdapter.notifyDataSetChanged();
                 }
                 break;
-            case REQUEST_CODE_ADD_FILE: {
+            case REQUEST_CODE_ADD_FILE:
                 if (resultCode == RESULT_OK) {
                     if (data == null) {
                         return;
@@ -493,11 +538,15 @@ public class EditorActivity extends AppCompatActivity implements EditorView, Att
                     presenter.uploadAttachment(filePart);
                 }
                 break;
-            }
-            default: {
+            case REQUEST_CODE_IMAGE_CAPTURE:
+                if (resultCode == RESULT_OK) {
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("image/jpeg"), tempPhotoCamera);
+                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", tempPhotoCamera.getName(), requestBody);
+                    presenter.uploadAttachment(filePart);
+                }
+                break;
+            default:
                 super.onActivityResult(requestCode, resultCode, data);
-            }
         }
     }
-
 }

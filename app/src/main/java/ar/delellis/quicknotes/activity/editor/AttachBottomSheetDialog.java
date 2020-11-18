@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -34,26 +33,21 @@ import ar.delellis.quicknotes.R;
 public class AttachBottomSheetDialog extends BottomSheetDialogFragment {
 
     public static final int ATTACH_TAKE_PHOTO = 0;
-    public static final int ATTACH_ADD_IMAGE = 1;
     public static final int ATTACH_ADD_FILE = 2;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bottom_sheet_attachments, container, false);
 
-        View[] mTaggedViews = new View[6];
+        View[] mTaggedViews = new View[4];
         mTaggedViews[0] = view.findViewById(R.id.takeAPhoto);
         mTaggedViews[0].setTag(ATTACH_TAKE_PHOTO);
         mTaggedViews[1] = view.findViewById(R.id.takeAPhotoText);
         mTaggedViews[1].setTag(ATTACH_TAKE_PHOTO);
-        mTaggedViews[2] = view.findViewById(R.id.addImage);
-        mTaggedViews[2].setTag(ATTACH_ADD_IMAGE);
-        mTaggedViews[3] = view.findViewById(R.id.addImageText);
-        mTaggedViews[3].setTag(ATTACH_ADD_IMAGE);
-        mTaggedViews[4] = view.findViewById(R.id.addFile);
-        mTaggedViews[4].setTag(ATTACH_ADD_FILE);
-        mTaggedViews[5] = view.findViewById(R.id.addFileText);
-        mTaggedViews[5].setTag(ATTACH_ADD_FILE);
+        mTaggedViews[2] = view.findViewById(R.id.addFile);
+        mTaggedViews[2].setTag(ATTACH_ADD_FILE);
+        mTaggedViews[3] = view.findViewById(R.id.addFileText);
+        mTaggedViews[3].setTag(ATTACH_ADD_FILE);
 
         OnAttachClickListener attachClickListener = new OnAttachClickListener();
 
