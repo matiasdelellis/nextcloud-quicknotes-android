@@ -106,6 +106,11 @@ public class Attachment implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(id, note_id, file_id, created_at, preview_url, redirect_url, deep_link_url);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

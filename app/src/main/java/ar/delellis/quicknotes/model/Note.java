@@ -174,6 +174,11 @@ public class Note implements Serializable {
         return 0;
     };
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, content, is_pinned, color, timestamp, share_with, share_by, tags, attachments);
+    }
+
     /**
      * Compare specific fields from two Note elements.
      * If there is any difference or fields are present in one,
@@ -196,7 +201,7 @@ public class Note implements Serializable {
                 (is_pinned == other.getIsPinned()) &&
                 (Objects.equals(other.getColor(), color)) &&
                 (Objects.equals(other.getShareWith(), share_with)) &&
-                (Objects.equals(other.getShareWith(), share_by)) &&
+                (Objects.equals(other.getShareBy(), share_by)) &&
                 (Objects.equals(other.getTags(), tags)) &&
                 (Objects.equals(other.getAttachtments(), attachments)));
     }

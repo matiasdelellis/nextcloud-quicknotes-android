@@ -25,6 +25,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Tag implements Serializable {
     @Expose
@@ -51,7 +52,7 @@ public class Tag implements Serializable {
 
     @Override
     public int hashCode() {
-        return id;
+        return Objects.hash(id, name);
     }
 
     @Override
@@ -60,6 +61,6 @@ public class Tag implements Serializable {
             return false;
         Tag oTag = (Tag) obj;
         // The important is the name since the new tags always use the same empty id.
-        return  (this.name.equals(oTag.getName()));
+        return  (Objects.equals(this.name, oTag.getName()));
     }
 }

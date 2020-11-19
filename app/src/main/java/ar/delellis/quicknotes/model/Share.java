@@ -84,6 +84,11 @@ public class Share implements Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(id, userId, noteId, sharedUser, sharedGroup);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
