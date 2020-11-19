@@ -69,6 +69,40 @@
                 android:singleLine="true"
                 android:text="@string/take_a_photo"
                 android:textSize="@dimen/two_line_primary_text_size"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/standard_half_margin">
+
+            <ImageButton
+                android:id="@+id/takeVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@color/transparent"
+                android:paddingStart="@dimen/standard_padding"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:contentDescription="@string/menu_item_sort_by_date_newest_first"
+                android:src="@drawable/ic_attach_video"/>
+
+            <TextView
+                android:id="@+id/takeVideoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:ellipsize="middle"
+                android:paddingStart="@dimen/zero"
+                android:paddingTop="@dimen/standard_half_padding"
+                android:paddingEnd="@dimen/standard_half_padding"
+                android:paddingBottom="@dimen/standard_half_padding"
+                android:singleLine="true"
+                android:text="@string/take_a_video"
+                android:textSize="@dimen/two_line_primary_text_size" />
 
         </TableRow>
 
@@ -96,7 +130,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-
                 android:layout_weight="1"
                 android:ellipsize="middle"
                 android:paddingStart="@dimen/zero"

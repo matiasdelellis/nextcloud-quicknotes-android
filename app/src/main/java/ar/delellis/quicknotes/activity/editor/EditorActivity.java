@@ -88,6 +88,7 @@ import static android.os.Build.VERSION_CODES.M;
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_FILE;
 import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_PHOTO;
+import static ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_VIDEO;
 
 public class EditorActivity extends AppCompatActivity implements EditorView, OnAttachOptionListener {
     private final String TAG = EditorActivity.class.getCanonicalName();
@@ -95,9 +96,11 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
     private static final int REQUEST_CODE_EDIT_TAGS = 100;
     private static final int REQUEST_CODE_ADD_FILE = 101;
     private static final int REQUEST_CODE_IMAGE_CAPTURE = 102;
+    private static final int REQUEST_CODE_VIDEO_CAPTURE = 103;
 
     private static final int REQUEST_CODE_ADD_FILE_PERMISSION = 200;
     private static final int REQUEST_CODE_ADD_CAMERA_PERMISSION = 201;
+    private static final int REQUEST_CODE_ADD_VIDEO_PERMISSION = 202;
 
     private static final String KEY_ACTION_VIEW_FILE_ID = "KEY_FILE_ID";
     private static final String KEY_ACTION_VIEW_ACCOUNT = "KEY_ACCOUNT";
@@ -126,8 +129,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
     private List<Tag> tags = new ArrayList<>();
     private List<Tag> tagSelection = new ArrayList<>();
 
-    // Temporary file to capture the images from the camera
+    // Temporary files to capture from the camera
     private File tempPhotoCamera = null;
+    private File tempVideoCamera = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -311,11 +315,16 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
     @Override
     public void addAttachment(Attachment attachment) {
+        attachmentAdapter.addItem(attachment);
+
         if (tempPhotoCamera != null) {
             tempPhotoCamera.delete();
             tempPhotoCamera = null;
         }
-        attachmentAdapter.addItem(attachment);
+        if (tempVideoCamera != null) {
+            tempVideoCamera.delete();
+            tempVideoCamera = null;
+        }
     }
 
     @Override
@@ -338,6 +347,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 break;
             case ATTACH_TAKE_PHOTO:
                 takePhoto();
+                break;
+            case ATTACH_TAKE_VIDEO:
+                takeVideo();
                 break;
             default:
                 break;
@@ -403,6 +415,29 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         }
     }
 
+    private void takeVideo() {
+        if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, CAMERA) != PERMISSION_GRANTED) {
+            requestPermissions(new String[]{CAMERA}, REQUEST_CODE_ADD_VIDEO_PERMISSION);
+            return;
+        }
+
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+            try {
+                tempVideoCamera = File.createTempFile("VID_CAMERA_", ".mp4", getCacheDir());
+            } catch (IOException e) {
+                tempVideoCamera = null;
+            }
+
+            if (tempVideoCamera == null)
+                return;
+
+            Uri videoURI = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", tempVideoCamera);
+            takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoURI);
+            startActivityForResult(takeVideoIntent, REQUEST_CODE_VIDEO_CAPTURE);
+        }
+    }
+
     public void pickFile() {
         if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
             requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_CODE_ADD_FILE_PERMISSION);
@@ -426,6 +461,13 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             case REQUEST_CODE_ADD_CAMERA_PERMISSION:
                 if (ContextCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED) {
                     takePhoto();
+                } else {
+                    Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
+                }
+                break;
+            case REQUEST_CODE_ADD_VIDEO_PERMISSION:
+                if (ContextCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED) {
+                    takeVideo();
                 } else {
                     Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
                 }
@@ -542,6 +584,13 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 if (resultCode == RESULT_OK) {
                     RequestBody requestBody = RequestBody.create(MediaType.parse("image/jpeg"), tempPhotoCamera);
                     MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", tempPhotoCamera.getName(), requestBody);
+                    presenter.uploadAttachment(filePart);
+                }
+                break;
+            case REQUEST_CODE_VIDEO_CAPTURE:
+                if (resultCode == RESULT_OK) {
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("video/mp4"), tempVideoCamera);
+                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", tempVideoCamera.getName(), requestBody);
                     presenter.uploadAttachment(filePart);
                 }
                 break;

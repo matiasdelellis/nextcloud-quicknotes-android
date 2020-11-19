@@ -33,21 +33,26 @@ import ar.delellis.quicknotes.R;
 public class AttachBottomSheetDialog extends BottomSheetDialogFragment {
 
     public static final int ATTACH_TAKE_PHOTO = 0;
+    public static final int ATTACH_TAKE_VIDEO = 1;
     public static final int ATTACH_ADD_FILE = 2;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.bottom_sheet_attachments, container, false);
 
-        View[] mTaggedViews = new View[4];
+        View[] mTaggedViews = new View[6];
         mTaggedViews[0] = view.findViewById(R.id.takeAPhoto);
         mTaggedViews[0].setTag(ATTACH_TAKE_PHOTO);
         mTaggedViews[1] = view.findViewById(R.id.takeAPhotoText);
         mTaggedViews[1].setTag(ATTACH_TAKE_PHOTO);
-        mTaggedViews[2] = view.findViewById(R.id.addFile);
-        mTaggedViews[2].setTag(ATTACH_ADD_FILE);
-        mTaggedViews[3] = view.findViewById(R.id.addFileText);
-        mTaggedViews[3].setTag(ATTACH_ADD_FILE);
+        mTaggedViews[2] = view.findViewById(R.id.takeVideo);
+        mTaggedViews[2].setTag(ATTACH_TAKE_VIDEO);
+        mTaggedViews[3] = view.findViewById(R.id.takeVideoText);
+        mTaggedViews[3].setTag(ATTACH_TAKE_VIDEO);
+        mTaggedViews[4] = view.findViewById(R.id.addFile);
+        mTaggedViews[4].setTag(ATTACH_ADD_FILE);
+        mTaggedViews[5] = view.findViewById(R.id.addFileText);
+        mTaggedViews[5].setTag(ATTACH_ADD_FILE);
 
         OnAttachClickListener attachClickListener = new OnAttachClickListener();
 
