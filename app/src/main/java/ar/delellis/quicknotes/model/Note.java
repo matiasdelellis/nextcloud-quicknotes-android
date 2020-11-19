@@ -25,6 +25,8 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
@@ -176,41 +178,45 @@ public class Note implements Serializable {
      * If there is any difference or fields are present in one,
      * but not the other objects, this will return true.
      *
-     * @param other Note to compare with
-     * @return true if there is other difference in the relevant fields
+     * @param obj Note to compare with
+     * @return true if there is no difference in the relevant fields
      */
-    public boolean compareBasicsWith(Note other) {
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+
+        Note other = (Note) obj;
 
         // Lets first check if one field is null and the other not (difference between other and current)
         // This is so we don't run into other NPE later when accessing methods of fields.
-        if (other.getTitle() == null ^ this.getTitle() == null
-                || other.getTags() == null ^ this.getTags() == null
-                || other.getColor() == null ^ this.getColor() == null
-                || other.getAttachtments() == null ^ this.getAttachtments() == null
-                || other.getContent() == null ^ this.getContent() == null) {
-            return true;
+        if ((other.getTitle() == null ^ this.getTitle() == null) ||
+            (other.getTags() == null ^ this.getTags() == null) ||
+            (other.getColor() == null ^ this.getColor() == null) ||
+            (other.getAttachtments() == null ^ this.getAttachtments() == null) ||
+            (other.getContent() == null ^ this.getContent() == null)) {
+            return false;
         }
 
         // Now lets compare the fields itself
-        return ((other.getTitle() != null
-                && !other.getTitle().equals(this.getTitle()))
-                || (other.getTags() != null
-                && other.getTags().size() != this.getTags().size())
-                || (other.getColor() != null
-                && !other.getColor().equals(this.getColor()))
-                || other.getAttachtments() != null
-                && other.getAttachtments().size() != this.getAttachtments().size())
-                || (other.getContent() != null
-                && !other.getContent().equals(this.getContent()))
-                || other.getIsPinned() != this.getIsPinned()
-                || other.getIsShared() != this.getIsShared();
+        return ((other.getTitle() != null && other.getTitle().equals(this.getTitle())) ||
+                (other.getTags() != null && other.getTags().size() == this.getTags().size()) ||
+                (other.getColor() != null && other.getColor().equals(this.getColor())) ||
+                (other.getAttachtments() != null && other.getAttachtments().size() == this.getAttachtments().size()) ||
+                (other.getContent() != null && other.getContent().equals(this.getContent())) ||
+                (other.getIsPinned() == this.getIsPinned()) ||
+                (other.getIsShared() == this.getIsShared()));
     }
 
     /**
      * serialize the object and create a new object from the serialization string
      * @return a new Note object which is a copy from this but no reference
      */
-    public Note createCopy() {
+    @NotNull
+    @Override
+    public Note clone() {
         Gson gson = new Gson(); // We create a new instance every time to save some memory... :)
         return gson.fromJson(gson.toJson(this), Note.class);
     }

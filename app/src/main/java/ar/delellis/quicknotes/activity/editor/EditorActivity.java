@@ -204,7 +204,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         setDataFromIntentExtra();
 
         // Store the either loaded or just created note as a copy so we can compare for modifications later
-        shadowCopyNote = note.createCopy();
+        shadowCopyNote = note.clone();
     }
 
 
@@ -625,7 +625,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         }
 
         fetchDataToNoteObject();
-        return note.compareBasicsWith(shadowCopyNote);
+        return !note.equals(shadowCopyNote);
     }
 
     /**
