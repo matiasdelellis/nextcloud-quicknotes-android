@@ -641,10 +641,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.note_confirm_discard_unsaved_changes_title)
                 .setMessage(R.string.note_confirm_discard_unsaved_changes_text)
-                .setPositiveButton(R.string.note_confirm_discard_unsaved_yes, (dialog, which) -> {
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
                     discardAction.run();
                 })
-                .setNegativeButton(R.string.note_confirm_discard_unsaved_no, (dialog, which) -> {
+                .setNegativeButton(R.string.common_cancel, (dialog, which) -> {
                     if (stayAction != null) stayAction.run();
                 })
                 .show();

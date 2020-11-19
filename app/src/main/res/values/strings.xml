@@ -54,8 +54,6 @@
     <string name="note_deleted">Note deleted</string>
     <string name="note_confirm_discard_unsaved_changes_title">Unsaved changes!</string>
     <string name="note_confirm_discard_unsaved_changes_text">You have changes in this note which are not saved yet. Discard changes?</string>
-    <string name="note_confirm_discard_unsaved_yes">Yes, discard</string>
-    <string name="note_confirm_discard_unsaved_no">No</string>
 
     <!-- Sidebar filters -->
     <string name="all_notes">All notes</string>
