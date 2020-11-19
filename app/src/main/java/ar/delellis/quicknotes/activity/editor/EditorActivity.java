@@ -23,7 +23,6 @@ package ar.delellis.quicknotes.activity.editor;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -204,8 +203,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
 
         setDataFromIntentExtra();
+
         // Store the either loaded or just created note as a copy so we can compare for modifications later
-        shadowCopyNote = note;
+        shadowCopyNote = NoteCompare.createNoteCopy(note);
     }
 
 
@@ -266,8 +266,15 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 alertDialog.show();
                 return true;
             case android.R.id.home:
-                setResult(RESULT_CANCELED);
-                finish();
+                if (hasModifications()) {
+                    showDiscardDialog(() -> {
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }, null);
+                } else {
+                    setResult(RESULT_OK);
+                    finish();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -492,9 +499,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             attachmentAdapter.setItems(note.getAttachtments());
             attachmentAdapter.notifyDataSetChanged();
             attachmentRecyclerView.setAdapter(attachmentAdapter);
-
-            et_title.setText(HtmlUtil.cleanString(note.getTitle()));
-            et_content.fromHtml(HtmlUtil.cleanHtml(note.getContent()), true);
+            note.setTitle(HtmlUtil.cleanString(note.getTitle()));
+            et_title.setText(note.getTitle());
+            note.setContent(HtmlUtil.cleanHtml(note.getContent()));
+            et_content.fromHtml(note.getContent(), true);
 
             tintActivityColor(Color.parseColor(note.getColor()));
 
@@ -621,23 +629,32 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         return NoteCompare.compareNotes(shadowCopyNote, note);
     }
 
+    /**
+     * Presents a dialog to the user which then can decide if he wants to discard the changes or not.
+     * If discard or stay is chosen, the Runnable given as parameter is executed
+     *
+     * @param discardAction What to execute when user wants to discard
+     * @param stayAction    What to do when user wants to stay (can be null)
+     */
+    private void showDiscardDialog(Runnable discardAction, Runnable stayAction) {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.note_confirm_discard_unsaved_changes_title)
+                .setMessage(R.string.note_confirm_discard_unsaved_changes_text)
+                .setPositiveButton(R.string.note_confirm_discard_unsaved_yes, (dialog, which) -> {
+                    discardAction.run();
+                })
+                .setNegativeButton(R.string.note_confirm_discard_unsaved_no, (dialog, which) -> {
+                    if (stayAction != null) stayAction.run();
+                })
+                .show();
+    }
+
+
     @Override
     public void onBackPressed() {
         if (hasModifications()) {
-            new AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Closing Activity")
-                    .setMessage("Are you sure you want to close this activity?")
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
-
+            showDiscardDialog(EditorActivity.super::onBackPressed, null);
         } else {
             super.onBackPressed();
         }

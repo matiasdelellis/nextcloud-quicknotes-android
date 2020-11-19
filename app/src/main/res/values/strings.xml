@@ -52,6 +52,10 @@
     <string name="search_in_all">Search all notes</string>
     <string name="note_saved">Note “%1$s” saved</string>
     <string name="note_deleted">Note deleted</string>
+    <string name="note_confirm_discard_unsaved_changes_title">Unsaved changes!</string>
+    <string name="note_confirm_discard_unsaved_changes_text">You have changes in this note which are not saved yet. Discard changes?</string>
+    <string name="note_confirm_discard_unsaved_yes">Yes, discard</string>
+    <string name="note_confirm_discard_unsaved_no">No</string>
 
     <!-- Sidebar filters -->
     <string name="all_notes">All notes</string>
