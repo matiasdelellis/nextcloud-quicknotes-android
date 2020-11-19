@@ -21,17 +21,6 @@
 
 package ar.delellis.quicknotes.activity.editor;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -51,6 +40,17 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 
@@ -66,13 +66,13 @@ import ar.delellis.quicknotes.BuildConfig;
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.OnAttachOptionListener;
 import ar.delellis.quicknotes.activity.tags.TagsActivity;
+import ar.delellis.quicknotes.api.ApiProvider;
 import ar.delellis.quicknotes.model.Attachment;
+import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
 import ar.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.delellis.quicknotes.shared.ShareAdapter;
 import ar.delellis.quicknotes.shared.TagAdapter;
-import ar.delellis.quicknotes.api.ApiProvider;
-import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.util.ColorUtil;
 import ar.delellis.quicknotes.util.FileUtils;
 import ar.delellis.quicknotes.util.HtmlUtil;
@@ -125,6 +125,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
     HorizontalScrollView rich_toolbar;
 
     Note note = new Note();
+    Note shadowCopyNote;
 
     private List<Tag> tags = new ArrayList<>();
     private List<Tag> tagSelection = new ArrayList<>();
@@ -199,7 +200,11 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
         tags = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tags"));
 
+
         setDataFromIntentExtra();
+
+        // Store the either loaded or just created note as a copy so we can compare for modifications later
+        shadowCopyNote = note.createCopy();
     }
 
 
@@ -237,10 +242,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                     closeEdition();
                     return true;
                 }
-
-                // Clean html from view and update note to save.
-                note.setTitle(HtmlUtil.cleanString(et_title.getText().toString()));
-                note.setContent(HtmlUtil.cleanHtml(et_content.toFormattedHtml()));
+                fetchDataToNoteObject();
 
                 if (note.getTitle().isEmpty()) {
                     et_title.setError(getString(R.string.must_enter_title));
@@ -263,12 +265,25 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 alertDialog.show();
                 return true;
             case android.R.id.home:
-                setResult(RESULT_CANCELED);
-                finish();
+                if (hasModifications()) {
+                    showDiscardDialog(() -> {
+                        setResult(RESULT_CANCELED);
+                        finish();
+                    }, null);
+                } else {
+                    setResult(RESULT_OK);
+                    finish();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void fetchDataToNoteObject() {
+        // Clean html from view and update note to save.
+        note.setTitle(HtmlUtil.cleanString(et_title.getText().toString()));
+        note.setContent(HtmlUtil.cleanHtml(et_content.toFormattedHtml()));
     }
 
     public void initToolbar() {
@@ -384,6 +399,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 note.setColor(ColorUtil.getRGBColorFromInt(color));
                 tintActivityColor(color);
             }
+
             @Override
             public void onCancel() {
                 //
@@ -482,9 +498,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             attachmentAdapter.setItems(note.getAttachtments());
             attachmentAdapter.notifyDataSetChanged();
             attachmentRecyclerView.setAdapter(attachmentAdapter);
-
-            et_title.setText(HtmlUtil.cleanString(note.getTitle()));
-            et_content.fromHtml(HtmlUtil.cleanHtml(note.getContent()), true);
+            note.setTitle(HtmlUtil.cleanString(note.getTitle()));
+            et_title.setText(note.getTitle());
+            note.setContent(HtmlUtil.cleanHtml(note.getContent()));
+            et_content.fromHtml(note.getContent(), true);
 
             tintActivityColor(Color.parseColor(note.getColor()));
 
@@ -596,6 +613,49 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    /**
+     * Checks if the note has been modified (only comparing major fields);
+     */
+    private boolean hasModifications() {
+        if (shadowCopyNote == null || note == null) {
+            return false;
+        }
+
+        fetchDataToNoteObject();
+        return note.compareBasicsWith(shadowCopyNote);
+    }
+
+    /**
+     * Presents a dialog to the user which then can decide if he wants to discard the changes or not.
+     * If discard or stay is chosen, the Runnable given as parameter is executed
+     *
+     * @param discardAction What to execute when user wants to discard
+     * @param stayAction    What to do when user wants to stay (can be null)
+     */
+    private void showDiscardDialog(Runnable discardAction, Runnable stayAction) {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.note_confirm_discard_unsaved_changes_title)
+                .setMessage(R.string.note_confirm_discard_unsaved_changes_text)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    discardAction.run();
+                })
+                .setNegativeButton(R.string.common_cancel, (dialog, which) -> {
+                    if (stayAction != null) stayAction.run();
+                })
+                .show();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (hasModifications()) {
+            showDiscardDialog(EditorActivity.super::onBackPressed, null);
+        } else {
+            super.onBackPressed();
         }
     }
 }
