@@ -14,8 +14,7 @@ Choose account | Notes View | Note | Sidebar filters
 * Nextcloud Quicknotes app enabled. Note that the development versions require the development version of Quicknotes, and the released versions the latest Quicknotes from appstore.
 
 ### :warning: Limitations:
-* You can only attach new images from the file manager. You cannot upload from the camera or from the nextcloud application.
-* You can view the shared notes, but you cannot yet share or reject shared notes.
 * It only works with the nextcloud client installed (and I don't expect to create a custom login.)
 * It works 100% online, without any type of cache.
+* You can view the shared notes, but you cannot yet share or reject shared notes.
 * **Needless to say, it was barely tested..**. 😅  hahaha.
