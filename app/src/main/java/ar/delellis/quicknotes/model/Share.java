@@ -25,6 +25,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Share implements Serializable {
     @Expose
@@ -80,5 +81,17 @@ public class Share implements Serializable {
 
     public void setSharedGroup(String sharedGroup) {
         this.sharedGroup = sharedGroup;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Share oShare = (Share) obj;
+        // The important is the shared user or group since the new shares always use the same empty id.
+        return  (Objects.equals(this.sharedUser, oShare.getSharedUser()) &&
+                 Objects.equals(this.sharedGroup, oShare.getSharedGroup()));
     }
 }

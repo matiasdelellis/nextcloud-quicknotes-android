@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 public class Note implements Serializable {
     @Expose
@@ -190,24 +191,14 @@ public class Note implements Serializable {
 
         Note other = (Note) obj;
 
-        // Lets first check if one field is null and the other not (difference between other and current)
-        // This is so we don't run into other NPE later when accessing methods of fields.
-        if ((other.getTitle() == null ^ this.getTitle() == null) ||
-            (other.getTags() == null ^ this.getTags() == null) ||
-            (other.getColor() == null ^ this.getColor() == null) ||
-            (other.getAttachtments() == null ^ this.getAttachtments() == null) ||
-            (other.getContent() == null ^ this.getContent() == null)) {
-            return false;
-        }
-
-        // Now lets compare the fields itself
-        return ((other.getTitle() != null && other.getTitle().equals(this.getTitle())) ||
-                (other.getTags() != null && other.getTags().size() == this.getTags().size()) ||
-                (other.getColor() != null && other.getColor().equals(this.getColor())) ||
-                (other.getAttachtments() != null && other.getAttachtments().size() == this.getAttachtments().size()) ||
-                (other.getContent() != null && other.getContent().equals(this.getContent())) ||
-                (other.getIsPinned() == this.getIsPinned()) ||
-                (other.getIsShared() == this.getIsShared()));
+        return ((Objects.equals(other.getTitle(), title)) &&
+                (Objects.equals(other.getContent(), content)) &&
+                (is_pinned == other.getIsPinned()) &&
+                (Objects.equals(other.getColor(), color)) &&
+                (Objects.equals(other.getShareWith(), share_with)) &&
+                (Objects.equals(other.getShareWith(), share_by)) &&
+                (Objects.equals(other.getTags(), tags)) &&
+                (Objects.equals(other.getAttachtments(), attachments)));
     }
 
     /**

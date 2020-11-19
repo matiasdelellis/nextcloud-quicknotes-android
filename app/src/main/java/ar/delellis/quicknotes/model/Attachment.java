@@ -25,6 +25,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Attachment implements Serializable {
     @Expose
@@ -102,5 +103,15 @@ public class Attachment implements Serializable {
 
     public void setDeepLinkUrl(String deep_link_url) {
         this.deep_link_url = deep_link_url;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Attachment oAttachment = (Attachment) obj;
+        return Objects.equals(this.file_id, oAttachment.getFileId());
     }
 }

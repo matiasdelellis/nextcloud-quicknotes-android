@@ -59,6 +59,7 @@ public class Tag implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         Tag oTag = (Tag) obj;
-        return  (this.id == oTag.getId());
+        // The important is the name since the new tags always use the same empty id.
+        return  (this.name.equals(oTag.getName()));
     }
 }
