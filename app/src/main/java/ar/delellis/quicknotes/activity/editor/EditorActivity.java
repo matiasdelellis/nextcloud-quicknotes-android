@@ -67,7 +67,6 @@ import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.OnAttachOptionListener;
 import ar.delellis.quicknotes.activity.tags.TagsActivity;
 import ar.delellis.quicknotes.api.ApiProvider;
-import ar.delellis.quicknotes.api.helper.NoteCompare;
 import ar.delellis.quicknotes.model.Attachment;
 import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
@@ -205,7 +204,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         setDataFromIntentExtra();
 
         // Store the either loaded or just created note as a copy so we can compare for modifications later
-        shadowCopyNote = NoteCompare.createNoteCopy(note);
+        shadowCopyNote = note.createCopy();
     }
 
 
@@ -626,7 +625,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         }
 
         fetchDataToNoteObject();
-        return NoteCompare.compareNotes(shadowCopyNote, note);
+        return note.compareBasicsWith(shadowCopyNote);
     }
 
     /**
