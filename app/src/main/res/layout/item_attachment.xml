@@ -39,6 +39,7 @@
             android:layout_height="match_parent"
             android:visibility="visible"
             android:scaleType="fitXY"
+            android:background="@color/white"
             tools:srcCompat="@tools:sample/backgrounds/scenic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>

@@ -74,7 +74,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
         private void bind(@NonNull Attachment attachment) {
             Glide.with(view.getContext())
                     .load(attachment.getPreviewUrl())
-                    .error(R.drawable.ic_delete_grey)
+                    .error(R.drawable.ic_attach_file)
                     .into(ivThumbnail);
         }
     }
