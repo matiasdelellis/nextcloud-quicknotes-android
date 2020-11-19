@@ -22,13 +22,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "30.0.1"
 
     defaultConfig {
         applicationId 'ar.delellis.quicknotes'
         minSdkVersion 21
-        compileSdkVersion 29
+        targetSdkVersion 29
         versionCode 1
         versionName "0.3.0"
 
@@ -76,7 +76,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation 'com.android.support:design:29.0.1'
+    implementation 'com.android.support:design:30.0.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation "androidx.cardview:cardview:1.0.0"
