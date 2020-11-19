@@ -21,19 +21,9 @@
 
 package ar.delellis.quicknotes.activity.editor;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -51,6 +41,17 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 
@@ -66,13 +67,14 @@ import ar.delellis.quicknotes.BuildConfig;
 import ar.delellis.quicknotes.R;
 import ar.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.OnAttachOptionListener;
 import ar.delellis.quicknotes.activity.tags.TagsActivity;
+import ar.delellis.quicknotes.api.ApiProvider;
+import ar.delellis.quicknotes.api.helper.NoteCompare;
 import ar.delellis.quicknotes.model.Attachment;
+import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.model.Tag;
 import ar.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.delellis.quicknotes.shared.ShareAdapter;
 import ar.delellis.quicknotes.shared.TagAdapter;
-import ar.delellis.quicknotes.api.ApiProvider;
-import ar.delellis.quicknotes.model.Note;
 import ar.delellis.quicknotes.util.ColorUtil;
 import ar.delellis.quicknotes.util.FileUtils;
 import ar.delellis.quicknotes.util.HtmlUtil;
@@ -125,6 +127,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
     HorizontalScrollView rich_toolbar;
 
     Note note = new Note();
+    Note shadowCopyNote;
 
     private List<Tag> tags = new ArrayList<>();
     private List<Tag> tagSelection = new ArrayList<>();
@@ -199,7 +202,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
         tags = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tags"));
 
+
         setDataFromIntentExtra();
+        // Store the either loaded or just created note as a copy so we can compare for modifications later
+        shadowCopyNote = note;
     }
 
 
@@ -237,10 +243,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                     closeEdition();
                     return true;
                 }
-
-                // Clean html from view and update note to save.
-                note.setTitle(HtmlUtil.cleanString(et_title.getText().toString()));
-                note.setContent(HtmlUtil.cleanHtml(et_content.toFormattedHtml()));
+                fetchDataToNoteObject();
 
                 if (note.getTitle().isEmpty()) {
                     et_title.setError(getString(R.string.must_enter_title));
@@ -269,6 +272,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void fetchDataToNoteObject() {
+        // Clean html from view and update note to save.
+        note.setTitle(HtmlUtil.cleanString(et_title.getText().toString()));
+        note.setContent(HtmlUtil.cleanHtml(et_content.toFormattedHtml()));
     }
 
     public void initToolbar() {
@@ -384,6 +393,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 note.setColor(ColorUtil.getRGBColorFromInt(color));
                 tintActivityColor(color);
             }
+
             @Override
             public void onCancel() {
                 //
@@ -596,6 +606,40 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                 break;
             default:
                 super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    /**
+     * Checks if the note has been modified (only comparing major fields);
+     */
+    private boolean hasModifications() {
+        if (shadowCopyNote == null || note == null) {
+            return false;
+        }
+
+        fetchDataToNoteObject();
+        return NoteCompare.compareNotes(shadowCopyNote, note);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (hasModifications()) {
+            new AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Closing Activity")
+                    .setMessage("Are you sure you want to close this activity?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
+        } else {
+            super.onBackPressed();
         }
     }
 }
