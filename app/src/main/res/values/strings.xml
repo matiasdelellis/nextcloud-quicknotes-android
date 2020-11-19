@@ -72,6 +72,10 @@
     <string name="must_enter_title">Please enter a title</string>
     <string name="note_color">Note color</string>
     <string name="select_note_color">Select the note color</string>
+    <string name="attach_to_note">Attach to note</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="take_a_video">Take a video</string>
+    <string name="add_file">Add file</string>
     <string name="sure_want_delete">Are you sure you want to delete the note?</string>
     <string name="need_permission_to_attach">Can not attach new files without permission</string>
 
