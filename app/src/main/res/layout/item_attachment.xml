@@ -20,7 +20,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<ar.delellis.quicknotes.shared.SquareFrameLayout
+<ar.com.delellis.quicknotes.shared.SquareFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -57,4 +57,4 @@
             android:src="@drawable/ic_delete_grey"/>
     </RelativeLayout>
 
-</ar.delellis.quicknotes.shared.SquareFrameLayout>
+</ar.com.delellis.quicknotes.shared.SquareFrameLayout>
