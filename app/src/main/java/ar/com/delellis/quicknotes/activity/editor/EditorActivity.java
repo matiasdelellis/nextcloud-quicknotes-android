@@ -525,7 +525,9 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             int defaultColor = getResources().getColor(R.color.defaultNoteColor);
             tintActivityColor(defaultColor);
 
-            // Add color to note.
+            // Fill default note.
+            note.setTitle("");
+            note.setContent("");
             note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
 
             // Focus to title and edit
