@@ -22,13 +22,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "30.0.1"
 
     defaultConfig {
         applicationId 'ar.com.delellis.quicknotes'
         minSdkVersion 21
-        compileSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "0.3.0"
 
@@ -76,7 +76,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation 'com.android.support:design:29.0.1'
+    implementation 'com.android.support:design:30.0.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation "androidx.cardview:cardview:1.0.0"
@@ -104,7 +104,7 @@ dependencies {
     implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
 
     // Nextcloud SSO
-    implementation "com.github.nextcloud:Android-SingleSignOn:0.5.4"
+    implementation 'com.github.nextcloud:Android-SingleSignOn:query-SNAPSHOT'
 
     // Glide integration
     implementation 'com.github.bumptech.glide:glide:4.11.0'
