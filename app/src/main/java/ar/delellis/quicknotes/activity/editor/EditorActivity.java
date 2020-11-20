@@ -200,7 +200,6 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
         tags = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tags"));
 
-
         setDataFromIntentExtra();
 
         // Store the either loaded or just created note as a copy so we can compare for modifications later
@@ -496,6 +495,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
     private void setDataFromIntentExtra() {
         if (note.getId() != 0) {
             attachmentAdapter.setItems(note.getAttachtments());
+            attachmentAdapter.setDisableDeletion(note.getIsShared());
             attachmentAdapter.notifyDataSetChanged();
             attachmentRecyclerView.setAdapter(attachmentAdapter);
             note.setTitle(HtmlUtil.cleanString(note.getTitle()));

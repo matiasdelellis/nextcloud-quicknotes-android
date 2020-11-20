@@ -43,6 +43,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
     private ImageItemClickListener imageItemClickListener;
     private DeleteItemClickListener deleteItemClickListener;
 
+    private boolean disableDeletion = false;
+
     class ViewHolder extends RecyclerView.ViewHolder {
         @NonNull
         private final View view;
@@ -64,7 +66,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
             });
 
             this.imDelete = itemView.findViewById(R.id.delete_attachment);
-            this.imDelete.setVisibility(deleteItemClickListener == null ? View.GONE : View.VISIBLE);
+            this.imDelete.setVisibility(deleteItemClickListener != null && !disableDeletion ? View.VISIBLE : View.GONE);
             this.imDelete.setOnClickListener(v -> {
                 int itemIndex = getAdapterPosition();
                 deleteItemClickListener.onDeleteItemClick(itemIndex);
@@ -116,6 +118,10 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
 
     public Attachment get(int position) {
         return this.attachments.get(position);
+    }
+
+    public void setDisableDeletion(boolean disableDeletion) {
+        this.disableDeletion = disableDeletion;
     }
 
     public void setOnImageClickListener(ImageItemClickListener onImageClickListener) {
