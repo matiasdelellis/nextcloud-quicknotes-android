@@ -32,10 +32,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
-
 public class MainPresenter {
-    private MainView view;
+    private final MainView view;
 
     public MainPresenter(MainView view) {
         this.view = view;
@@ -43,6 +41,7 @@ public class MainPresenter {
 
     public void getNotes() {
         view.showLoading();
+
         Call<List<Note>> call = ApiProvider.getQuicknotesAPI().getNotes();
         call.enqueue(new Callback<List<Note>>() {
             @Override
@@ -52,10 +51,7 @@ public class MainPresenter {
                     if (response.isSuccessful() && response.body() != null) {
                         view.onGetResult(response.body());
                     } else {
-                        // Server under maintenance.
-                        if (response.code() == HTTP_UNAVAILABLE) {
-                            view.onErrorLoading(null);
-                        }
+                        view.onErrorLoading(null);
                     }
                 });
             }
