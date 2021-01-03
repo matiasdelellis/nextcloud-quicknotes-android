@@ -104,11 +104,11 @@ dependencies {
     implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
 
     // Nextcloud SSO
-    implementation "com.github.nextcloud:Android-SingleSignOn:0.5.4"
+    implementation "com.github.nextcloud:Android-SingleSignOn:0.5.6"
 
     // Glide integration
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
-    implementation 'com.github.stefan-niedermann.nextcloud-commons:sso-glide:1.2.1'
+    implementation 'com.github.stefan-niedermann.nextcloud-commons:sso-glide:1.2.5'
 }
