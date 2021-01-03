@@ -241,6 +241,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
                     closeEdition();
                     return true;
                 }
+
                 fetchDataToNoteObject();
 
                 if (note.getTitle().isEmpty()) {
@@ -626,7 +627,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             return false;
         }
 
+        if (note.getIsShared()) {
+            return false;
+        }
+
         fetchDataToNoteObject();
+
         return !note.equals(shadowCopyNote);
     }
 
