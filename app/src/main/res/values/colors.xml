@@ -23,20 +23,14 @@
 <resources>
     <!-- Colors -->
     <color name="transparent">#00000000</color>
-
     <color name="defaultBrand">#0082C9</color>
-
     <color name="note_font_color_default">#202124</color>
-
     <color name="badge_background">#14000000</color>
-
     <color name="bg_highlighted">#eee</color>
-
     <color name="fg_default_selection">#333333</color>
 
     <!-- Default colors of note -->
     <color name="defaultNoteColor">#F7EB96</color>
     <color name="defaultNoteTint">#202124</color>
     <color name="defaultNoteHint">#61000000</color>
-
 </resources>
