@@ -26,8 +26,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_list_view"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorPrimary">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -40,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
+            android:background="?android:colorBackground"
             app:layout_scrollFlags="scroll|enterAlways"
             app:toolbarId="@+id/toolbar" >
 
@@ -87,7 +86,7 @@
                         android:paddingTop="@dimen/spacer_2x"
                         android:paddingEnd="@dimen/spacer_1x"
                         android:paddingBottom="@dimen/spacer_2x"
-                        android:tint="?attr/colorAccent"
+                        android:tint="?colorOnBackground"
                         android:src="@drawable/ic_menu_grey"/>
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/search_text"
@@ -110,8 +109,8 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/change_sort"
                         android:padding="@dimen/spacer_2x"
-                        android:tint="?attr/colorAccent"
                         android:translationX="@dimen/spacer_1x"
+                        android:tint="?colorOnBackground"
                         android:src="@drawable/ic_alphabetical_asc" />
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/view_mode"
@@ -121,8 +120,8 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/change_view"
                         android:padding="@dimen/spacer_2x"
-                        android:tint="?attr/colorAccent"
                         android:translationX="@dimen/spacer_1x"
+                        android:tint="?colorOnBackground"
                         android:src="@drawable/ic_view_module" />
                 </LinearLayout>
 
@@ -150,8 +149,7 @@
                 app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
                 app:spanCount="2"
                 tools:itemCount="3"
-                tools:listitem="@layout/item_note">
-            </androidx.recyclerview.widget.RecyclerView>
+                tools:listitem="@layout/item_note" />
 
         </androidx.core.widget.NestedScrollView>
 
@@ -163,6 +161,7 @@
         android:layout_gravity="bottom|end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:tint="@android:color/white"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/defaultBrand"/>
 

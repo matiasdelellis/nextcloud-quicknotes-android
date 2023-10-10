@@ -349,6 +349,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
             card_item.setOnClickListener(this);
             tv_content.setOnClickListener(this);
+            tv_content.setCalypsoMode(false);
 
             attachmentAdapter.setOnImageClickListener(position -> this.onClick(itemView));
         }

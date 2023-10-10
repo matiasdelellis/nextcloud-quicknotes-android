@@ -21,11 +21,13 @@
   -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:fadingEdge="horizontal"
     android:fadingEdgeLength="24dp"
     android:requiresFadingEdge="horizontal"
     android:layout_height="wrap_content"
+    android:background="?android:colorBackground"
     android:orientation="horizontal">
 
     <ImageButton
@@ -36,6 +38,7 @@
         android:maxHeight="32dp"
         android:maxWidth="32dp"
         android:src="@drawable/ic_format_bold_black_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/format_bar_description_bold"/>
     <ImageButton
         android:id="@+id/action_italic"
@@ -45,6 +48,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_format_italic_black_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/format_bar_description_italic"/>
     <ImageButton
         android:id="@+id/action_underline"
@@ -54,6 +58,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_format_underlined_black_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/format_bar_description_underline"/>
     <ImageButton
         android:id="@+id/action_strike"
@@ -63,6 +68,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_format_strikethrough_black_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/format_bar_description_strike"/>
     <ImageButton
         android:id="@+id/action_quote"
@@ -72,6 +78,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_format_quote_black_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/format_bar_description_quote"/>
     <ImageButton
         android:id="@+id/action_bulleted_list"
@@ -81,6 +88,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_format_list_bulleted_black_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/format_bar_description_list"/>
     <ImageButton
         android:id="@+id/action_numbered_list"
@@ -90,6 +98,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_format_list_numbered_black_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/format_bar_description_list"/>
     <ImageButton
         android:id="@+id/action_note_color"
@@ -99,6 +108,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_note_color_picker_24dp"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/note_color"/>
     <ImageButton
         android:id="@+id/action_tags"
@@ -108,6 +118,7 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_tag_grey"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/tags"/>
     <ImageButton
         android:id="@+id/action_attach"
@@ -117,15 +128,17 @@
         android:maxHeight="24dp"
         android:maxWidth="24dp"
         android:src="@drawable/ic_attach_file"
+        app:tint="?colorOnBackground"
         android:contentDescription="@string/tags"/>
-    <ImageButton
-        android:id="@+id/action_share"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@android:color/transparent"
-        android:maxHeight="24dp"
-        android:maxWidth="24dp"
-        android:src="@drawable/ic_shared_grey"
-        android:contentDescription="@string/share"/>
+<!--    <ImageButton-->
+<!--        android:id="@+id/action_share"-->
+<!--        android:layout_width="48dp"-->
+<!--        android:layout_height="48dp"-->
+<!--        android:background="@android:color/transparent"-->
+<!--        android:maxHeight="24dp"-->
+<!--        android:maxWidth="24dp"-->
+<!--        android:src="@drawable/ic_shared_grey"-->
+<!--        android:contentDescription="@string/share"-->
+<!--        app:tint="?colorOnBackground" />-->
 
 </LinearLayout>

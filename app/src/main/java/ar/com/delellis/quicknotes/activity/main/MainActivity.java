@@ -22,6 +22,7 @@
 package ar.com.delellis.quicknotes.activity.main;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.Toolbar;
@@ -372,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
                     startActivity(intent);
                     finish();
                 } else {
-                    String errorDetail = !errorMessage.isEmpty() ? errorMessage : getString(R.string.error_unknown);
+                    String errorDetail = errorMessage != null && !errorMessage.isEmpty() ? errorMessage : getString(R.string.error_unknown);
                     Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
                     intent.putExtra("errorMessage", errorDetail);
                     startActivity(intent);

@@ -22,19 +22,12 @@
 package ar.com.delellis.quicknotes.activity.main;
 
 import android.app.Dialog;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.DialogFragment;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import ar.com.delellis.quicknotes.R;
 
@@ -43,14 +36,8 @@ import ar.com.delellis.quicknotes.R;
  */
 public class SortingOrderDialogFragment extends DialogFragment {
 
-    private final static String TAG = SortingOrderDialogFragment.class.getSimpleName();
-
     public static final String SORTING_ORDER_FRAGMENT = "SORTING_ORDER_FRAGMENT";
     private static final String KEY_SORT_ORDER = "SORT_ORDER";
-
-    private View mView;
-    private View[] mTaggedViews;
-    private Button mCancel;
 
     private int mCurrentSortOrder;
 
@@ -71,8 +58,6 @@ public class SortingOrderDialogFragment extends DialogFragment {
         // keep the state of the fragment on configuration changes
         setRetainInstance(true);
 
-        mView = null;
-
         Bundle arguments = getArguments();
         if (arguments == null) {
             throw new IllegalArgumentException("Arguments may not be null");
@@ -81,78 +66,18 @@ public class SortingOrderDialogFragment extends DialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.sorting_order_fragment, container, false);
-
-        setupDialogElements(mView);
-        setupListeners();
-
-        return mView;
-    }
-
-    /**
-     * find all relevant UI elements and set their values.
-     *
-     * @param view the parent view
-     */
-    private void setupDialogElements(View view) {
-        mCancel = view.findViewById(R.id.cancel);
-
-        mTaggedViews = new View[6];
-        mTaggedViews[0] = view.findViewById(R.id.sortByTitleAscending);
-        mTaggedViews[0].setTag(NoteAdapter.SORT_BY_TITLE);
-        mTaggedViews[1] = view.findViewById(R.id.sortByTitleAscendingText);
-        mTaggedViews[1].setTag(NoteAdapter.SORT_BY_TITLE);
-        mTaggedViews[2] = view.findViewById(R.id.sortByModificationDateDescending);
-        mTaggedViews[2].setTag(NoteAdapter.SORT_BY_UPDATED);
-        mTaggedViews[3] = view.findViewById(R.id.sortByModificationDateDescendingText);
-        mTaggedViews[3].setTag(NoteAdapter.SORT_BY_UPDATED);
-        mTaggedViews[4] = view.findViewById(R.id.sortByCreationDateDescending);
-        mTaggedViews[4].setTag(NoteAdapter.SORT_BY_CREATED);
-        mTaggedViews[5] = view.findViewById(R.id.sortByCreationDateDescendingText);
-        mTaggedViews[5].setTag(NoteAdapter.SORT_BY_CREATED);
-
-        setupActiveOrderSelection();
-    }
-
-    /**
-     * tints the icon reflecting the actual sorting choice in the apps primary color.
-     */
-    private void setupActiveOrderSelection() {
-        for (View view: mTaggedViews) {
-            if (mCurrentSortOrder != (int) view.getTag()) {
-                continue;
-            }
-            int tintColor =  view.getResources().getColor(R.color.fg_default_selection);
-            if (view instanceof ImageButton) {
-                Drawable normalDrawable = ((ImageButton) view).getDrawable();
-                Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
-                DrawableCompat.setTint(wrapDrawable, tintColor);
-            }
-            if (view instanceof TextView) {
-                ((TextView)view).setTextColor(tintColor);
-                ((TextView)view).setTypeface(Typeface.DEFAULT_BOLD);
-            }
-        }
-    }
-
-    /**
-     * setup all listeners.
-     */
-    private void setupListeners() {
-        mCancel.setOnClickListener(view -> dismiss());
-
-        OnSortOrderClickListener sortOrderClickListener = new OnSortOrderClickListener();
-
-        for (View view : mTaggedViews) {
-            view.setOnClickListener(sortOrderClickListener);
-        }
-    }
-
-    @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return super.onCreateDialog(savedInstanceState);
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getActivity());
+        builder.setTitle(R.string.sort_by)
+                .setSingleChoiceItems(R.array.sortBy, mCurrentSortOrder,
+                        (dialog, which) -> {
+                            dismiss();
+                            ((SortingOrderDialogFragment.OnSortingOrderListener) getActivity())
+                                    .onSortingOrderChosen(which);
+                        });
+
+        return builder.create();
     }
 
     @Override
@@ -161,15 +86,6 @@ public class SortingOrderDialogFragment extends DialogFragment {
             getDialog().setDismissMessage(null);
         }
         super.onDestroyView();
-    }
-
-    private class OnSortOrderClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            dismissAllowingStateLoss();
-            ((SortingOrderDialogFragment.OnSortingOrderListener) getActivity())
-                    .onSortingOrderChosen((int) v.getTag());
-        }
     }
 
     public interface OnSortingOrderListener {

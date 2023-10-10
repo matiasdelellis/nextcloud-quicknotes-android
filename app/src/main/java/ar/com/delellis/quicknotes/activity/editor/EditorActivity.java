@@ -21,13 +21,22 @@
 
 package ar.com.delellis.quicknotes.activity.editor;
 
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.M;
+import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
+import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_FILE;
+import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_PHOTO;
+import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_VIDEO;
+
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -43,13 +52,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
@@ -80,15 +90,6 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import petrov.kristiyan.colorpicker.ColorPicker;
-
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.M;
-import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
-import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_FILE;
-import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_PHOTO;
-import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_VIDEO;
 
 public class EditorActivity extends AppCompatActivity implements EditorView, OnAttachOptionListener {
     private final String TAG = EditorActivity.class.getCanonicalName();
@@ -153,9 +154,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         mApi = new ApiProvider(getApplicationContext());
 
@@ -177,6 +176,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
         et_title = findViewById(R.id.editor_title);
         et_content = findViewById(R.id.editor_content);
+        et_content.setCalypsoMode(false);
         rich_toolbar = findViewById(R.id.editor_rich_toolbar);
 
         tagAdapter = new TagAdapter();
@@ -204,6 +204,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
         // Store the either loaded or just created note as a copy so we can compare for modifications later
         shadowCopyNote = note.clone();
+        getSupportActionBar().setElevation(0);
     }
 
 
@@ -230,60 +231,61 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.pin:
-                note.setIsPinned(!note.getIsPinned());
-                item.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
-                ColorUtil.menuItemTintColor(item, this.getResources().getColor(R.color.defaultNoteTint));
+        int itemId = item.getItemId();
+        if (itemId == R.id.pin) {
+            note.setIsPinned(!note.getIsPinned());
+            item.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
+            ColorUtil.menuItemTintColor(item, this.getResources().getColor(R.color.defaultNoteTint));
+            return true;
+        } else if (itemId == R.id.save) {
+            if (note.getIsShared()) {
+                closeEdition();
                 return true;
-            case R.id.save:
-                if (note.getIsShared()) {
-                    closeEdition();
-                    return true;
-                }
+            }
 
-                fetchDataToNoteObject();
+            fetchDataToNoteObject();
 
-                if (note.getTitle().isEmpty()) {
-                    et_title.setError(getString(R.string.must_enter_title));
-                } else {
-                    if (note.getId() == 0)
-                        presenter.createNote(note);
-                    else
-                        presenter.updateNote(note);
-                }
-                return true;
-            case R.id.delete:
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle(getString(R.string.delete_note));
-                alertDialog.setMessage(R.string.sure_want_delete);
-                alertDialog.setNegativeButton(R.string.common_yes, (dialog, wich) -> {
-                    dialog.dismiss();
-                    presenter.deleteNote(note.getId());
-                });
-                alertDialog.setPositiveButton(R.string.common_cancel, ((dialog, which) -> dialog.dismiss()));
-                alertDialog.show();
-                return true;
-            case android.R.id.home:
-                if (hasModifications()) {
-                    showDiscardDialog(() -> {
-                        setResult(RESULT_CANCELED);
-                        finish();
-                    }, null);
-                } else {
-                    setResult(RESULT_OK);
+            if (note.getTitle().isEmpty()) {
+                et_title.setError(getString(R.string.must_enter_title));
+            } else {
+                if (note.getId() == 0)
+                    presenter.createNote(note);
+                else
+                    presenter.updateNote(note);
+            }
+            return true;
+        } else if (itemId == R.id.delete) {
+            new MaterialAlertDialogBuilder(this).setTitle(R.string.delete_note)
+                    .setMessage(R.string.sure_want_delete)
+                    .setPositiveButton(R.string.common_yes, ((dialog, which) -> {
+                        dialog.dismiss();
+                        presenter.deleteNote(note.getId());
+                    }))
+                    .setNegativeButton(R.string.common_cancel, (dialog, which) -> {
+                        dialog.dismiss();
+                    })
+                    .show();
+            return true;
+        } else if (itemId == android.R.id.home) {
+            if (hasModifications()) {
+                showDiscardDialog(() -> {
+                    setResult(RESULT_CANCELED);
                     finish();
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+                }, null);
+            } else {
+                setResult(RESULT_OK);
+                finish();
+            }
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
 
     private void fetchDataToNoteObject() {
         // Clean html from view and update note to save.
         note.setTitle(HtmlUtil.cleanString(et_title.getText().toString()));
-        note.setContent(HtmlUtil.cleanHtml(et_content.toFormattedHtml()));
+        note.setContent(HtmlUtil.cleanHtml(et_content.toPlainHtml(false)));
     }
 
     public void initToolbar() {
@@ -556,9 +558,8 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
     private void tintActivityColor(int noteColor) {
         et_content.getRootView().setBackgroundColor(noteColor);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(noteColor);
-        }
+        getWindow().setStatusBarColor(noteColor);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(noteColor));
     }
 
     private void closeEdition() {
@@ -644,19 +645,18 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
      * @param stayAction    What to do when user wants to stay (can be null)
      */
     private void showDiscardDialog(Runnable discardAction, Runnable stayAction) {
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.note_confirm_discard_unsaved_changes_title)
+                .setIcon(android.R.drawable.ic_dialog_alert)
                 .setMessage(R.string.note_confirm_discard_unsaved_changes_text)
-                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                .setPositiveButton(R.string.common_yes, ((dialog, which) -> {
                     discardAction.run();
-                })
+                }))
                 .setNegativeButton(R.string.common_cancel, (dialog, which) -> {
                     if (stayAction != null) stayAction.run();
                 })
                 .show();
     }
-
 
     @Override
     public void onBackPressed() {

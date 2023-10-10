@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="sortBy">
+        <item>@string/menu_item_sort_by_title_a_z</item>
+        <item>@string/menu_item_sort_by_date_newest_first</item>
+        <item>@string/menu_item_sort_by_date_updated_first</item>
+    </array>
+</resources>

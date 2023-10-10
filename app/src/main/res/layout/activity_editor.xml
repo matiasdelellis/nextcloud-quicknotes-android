@@ -61,6 +61,7 @@
                 android:textSize="@dimen/note_font_size_large"
                 android:textColor="@color/defaultNoteTint"
                 android:textColorHint="@color/defaultNoteHint"
+                android:textStyle="bold"
                 app:backgroundTint="@color/transparent">
             </EditText>
 
@@ -79,8 +80,10 @@
                 app:textColor="@color/defaultNoteTint"
                 app:bulletColor="@color/defaultNoteTint"
                 app:textColorHint="@color/defaultNoteHint"
-                app:quoteBackground="@color/defaultNoteTint"
-                app:quoteBackgroundAlpha="5%"
+                app:quoteBackgroundAlpha="0%"
+                app:quoteColor="@color/defaultNoteTint"
+                app:quoteTextColor="@color/defaultNoteTint"
+                app:quoteWidth="1dp"
                 app:lineSpacingExtra="10dp"
                 app:blockVerticalPadding="1dp">
             </org.wordpress.aztec.AztecText>
@@ -105,6 +108,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:layout_marginHorizontal="12dp"
                 android:visibility="visible"
                 android:orientation="horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
