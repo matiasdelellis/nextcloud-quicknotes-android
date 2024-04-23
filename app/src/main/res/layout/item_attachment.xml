@@ -46,15 +46,20 @@
 
         <ImageButton
             android:id="@+id/delete_attachment"
-            android:contentDescription="@string/delete_attachment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_margin="@dimen/spacer_1x"
-            android:padding="@dimen/spacer_1hx"
+            android:layout_marginStart="@dimen/spacer_1x"
+            android:layout_marginTop="@dimen/spacer_1x"
+            android:layout_marginEnd="@dimen/spacer_1x"
+            android:layout_marginBottom="@dimen/spacer_1x"
             android:background="@drawable/round_button"
-            android:src="@drawable/ic_delete_grey"/>
+            android:backgroundTint="@color/defaultBrand"
+            android:contentDescription="@string/delete_attachment"
+            android:padding="@dimen/spacer_1hx"
+            android:src="@drawable/ic_delete_grey"
+            app:tint="@color/white" />
     </RelativeLayout>
 
 </ar.com.delellis.quicknotes.shared.SquareFrameLayout>

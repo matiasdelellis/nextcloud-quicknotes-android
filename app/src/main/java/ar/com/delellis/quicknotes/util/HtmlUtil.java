@@ -21,8 +21,12 @@
 
 package ar.com.delellis.quicknotes.util;
 
+import static org.jsoup.Jsoup.parseBodyFragment;
+
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Cleaner;
+import org.jsoup.safety.Safelist;
 
 public class HtmlUtil {
 
@@ -41,21 +45,25 @@ public class HtmlUtil {
      * @return clean html
      */
     public static String cleanHtml(String htmlString) {
-        return Jsoup.clean(htmlString.trim(), basicWhitelist());
+        Document dirty = parseBodyFragment(htmlString, "");
+        dirty.outputSettings().indentAmount(0).prettyPrint(false);
+        Cleaner cleaner = new Cleaner(basicWhitelist());
+        Document clean = cleaner.clean(dirty);
+        return clean.body().html();
     }
 
     /**
      *  @return whitelist
      */
-    public static Whitelist noneWhitelist() {
-        return Whitelist.none();
+    public static Safelist noneWhitelist() {
+        return Safelist.none();
     }
 
     /**
      *  @return whitelist
      */
-    public static Whitelist basicWhitelist() {
-        return new Whitelist()
+    public static Safelist basicWhitelist() {
+        return Safelist.none()
                 .addTags("p", "br")
                 .addTags("b", "strong")
                 .addTags("i")
@@ -66,6 +74,7 @@ public class HtmlUtil {
                 .addAttributes("a", "href")
                 .addProtocols("a", "href", "ftp", "http", "https", "mailto")
                 .addEnforcedAttribute("a", "rel", "nofollow")
+                .addTags("br")
                 ;
     }
 

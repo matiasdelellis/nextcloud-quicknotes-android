@@ -41,6 +41,7 @@
         android:requestLegacyExternalStorage="true">
 
         <activity
+            android:exported="true"
             android:name=".activity.splash.SplashscreenActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -50,7 +51,7 @@
         </activity>
         <activity android:name=".activity.login.LoginActivity">
         </activity>
-        <activity android:name=".activity.main.MainActivity">
+        <activity android:name=".activity.main.MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>

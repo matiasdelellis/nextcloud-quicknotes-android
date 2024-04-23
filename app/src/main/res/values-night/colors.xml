@@ -22,6 +22,7 @@
 
 <resources>
     <!-- Colors -->
+    <color name="defaultBrand">#0082C9</color>
     <color name="fg_default_selection">#cccccc</color>
     <color name="bg_highlighted">#2a2a2a</color>
 </resources>

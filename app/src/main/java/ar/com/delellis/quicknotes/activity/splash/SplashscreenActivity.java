@@ -41,7 +41,7 @@ public class SplashscreenActivity extends AppCompatActivity {
 
         try {
             SingleSignOnAccount ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(getApplicationContext());
-            SingleAccountHelper.setCurrentAccount(getApplicationContext(), ssoAccount.name);
+            SingleAccountHelper.commitCurrentAccount(getApplicationContext(), ssoAccount.name);
 
             Intent intent = new Intent(SplashscreenActivity.this, MainActivity.class);
             startActivity(intent);
