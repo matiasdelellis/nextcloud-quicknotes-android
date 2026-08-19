@@ -128,4 +128,87 @@
     <string name="url_donate" translatable="false">https://github.com/matiasdelellis/quicknotes/wiki/Donate</string>
     <string name="url_translations" translatable="false">https://www.transifex.com/matias/nextcloud-quicknotes-android/</string>
 
+    <!-- Note actions -->
+    <string name="note_actions">Note actions</string>
+    <string name="pin">Pin</string>
+    <string name="unpin">Unpin</string>
+    <string name="archive">Archive</string>
+    <string name="unarchive">Move out of the archive</string>
+    <string name="move_to_trash">Move to trash</string>
+    <string name="restore">Restore</string>
+    <string name="delete_forever">Delete permanently</string>
+    <string name="set_reminder">Set reminder</string>
+    <string name="edit_reminder">Change reminder</string>
+    <string name="remove_reminder">Remove reminder</string>
+    <string name="leave_note">Leave this note</string>
+    <string name="open_note">Open</string>
+
+    <string name="note_archived">Note archived</string>
+    <string name="note_unarchived">Note moved out of the archive</string>
+    <string name="note_trashed">Note moved to trash</string>
+    <string name="note_restored">Note restored</string>
+    <string name="note_left">You left the note</string>
+
+    <string name="sure_want_destroy">This note and everything on it will be gone for good. Delete it anyway?</string>
+    <string name="sure_want_leave">You will stop seeing this note, along with your tags, your pin and your reminder on it. Leave it?</string>
+
+    <!-- Trash -->
+    <string name="trash">Trash</string>
+    <string name="empty_trash">Empty trash</string>
+    <string name="sure_want_empty_trash">Every note in your trash will be gone for good. Empty it?</string>
+    <string name="trash_is_empty">There is nothing in the trash</string>
+
+    <!-- Archive and reminders -->
+    <string name="archived">Archived</string>
+    <string name="with_reminder">Reminders</string>
+    <string name="reminder_at">Reminder: %1$s</string>
+    <string name="reminder_notified">Reminded: %1$s</string>
+    <string name="reminder_set_for">Reminder set for %1$s</string>
+    <string name="reminder_removed">Reminder removed</string>
+    <string name="select_reminder_date">Pick the day</string>
+    <string name="select_reminder_time">Pick the time</string>
+    <string name="reminder_must_be_in_the_future">Pick a moment that has not happened yet</string>
+
+    <!-- Sharing -->
+    <string name="shares">Sharing</string>
+    <string name="shared_by">Shared by %1$s</string>
+    <string name="share_with_people">Share with people</string>
+    <string name="search_people_and_groups">Search people and groups</string>
+    <string name="no_one_else_has_this_note">Nobody else has this note yet</string>
+    <string name="no_matches">Nobody found</string>
+    <string name="group">Group</string>
+    <string name="permission_can_view">Can view</string>
+    <string name="permission_can_edit">Can edit</string>
+    <string name="permission_can_view_and_reshare">Can view and share</string>
+    <string name="permission_can_edit_and_reshare">Can edit and share</string>
+    <string name="change_permissions">Change permissions</string>
+    <string name="remove_share">Stop sharing</string>
+    <string name="shared_with_name">Shared with %1$s</string>
+    <string name="note_is_read_only">This note is read only for you</string>
+
+    <!-- Conflicts -->
+    <string name="conflict_title">Somebody else saved this note</string>
+    <string name="conflict_message">This note changed on the server while you were writing. Keeping your version overwrites theirs.</string>
+    <string name="conflict_keep_mine">Keep mine</string>
+    <string name="conflict_take_theirs">Take theirs</string>
+
+    <!-- More errors -->
+    <string name="error_api_too_old">Your server is running Quick notes %1$s, which is older than this app can talk to. Please update the server app to one publishing api %2$s or newer.</string>
+    <string name="error_note_is_read_only">You can read this note, but not change it</string>
+    <string name="error_note_changed_elsewhere">This note changed on the server and could not be read back</string>
+    <string name="error_setting_reminder">There was an error setting the reminder</string>
+    <string name="error_uploading_attachment">There was an error uploading the file</string>
+    <string name="error_leaving_note">There was an error leaving the note</string>
+    <string name="error_loading_shares">There was an error reading who has this note</string>
+    <string name="error_no_account">There is no Nextcloud account signed in</string>
+
+    <!-- Empty states -->
+    <string name="no_notes_yet">No notes here yet</string>
+    <string name="no_notes_found">No notes match your search</string>
+
+    <plurals name="trash_emptied">
+        <item quantity="one">%1$d note deleted permanently</item>
+        <item quantity="other">%1$d notes deleted permanently</item>
+    </plurals>
+
 </resources>

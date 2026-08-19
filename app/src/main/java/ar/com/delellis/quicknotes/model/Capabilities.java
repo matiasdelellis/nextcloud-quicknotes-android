@@ -28,7 +28,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
+import ar.com.delellis.quicknotes.util.VersionUtil;
+
 public class Capabilities implements Serializable {
+    /**
+     * The api this client is written against. 1.5 is where emptying the trash
+     * arrived, and it is the last of the reshapes that started at 1.1, so it
+     * is the whole contract this client counts on.
+     */
+    public static final String REQUIRED_API_VERSION = "1.5";
+
     @Expose
     @SerializedName("quicknotesVersion") private String quicknotesVersion;
 
@@ -46,7 +55,7 @@ public class Capabilities implements Serializable {
     }
 
     public String getQuicknotesVersion() {
-        return quicknotesVersion;
+        return quicknotesVersion != null ? quicknotesVersion : "";
     }
 
     public void setQuicknotesVersion(String quicknotesVersion) {
@@ -54,7 +63,7 @@ public class Capabilities implements Serializable {
     }
 
     public String getQuicknotesApiVersion() {
-        return quicknotesApiVersion;
+        return quicknotesApiVersion != null ? quicknotesApiVersion : "";
     }
 
     public void setQuicknotesApiVersion(String quicknotesApiVersion) {
@@ -62,7 +71,7 @@ public class Capabilities implements Serializable {
     }
 
     public String getNextcloudVersion() {
-        return nextcloudVersion;
+        return nextcloudVersion != null ? nextcloudVersion : "";
     }
 
     public void setNextcloudVersion(String nextcloudVersion) {
@@ -75,6 +84,20 @@ public class Capabilities implements Serializable {
 
     public void setMaintenanceEnabled(boolean maintenanceEnabled) {
         this.maintenanceEnabled = maintenanceEnabled;
+    }
+
+    /** Whether the server app is there at all. */
+    public boolean isQuicknotesInstalled() {
+        return !getQuicknotesVersion().isEmpty();
+    }
+
+    /**
+     * Whether the server speaks the api this client talks. An older server
+     * answers a different shape on shares and knows nothing about reminders,
+     * archiving or the trash, so there is no half way to meet it at.
+     */
+    public boolean isApiVersionSupported() {
+        return VersionUtil.isAtLeast(getQuicknotesApiVersion(), REQUIRED_API_VERSION);
     }
 
     @NotNull

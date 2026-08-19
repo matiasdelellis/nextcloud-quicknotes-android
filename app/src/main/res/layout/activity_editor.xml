@@ -65,9 +65,39 @@
                 app:backgroundTint="@color/transparent">
             </EditText>
 
+            <LinearLayout
+                android:id="@+id/editor_reminder_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/editor_title"
+                android:layout_marginHorizontal="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/editor_reminder_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@string/with_reminder"
+                    android:src="@drawable/ic_alarm"
+                    app:tint="@color/defaultNoteTint" />
+
+                <TextView
+                    android:id="@+id/editor_reminder_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacer_1hx"
+                    android:textColor="@color/defaultNoteTint"
+                    android:textSize="@dimen/note_font_size_small"
+                    tools:text="Reminder: 24 Aug 2026, 12:00" />
+
+            </LinearLayout>
+
             <org.wordpress.aztec.AztecText
                 android:id="@+id/editor_content"
-                android:layout_below="@id/editor_title"
+                android:layout_below="@id/editor_reminder_bar"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_marginHorizontal="18dp"
@@ -120,6 +150,15 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/editor_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:indeterminate="true"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <HorizontalScrollView
         android:id="@+id/editor_rich_toolbar"
         android:layout_width="match_parent"
@@ -128,7 +167,9 @@
         android:scrollbars="none"
         android:layout_gravity="bottom">
 
-        <include layout="@layout/editor_toolbar" />
+        <include
+            android:id="@+id/editor_toolbar"
+            layout="@layout/editor_toolbar" />
     </HorizontalScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

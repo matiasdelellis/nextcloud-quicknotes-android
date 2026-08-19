@@ -22,8 +22,10 @@
 package ar.com.delellis.quicknotes.api;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.nextcloud.android.sso.api.NextcloudAPI;
 import com.nextcloud.android.sso.exceptions.NextcloudFilesAppAccountNotFoundException;
@@ -31,18 +33,20 @@ import com.nextcloud.android.sso.exceptions.NoCurrentAccountSelectedException;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
 import com.nextcloud.android.sso.model.SingleSignOnAccount;
 
-import android.util.Log;
-
-import org.jetbrains.annotations.NotNull;
-
 import ar.com.delellis.quicknotes.api.helper.GsonConfig;
 import retrofit2.NextcloudRetrofitApiBuilder;
 
+/**
+ * Holds the api of the account that is signed in.
+ *
+ * Everything goes through the Files app over SSO, so there is no url and no
+ * password of ours anywhere: what there is, is the account the user picked.
+ */
 public class ApiProvider {
-    private final String TAG = ApiProvider.class.getCanonicalName();
+    private static final String TAG = ApiProvider.class.getCanonicalName();
 
     @NonNull
-    protected Context context;
+    protected final Context context;
 
     protected static QuicknotesAPI quicknotesAPI;
 
@@ -50,7 +54,7 @@ public class ApiProvider {
 
     protected static String username;
 
-    public ApiProvider(@NotNull Context context) {
+    public ApiProvider(@NonNull Context context) {
         this.context = context;
 
         initSsoApi();
@@ -67,7 +71,7 @@ public class ApiProvider {
 
                 @Override
                 public void onError(Exception ex) {
-                    // Ignore...
+                    Log.w(TAG, "Could not connect to the Files app", ex);
                 }
             });
 
@@ -76,7 +80,7 @@ public class ApiProvider {
 
             username = ssoAccount.name;
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
-            Log.d(TAG, "setAccout() called with: ex = [" + e + "]");
+            Log.d(TAG, "setAccount() called with: ex = [" + e + "]");
         }
     }
 
@@ -88,6 +92,12 @@ public class ApiProvider {
         return nextcloudServerApi;
     }
 
+    /** Whether there is an account signed in and an api to talk to. */
+    public static boolean isReady() {
+        return quicknotesAPI != null && nextcloudServerApi != null;
+    }
+
+    @Nullable
     public static String getUsername() {
         return username;
     }

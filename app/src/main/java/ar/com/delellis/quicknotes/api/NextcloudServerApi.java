@@ -24,8 +24,8 @@ package ar.com.delellis.quicknotes.api;
 import com.nextcloud.android.sso.api.ParsedResponse;
 
 import ar.com.delellis.quicknotes.model.Capabilities;
+import io.reactivex.rxjava3.core.Observable;
 import retrofit2.http.GET;
-import io.reactivex.Observable;
 import retrofit2.http.Header;
 
 public interface NextcloudServerApi {

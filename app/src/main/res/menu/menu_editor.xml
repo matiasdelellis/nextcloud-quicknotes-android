@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Nextcloud Quicknotes Android client application.
-  ~
-  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
-  ~
-  ~ @author Matias De lellis <mati86dl@gmail.com>
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
+ ~ Nextcloud Quicknotes Android client application.
+ ~
+ ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+ ~
+ ~ @author Matias De lellis <mati86dl@gmail.com>
+ ~
+ ~ This program is free software: you can redistribute it and/or modify
+ ~ it under the terms of the GNU General Public License as published by
+ ~ the Free Software Foundation, either version 3 of the License, or
+ ~ (at your option) any later version.
+ ~
+ ~ This program is distributed in the hope that it will be useful,
+ ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ~ GNU General Public License for more details.
+ ~
+ ~ You should have received a copy of the GNU General Public License
+ ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,14 +29,49 @@
         android:icon="@drawable/ic_pin"
         app:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/delete"
-        android:title="@string/delete_note"
-        android:icon="@drawable/ic_delete_grey"
-        app:showAsAction="ifRoom"/>
-
     <item android:id="@+id/save"
         android:title="@string/save"
         android:icon="@drawable/ic_save_grey"
         app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/reminder"
+        android:title="@string/set_reminder"
+        android:icon="@drawable/ic_alarm"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/remove_reminder"
+        android:title="@string/remove_reminder"
+        android:icon="@drawable/ic_alarm_off"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/share"
+        android:title="@string/shares"
+        android:icon="@drawable/ic_shared_grey"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/archive"
+        android:title="@string/archive"
+        android:icon="@drawable/ic_archive"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/unarchive"
+        android:title="@string/unarchive"
+        android:icon="@drawable/ic_unarchive"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/trash"
+        android:title="@string/move_to_trash"
+        android:icon="@drawable/ic_trash"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/restore"
+        android:title="@string/restore"
+        android:icon="@drawable/ic_restore"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/leave"
+        android:title="@string/leave_note"
+        android:icon="@drawable/ic_exit"
+        app:showAsAction="never"/>
 
 </menu>

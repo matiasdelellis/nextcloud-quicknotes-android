@@ -55,9 +55,6 @@ public class SortingOrderDialogFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // keep the state of the fragment on configuration changes
-        setRetainInstance(true);
-
         Bundle arguments = getArguments();
         if (arguments == null) {
             throw new IllegalArgumentException("Arguments may not be null");
@@ -78,14 +75,6 @@ public class SortingOrderDialogFragment extends DialogFragment {
                         });
 
         return builder.create();
-    }
-
-    @Override
-    public void onDestroyView() {
-        if (getDialog() != null && getRetainInstance()) {
-            getDialog().setDismissMessage(null);
-        }
-        super.onDestroyView();
     }
 
     public interface OnSortingOrderListener {

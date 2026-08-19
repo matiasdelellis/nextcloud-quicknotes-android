@@ -22,65 +22,107 @@
 package ar.com.delellis.quicknotes.activity.main;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.wordpress.aztec.AztecText;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import ar.com.delellis.quicknotes.R;
+import ar.com.delellis.quicknotes.databinding.ItemNoteBinding;
 import ar.com.delellis.quicknotes.model.Note;
 import ar.com.delellis.quicknotes.model.Tag;
 import ar.com.delellis.quicknotes.shared.AttachmentAdapter;
 import ar.com.delellis.quicknotes.shared.ShareAdapter;
 import ar.com.delellis.quicknotes.shared.TagAdapter;
 import ar.com.delellis.quicknotes.util.ColorUtil;
+import ar.com.delellis.quicknotes.util.DateUtil;
 import ar.com.delellis.quicknotes.util.HtmlUtil;
 
-public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAdapter> implements Filterable {
+/**
+ * The grid of notes.
+ *
+ * What is on screen is one scope — a drawer entry — narrowed further by
+ * whatever is typed in the search box. Archived and trashed notes come down
+ * with everything else and are filtered out here: they only show under their
+ * own scope, and never anywhere else.
+ */
+public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
 
     public static final int SORT_BY_TITLE = 0;
     public static final int SORT_BY_CREATED = 1;
     public static final int SORT_BY_UPDATED = 2;
 
+    /** Everything active: not archived, not in the trash. */
+    public static final int SCOPE_ALL = 0;
+    public static final int SCOPE_PINNED = 1;
+    public static final int SCOPE_SHARED_WITH_ME = 2;
+    public static final int SCOPE_SHARED_BY_ME = 3;
+    public static final int SCOPE_REMINDERS = 4;
+    public static final int SCOPE_ARCHIVED = 5;
+    public static final int SCOPE_TRASH = 6;
+    public static final int SCOPE_TAG = 7;
+
     private int sortRule = SORT_BY_UPDATED;
     private boolean firstPinned = true;
 
-    private Context context;
-    int tintColor;
+    private int scope = SCOPE_ALL;
+    private String tagName = null;
+    private String query = "";
+
+    private final Context context;
+    private final int tintColor;
+    private final int defaultColor;
 
     private List<Note> noteList = new ArrayList<>();
     private List<Note> noteListFiltered = new ArrayList<>();
 
-    private ItemClickListener itemClickListener;
+    private final ItemClickListener itemClickListener;
 
     public NoteAdapter(Context context, ItemClickListener itemClickListener) {
         this.context = context;
         this.itemClickListener = itemClickListener;
 
-        this.tintColor = context.getResources().getColor(R.color.defaultNoteTint);
+        this.tintColor = ContextCompat.getColor(context, R.color.defaultNoteTint);
+        this.defaultColor = ContextCompat.getColor(context, R.color.defaultNoteColor);
     }
 
     public void setNoteList(@NonNull List<Note> noteList) {
         this.noteList = noteList;
-        this.noteListFiltered = new ArrayList<>(noteList);
+        applyFilters();
+    }
 
-        performSort();
-        notifyDataSetChanged();
+    @NonNull
+    public List<Note> getNoteList() {
+        return noteList;
+    }
+
+    /** Puts a note the server sent back in place of the one held here. */
+    public void replaceNote(@NonNull Note note) {
+        for (int i = 0; i < noteList.size(); i++) {
+            if (noteList.get(i).getId() == note.getId()) {
+                noteList.set(i, note);
+                break;
+            }
+        }
+        applyFilters();
+    }
+
+    public void removeNote(int noteId) {
+        for (int i = 0; i < noteList.size(); i++) {
+            if (noteList.get(i).getId() == noteId) {
+                noteList.remove(i);
+                break;
+            }
+        }
+        applyFilters();
     }
 
     public Note get(int position) {
@@ -93,9 +135,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     public void setSortRule(int sortRule) {
         this.sortRule = sortRule;
-
-        performSort();
-        notifyDataSetChanged();
+        applyFilters();
     }
 
     public boolean getFirstPinned() {
@@ -104,42 +144,110 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
 
     public void setFirstPinned(boolean firstPinned) {
         this.firstPinned = firstPinned;
+        applyFilters();
+    }
 
+    public int getScope() {
+        return scope;
+    }
+
+    /** Shows one drawer entry. The search box is left as it is. */
+    public void setScope(int scope) {
+        this.scope = scope;
+        this.tagName = null;
+        applyFilters();
+    }
+
+    public void setTagScope(String tagName) {
+        this.scope = SCOPE_TAG;
+        this.tagName = tagName;
+        applyFilters();
+    }
+
+    /** Narrows whatever scope is on screen by what the user typed. */
+    public void setQuery(String query) {
+        this.query = query != null ? query : "";
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        List<Note> filtered = new ArrayList<>();
+        String needle = query.trim().toLowerCase(Locale.getDefault());
+
+        for (Note note : noteList) {
+            if (!matchesScope(note)) {
+                continue;
+            }
+            if (!needle.isEmpty() && !matchesQuery(note, needle)) {
+                continue;
+            }
+            filtered.add(note);
+        }
+
+        noteListFiltered = filtered;
         performSort();
         notifyDataSetChanged();
     }
 
+    private boolean matchesScope(@NonNull Note note) {
+        // The trash and the archive are places of their own: a note sitting in
+        // either is out of every other scope.
+        if (scope == SCOPE_TRASH) {
+            return note.isTrashed();
+        }
+        if (note.isTrashed()) {
+            return false;
+        }
+        if (scope == SCOPE_ARCHIVED) {
+            return note.isArchived();
+        }
+        if (note.isArchived()) {
+            return false;
+        }
+
+        switch (scope) {
+            case SCOPE_PINNED:
+                return note.isPinned();
+            case SCOPE_SHARED_WITH_ME:
+                return note.isSharedWithMe();
+            case SCOPE_SHARED_BY_ME:
+                return note.isSharedByMe();
+            case SCOPE_REMINDERS:
+                return note.hasReminder();
+            case SCOPE_TAG:
+                return hasTag(note, tagName);
+            case SCOPE_ALL:
+            default:
+                return true;
+        }
+    }
+
+    private static boolean hasTag(@NonNull Note note, String tagName) {
+        if (tagName == null) {
+            return true;
+        }
+        for (Tag tag : note.getTags()) {
+            if (tagName.equals(tag.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean matchesQuery(@NonNull Note note, @NonNull String needle) {
+        return HtmlUtil.cleanString(note.getTitle()).toLowerCase(Locale.getDefault()).contains(needle)
+                || HtmlUtil.cleanString(note.getContent()).toLowerCase(Locale.getDefault()).contains(needle);
+    }
+
     @NonNull
     @Override
-    public RecyclerViewAdapter onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_note, parent, false);
-        return new RecyclerViewAdapter(view, itemClickListener);
+    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new NoteViewHolder(ItemNoteBinding.inflate(LayoutInflater.from(context), parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerViewAdapter holder, int position) {
-        Note note = noteListFiltered.get(position);
-
-        holder.tv_title.setText(HtmlUtil.cleanString(note.getTitle()));
-        holder.tv_content.fromHtml(HtmlUtil.cleanHtml(note.getContent()), true);
-        holder.card_item.setCardBackgroundColor(Color.parseColor(note.getColor()));
-        holder.im_shared.setVisibility(note.getIsShared() ? View.VISIBLE : View.GONE);
-        holder.im_pinned.setVisibility(note.getIsPinned() ? View.VISIBLE : View.GONE);
-
-        holder.attachmentAdapter.setItems(note.getAttachtments());
-        holder.attachmentAdapter.notifyDataSetChanged();
-        holder.attachmentRecyclerView.setAdapter(holder.attachmentAdapter);
-
-        holder.tagAdapter.setItems(note.getTags());
-        holder.tagAdapter.notifyDataSetChanged();
-        holder.tagRecyclerView.setAdapter(holder.tagAdapter);
-
-        holder.shareAdapter.setItems(note.getShareWith());
-        holder.shareAdapter.notifyDataSetChanged();
-        holder.shareRecyclerView.setAdapter(holder.shareAdapter);
-
-        ColorUtil.imageViewTintColor(holder.im_shared, tintColor);
-        ColorUtil.imageViewTintColor(holder.im_pinned, tintColor);
+    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
+        holder.bind(noteListFiltered.get(position));
     }
 
     @Override
@@ -147,216 +255,77 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
         return noteListFiltered.size();
     }
 
-    @Override
-    public Filter getFilter() {
-        return filter;
-    }
+    class NoteViewHolder extends RecyclerView.ViewHolder {
+        @NonNull
+        private final ItemNoteBinding binding;
 
-    Filter filter = new Filter() {
-        @Override
-        // Run on Background thread.
-        protected FilterResults performFiltering(CharSequence charSequence) {
-            FilterResults filterResults = new FilterResults();
-            List <Note> filteredNotes = new ArrayList<>();
+        private final AttachmentAdapter attachmentAdapter = new AttachmentAdapter();
+        private final TagAdapter tagAdapter = new TagAdapter();
+        private final ShareAdapter shareAdapter = new ShareAdapter();
 
-            if (charSequence.toString().isEmpty()) {
-                filteredNotes.addAll(noteList);
+        NoteViewHolder(@NonNull ItemNoteBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+
+            binding.itemContent.setCalypsoMode(false);
+
+            View.OnClickListener onClick = view -> {
+                int index = getBindingAdapterPosition();
+                if (index != RecyclerView.NO_POSITION) {
+                    itemClickListener.onItemClick(noteListFiltered.get(index));
+                }
+            };
+            View.OnLongClickListener onLongClick = view -> {
+                int index = getBindingAdapterPosition();
+                if (index == RecyclerView.NO_POSITION) {
+                    return false;
+                }
+                itemClickListener.onItemLongClick(noteListFiltered.get(index));
+                return true;
+            };
+
+            binding.itemNote.setOnClickListener(onClick);
+            binding.itemNote.setOnLongClickListener(onLongClick);
+            binding.itemContent.setOnClickListener(onClick);
+            binding.itemContent.setOnLongClickListener(onLongClick);
+
+            // A thumbnail is part of the card, not a target of its own.
+            attachmentAdapter.setOnImageClickListener(position -> onClick.onClick(binding.getRoot()));
+
+            binding.itemRecyclerAttachments.setAdapter(attachmentAdapter);
+            binding.itemRecyclerTags.setAdapter(tagAdapter);
+            binding.itemRecyclerShares.setAdapter(shareAdapter);
+        }
+
+        private void bind(@NonNull Note note) {
+            binding.itemTitle.setText(HtmlUtil.cleanString(note.getTitle()));
+            binding.itemContent.fromHtml(HtmlUtil.cleanHtml(note.getContent()), true);
+            binding.itemNote.setCardBackgroundColor(ColorUtil.parseColorOr(note.getColor(), defaultColor));
+
+            binding.itemShared.setVisibility(note.isSharedWithMe() || note.isSharedByMe() ? View.VISIBLE : View.GONE);
+            binding.itemPinned.setVisibility(note.isPinned() ? View.VISIBLE : View.GONE);
+            binding.itemArchived.setVisibility(note.isArchived() ? View.VISIBLE : View.GONE);
+            binding.itemReminder.setVisibility(note.hasReminder() ? View.VISIBLE : View.GONE);
+
+            String reminder = note.hasReminder() ? DateUtil.toLocalDisplay(note.getReminderAt()) : null;
+            if (reminder != null) {
+                // Once the notification has gone out the reminder is history,
+                // and saying so tells a pending one from one already fired.
+                binding.itemReminderText.setText(context.getString(
+                        note.isReminderPending() ? R.string.reminder_at : R.string.reminder_notified, reminder));
+                binding.itemReminderText.setVisibility(View.VISIBLE);
             } else {
-                String query = charSequence.toString().toLowerCase();
-                for (Note note: noteList) {
-                    if (HtmlUtil.cleanString(note.getTitle()).contains(query)) {
-                        filteredNotes.add(note);
-                    } else if (HtmlUtil.cleanString(note.getContent()).contains(query)) {
-                        filteredNotes.add(note);
-                    }
-                }
+                binding.itemReminderText.setVisibility(View.GONE);
             }
 
-            filterResults.values = filteredNotes;
-            return filterResults;
-        }
-        //Run on ui thread
-        @Override
-        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            noteListFiltered.clear();
-            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
+            attachmentAdapter.setItems(note.getAttachments());
+            tagAdapter.setItems(note.getTags());
+            shareAdapter.setItems(note.getSharedWith());
 
-            performSort();
-            notifyDataSetChanged();
-        }
-    };
-
-    public Filter getTagFilter() {
-        return tagFilter;
-    }
-
-    Filter tagFilter = new Filter() {
-        @Override
-        // Run on Background thread.
-        protected FilterResults performFiltering(CharSequence charSequence) {
-            FilterResults filterResults = new FilterResults();
-            List <Note> filteredNotes = new ArrayList<>();
-
-            if (charSequence.toString().isEmpty()) {
-                filteredNotes.addAll(noteList);
-            } else {
-                String query = charSequence.toString();
-                for (Note note: noteList) {
-                    for (Tag tag: note.getTags()) {
-                        if (tag.getName().equals(query)) {
-                            filteredNotes.add(note);
-                            break;
-                        }
-                    }
-                }
-            }
-            filterResults.values = filteredNotes;
-            return filterResults;
-        }
-        @Override
-        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            noteListFiltered.clear();
-            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
-
-            performSort();
-            notifyDataSetChanged();
-        }
-    };
-
-    public Filter getIsSharedFilter() {
-        return isSharedFilter;
-    }
-
-    Filter isSharedFilter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence charSequence) {
-            FilterResults filterResults = new FilterResults();
-            List <Note> filteredNotes = new ArrayList<>();
-
-            for (Note note: noteList) {
-                if (note.getIsShared()) {
-                    filteredNotes.add(note);
-                }
-            }
-
-            filterResults.values = filteredNotes;
-            return filterResults;
-        }
-        @Override
-        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            noteListFiltered.clear();
-            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
-
-            performSort();
-            notifyDataSetChanged();
-        }
-    };
-
-    public Filter getSharedWithOthersFilter() {
-        return sharedWithOthersFilter;
-    }
-
-    Filter sharedWithOthersFilter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence charSequence) {
-            FilterResults filterResults = new FilterResults();
-            List <Note> filteredNotes = new ArrayList<>();
-
-            for (Note note: noteList) {
-                if (note.getShareWith().size() > 0) {
-                    filteredNotes.add(note);
-                }
-            }
-
-            filterResults.values = filteredNotes;
-            return filterResults;
-        }
-        @Override
-        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            noteListFiltered.clear();
-            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
-
-            performSort();
-            notifyDataSetChanged();
-        }
-    };
-
-    public Filter getPinnedFilter() {
-        return pinnedFilter;
-    }
-
-    Filter pinnedFilter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence charSequence) {
-            FilterResults filterResults = new FilterResults();
-            List <Note> filteredNotes = new ArrayList<>();
-
-            for (Note note: noteList) {
-                if (note.getIsPinned()) {
-                    filteredNotes.add(note);
-                }
-            }
-
-            filterResults.values = filteredNotes;
-            return filterResults;
-        }
-        @Override
-        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            noteListFiltered.clear();
-            noteListFiltered.addAll((Collection<? extends Note>) filterResults.values);
-
-            performSort();
-            notifyDataSetChanged();
-        }
-    };
-
-    class RecyclerViewAdapter extends RecyclerView.ViewHolder implements View.OnClickListener {
-        CardView card_item;
-        TextView tv_title;
-        AztecText tv_content;
-        ImageView im_shared;
-        ImageView im_pinned;
-
-        AttachmentAdapter attachmentAdapter;
-        RecyclerView attachmentRecyclerView;
-
-        TagAdapter tagAdapter;
-        RecyclerView tagRecyclerView;
-
-        ShareAdapter shareAdapter;
-        RecyclerView shareRecyclerView;
-
-        ItemClickListener itemClickListener;
-
-        RecyclerViewAdapter(@NonNull View itemView, ItemClickListener itemClickListener) {
-            super(itemView);
-            this.itemClickListener = itemClickListener;
-
-            card_item = itemView.findViewById(R.id.item_note);
-            tv_title = itemView.findViewById(R.id.item_title);
-            tv_content = itemView.findViewById(R.id.item_content);
-            im_shared = itemView.findViewById(R.id.item_shared);
-            im_pinned = itemView.findViewById(R.id.item_pinned);
-
-            attachmentAdapter = new AttachmentAdapter();
-            attachmentRecyclerView = itemView.findViewById(R.id.item_recyclerAttachments);
-
-            tagAdapter = new TagAdapter();
-            tagRecyclerView = itemView.findViewById(R.id.item_recyclerTags);
-
-            shareAdapter = new ShareAdapter();
-            shareRecyclerView = itemView.findViewById(R.id.item_recyclerShares);
-
-            card_item.setOnClickListener(this);
-            tv_content.setOnClickListener(this);
-            tv_content.setCalypsoMode(false);
-
-            attachmentAdapter.setOnImageClickListener(position -> this.onClick(itemView));
-        }
-
-        @Override
-        public void onClick(View view) {
-            itemClickListener.onItemClick(view, getAdapterPosition());
+            ColorUtil.imageViewTintColor(binding.itemShared, tintColor);
+            ColorUtil.imageViewTintColor(binding.itemPinned, tintColor);
+            ColorUtil.imageViewTintColor(binding.itemArchived, tintColor);
+            ColorUtil.imageViewTintColor(binding.itemReminder, tintColor);
         }
     }
 
@@ -375,6 +344,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.RecyclerViewAd
     }
 
     public interface ItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(@NonNull Note note);
+        void onItemLongClick(@NonNull Note note);
     }
 }

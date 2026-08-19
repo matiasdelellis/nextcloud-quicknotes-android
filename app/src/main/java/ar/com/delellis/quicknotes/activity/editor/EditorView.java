@@ -21,12 +21,28 @@
 
 package ar.com.delellis.quicknotes.activity.editor;
 
-import ar.com.delellis.quicknotes.model.Attachment;
+import ar.com.delellis.quicknotes.model.AttachmentInfo;
+import ar.com.delellis.quicknotes.model.Note;
 
 public interface EditorView {
     void showProgress();
     void hideProgress();
+
+    /** The note was saved, or destroyed, and the editor is done. */
     void onRequestSuccess(String message);
+
     void onRequestError(String message);
-    void addAttachment(Attachment attachment);
+
+    /** A file was uploaded and is ready to be attached to the note. */
+    void addAttachment(AttachmentInfo attachment);
+
+    /** The note came back changed, and the editor stays open on it. */
+    void onNoteUpdated(Note note);
+
+    /**
+     * Somebody else saved the note since it was read here.
+     *
+     * @param current the note as it is now on the server.
+     */
+    void onConflict(Note current);
 }

@@ -23,6 +23,7 @@
 <resources>
     <!-- Colors -->
     <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFFFF</color>
     <color name="defaultBrand">#0082C9</color>
     <color name="note_font_color_default">#202124</color>
     <color name="badge_background">#14000000</color>

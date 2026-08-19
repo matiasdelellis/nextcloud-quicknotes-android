@@ -24,40 +24,49 @@ package ar.com.delellis.quicknotes.activity.error;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Html;
-import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
 
 import java.util.Objects;
 
 import ar.com.delellis.quicknotes.R;
+import ar.com.delellis.quicknotes.databinding.ActivitySingleErrorBinding;
+import ar.com.delellis.quicknotes.util.InsetsUtil;
 
 public class ErrorActivity extends AppCompatActivity {
+
+    public static final String EXTRA_ERROR_MESSAGE = "errorMessage";
+
+    private ActivitySingleErrorBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_single_error);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        binding = ActivitySingleErrorBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        InsetsUtil.applySystemBarsPadding(binding.getRoot());
+
+        setSupportActionBar(binding.toolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        Intent intent = getIntent();
+        String errorMessage = (String) Objects.requireNonNull(
+                getIntent().getSerializableExtra(EXTRA_ERROR_MESSAGE));
+        binding.errorMessage.setText(fromHtml(errorMessage));
 
-        String errorMessage = (String) Objects.requireNonNull(intent.getSerializableExtra("errorMessage"));
-        TextView tvError = findViewById(R.id.error_message);
-        tvError.setText(Html.fromHtml(errorMessage));
+        binding.aboutIssues.setText(fromHtml(getString(R.string.about_issues, getString(R.string.url_issues))));
+        binding.aboutIssues.setOnClickListener(view ->
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_issues)))));
+    }
 
-        TextView tvIssues = findViewById(R.id.about_issues);
-        tvIssues.setText(Html.fromHtml(getString(R.string.about_issues, getString(R.string.url_issues))));
-        tvIssues.setOnClickListener(view -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_issues)))));
+    private static CharSequence fromHtml(String source) {
+        return HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     @Override

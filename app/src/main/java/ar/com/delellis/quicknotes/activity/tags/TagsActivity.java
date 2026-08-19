@@ -21,50 +21,43 @@
 
 package ar.com.delellis.quicknotes.activity.tags;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import ar.com.delellis.quicknotes.R;
+import ar.com.delellis.quicknotes.databinding.ActivityTagsBinding;
 import ar.com.delellis.quicknotes.model.Tag;
 import ar.com.delellis.quicknotes.shared.TagSelectionAdapter;
-
+import ar.com.delellis.quicknotes.util.InsetsUtil;
 
 public class TagsActivity extends AppCompatActivity {
 
-    EditText filterText;
-    ImageButton filterClearButton;
+    public static final String EXTRA_TAGS = "tags";
+    public static final String EXTRA_TAG_SELECTION = "tagSelection";
 
-    TextView createTag;
+    private ActivityTagsBinding binding;
 
-    TagSelectionAdapter tagsAdapter;
-    RecyclerView tagsRecyclerView;
-
-    List<Tag> tags;
-    List<Tag> tagSelection;
+    private TagSelectionAdapter tagsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tags);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        binding = ActivityTagsBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        InsetsUtil.applySystemBarsPadding(binding.getRoot());
+
+        setSupportActionBar(binding.toolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -72,46 +65,46 @@ public class TagsActivity extends AppCompatActivity {
         }
 
         tagsAdapter = new TagSelectionAdapter();
-        tagsRecyclerView = findViewById(R.id.recycler_tags_view);
+        binding.recyclerTagsView.setAdapter(tagsAdapter);
 
-        filterText = findViewById(R.id.tag_search);
-        filterText.addTextChangedListener(mTextWatcher);
+        binding.tagSearch.addTextChangedListener(textWatcher);
 
-        filterClearButton = findViewById(R.id.ic_filter_clear);
-        filterClearButton.setVisibility(View.GONE);
-        filterClearButton.setOnClickListener(view -> filterText.setText(null));
+        binding.icFilterClear.setVisibility(View.GONE);
+        binding.icFilterClear.setOnClickListener(view -> binding.tagSearch.setText(null));
 
-        createTag = findViewById(R.id.create_tag);
-        createTag.setVisibility(View.GONE);
-        createTag.setOnClickListener(view -> {
+        binding.createTag.setVisibility(View.GONE);
+        binding.createTag.setOnClickListener(view -> {
             Tag newTag = new Tag();
-            newTag.setId(-1);
-            newTag.setName(filterText.getText().toString().trim());
+            newTag.setId(Tag.NO_ID);
+            newTag.setName(binding.tagSearch.getText().toString().trim());
             tagsAdapter.insertTagSelection(newTag);
         });
 
         Intent intent = getIntent();
-        tags = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tags"));
-        tagSelection = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tagSelection"));
+        List<Tag> tags = readTags(intent, EXTRA_TAGS);
+        List<Tag> tagSelection = readTags(intent, EXTRA_TAG_SELECTION);
 
         tagsAdapter.setTags(tags);
         tagsAdapter.setTagSelection(tagSelection);
+    }
 
-        tagsAdapter.notifyDataSetChanged();
-        tagsRecyclerView.setAdapter(tagsAdapter);
+    @SuppressWarnings("unchecked")
+    private static List<Tag> readTags(Intent intent, String key) {
+        Serializable extra = intent.getSerializableExtra(key);
+        return extra != null ? (List<Tag>) extra : new ArrayList<>();
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         Intent intent = new Intent();
-        intent.putExtra("tagSelection", (Serializable) tagsAdapter.getTagSelection());
+        intent.putExtra(EXTRA_TAG_SELECTION, (Serializable) tagsAdapter.getTagSelection());
         setResult(RESULT_OK, intent);
         finish();
 
         return true;
     }
 
-    private TextWatcher mTextWatcher = new TextWatcher() {
+    private final TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int before, int after) { }
 
@@ -119,14 +112,15 @@ public class TagsActivity extends AppCompatActivity {
         public void onTextChanged(CharSequence charSequence, int start, int before, int after) {
             String query = charSequence.toString().trim();
             if (query.isEmpty()) {
-                createTag.setVisibility(View.GONE);
-                filterClearButton.setVisibility(View.GONE);
+                binding.createTag.setVisibility(View.GONE);
+                binding.icFilterClear.setVisibility(View.GONE);
             } else if (tagsAdapter.tagExists(query)) {
-                    createTag.setVisibility(View.GONE);
+                binding.createTag.setVisibility(View.GONE);
+                binding.icFilterClear.setVisibility(View.VISIBLE);
             } else {
-                createTag.setText(getString(R.string.create_tag, query));
-                createTag.setVisibility(View.VISIBLE);
-                filterClearButton.setVisibility(View.VISIBLE);
+                binding.createTag.setText(getString(R.string.create_tag, query));
+                binding.createTag.setVisibility(View.VISIBLE);
+                binding.icFilterClear.setVisibility(View.VISIBLE);
             }
             tagsAdapter.getFilter().filter(charSequence);
         }

@@ -27,96 +27,152 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * A file hanging off a note. Everything the client needs to show it is served
+ * by the app itself, not by Files: a recipient of a shared note cannot reach
+ * the file there.
+ */
 public class Attachment implements Serializable {
     @Expose
     @SerializedName("id") private int id;
 
     @Expose
-    @SerializedName("note_id") private String note_id;
+    @SerializedName("note_id") private int noteId;
 
     @Expose
-    @SerializedName("file_id") private String file_id;
+    @SerializedName("file_id") private int fileId;
 
     @Expose
-    @SerializedName("create_at") private String created_at;
+    @SerializedName("created_at") private long createdAt;
 
     @Expose
-    @SerializedName("preview_url") private String preview_url;
+    @SerializedName("user_id") private String userId;
 
     @Expose
-    @SerializedName("redirect_url") private String redirect_url;
+    @SerializedName("is_mine") private boolean isMine;
 
     @Expose
-    @SerializedName("deep_link_url") private String deep_link_url;
+    @SerializedName("has_preview") private boolean hasPreview;
+
+    @Expose
+    @SerializedName("basename") private String basename;
+
+    @Expose
+    @SerializedName("mime") private String mime;
+
+    @Expose
+    @SerializedName("preview_url") private String previewUrl;
+
+    @Expose
+    @SerializedName("download_url") private String downloadUrl;
+
+    @Expose
+    @SerializedName("redirect_url") private String redirectUrl;
+
+    @Expose
+    @SerializedName("deep_link_url") private String deepLinkUrl;
+
+    @Expose
+    @SerializedName("link_url") private String linkUrl;
+
+    public Attachment() {
+    }
+
+    /**
+     * The attachment a file just uploaded, or just picked out of Files, turns
+     * into once it is put on a note.
+     */
+    public static Attachment fromInfo(AttachmentInfo info) {
+        Attachment attachment = new Attachment();
+        attachment.fileId = info.getFileId();
+        attachment.basename = info.getBasename();
+        attachment.mime = info.getMime();
+        attachment.hasPreview = info.hasPreview();
+        attachment.previewUrl = info.getPreviewUrl();
+        attachment.redirectUrl = info.getRedirectUrl();
+        attachment.deepLinkUrl = info.getDeepLinkUrl();
+        attachment.linkUrl = info.getRedirectUrl();
+        attachment.isMine = true;
+        return attachment;
+    }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getNoteId() {
+        return noteId;
     }
 
-    public String getNoteId() {
-        return note_id;
+    public int getFileId() {
+        return fileId;
     }
 
-    public void setNoteId(String note_id) {
-        this.note_id = note_id;
+    public long getCreatedAt() {
+        return createdAt;
     }
 
-    public String getFileId() {
-        return file_id;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setFileId(String file_id) {
-        this.file_id = file_id;
+    /** Whether the caller is the one who attached it. */
+    public boolean isMine() {
+        return isMine;
     }
 
-    public String getCreatedAt() {
-        return created_at;
+    /** Whether there is a real thumbnail behind the preview url. */
+    public boolean hasPreview() {
+        return hasPreview;
     }
 
-    public void setCreatedAt(String created_at) {
-        this.created_at = created_at;
+    public String getBasename() {
+        return basename;
+    }
+
+    public String getMime() {
+        return mime;
     }
 
     public String getPreviewUrl() {
-        return preview_url;
+        return previewUrl;
     }
 
-    public void setPreviewUrl(String preview_url) {
-        this.preview_url = preview_url;
+    public String getDownloadUrl() {
+        return downloadUrl;
     }
 
     public String getRedirectUrl() {
-        return redirect_url;
-    }
-
-    public void setRedirectUrl(String redirect_url) {
-        this.redirect_url = redirect_url;
+        return redirectUrl;
     }
 
     public String getDeepLinkUrl() {
-        return deep_link_url;
+        return deepLinkUrl;
     }
 
-    public void setDeepLinkUrl(String deep_link_url) {
-        this.deep_link_url = deep_link_url;
+    /**
+     * Where a tap on the thumbnail should go: the file in Files when the
+     * caller can reach it there, the download otherwise.
+     */
+    public String getLinkUrl() {
+        if (linkUrl != null && !linkUrl.isEmpty()) {
+            return linkUrl;
+        }
+        return redirectUrl != null ? redirectUrl : downloadUrl;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, note_id, file_id, created_at, preview_url, redirect_url, deep_link_url);
+        return Objects.hash(fileId, userId);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Attachment oAttachment = (Attachment) obj;
-        return Objects.equals(this.file_id, oAttachment.getFileId());
+        Attachment other = (Attachment) obj;
+        return this.fileId == other.fileId && Objects.equals(this.userId, other.userId);
     }
 }

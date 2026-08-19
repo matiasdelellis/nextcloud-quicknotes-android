@@ -19,5 +19,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositories {
+        google()
+        mavenCentral()
+        // Nextcloud SSO and the nextcloud-commons libraries.
+        maven { url = uri("https://jitpack.io") }
+        // Wordpress Aztec, the rich text editor.
+        maven { url = uri("https://a8c-libs.s3.amazonaws.com/android") }
+    }
+}
+
 include ':app'
 rootProject.name = "Quicknotes"

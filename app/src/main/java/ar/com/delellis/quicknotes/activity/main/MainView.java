@@ -30,4 +30,16 @@ public interface MainView {
     void hideLoading();
     void onGetResult(List<Note> notes);
     void onErrorLoading(String errorMessage);
+
+    /** One note came back changed, and the list has to show it that way. */
+    void onNoteUpdated(Note note);
+
+    /** One note is not in the list any more: destroyed, or left. */
+    void onNoteRemoved(int noteId);
+
+    /** How many notes emptying the trash destroyed. */
+    void onTrashEmptied(int destroyed);
+
+    /** An action on a single note did not go through. */
+    void onActionError(String errorMessage);
 }

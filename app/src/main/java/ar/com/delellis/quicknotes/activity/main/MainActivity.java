@@ -21,100 +21,103 @@
 
 package ar.com.delellis.quicknotes.activity.main;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static ar.com.delellis.quicknotes.activity.main.NoteAdapter.SORT_BY_CREATED;
+import static ar.com.delellis.quicknotes.activity.main.NoteAdapter.SORT_BY_TITLE;
+import static ar.com.delellis.quicknotes.activity.main.NoteAdapter.SORT_BY_UPDATED;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import androidx.appcompat.widget.SearchView;
+import android.widget.Toast;
 
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.GravityCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.nextcloud.android.sso.helper.SingleAccountHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import ar.com.delellis.quicknotes.BuildConfig;
 import ar.com.delellis.quicknotes.R;
-import ar.com.delellis.quicknotes.activity.error.ErrorActivity;
-import ar.com.delellis.quicknotes.activity.login.LoginActivity;
 import ar.com.delellis.quicknotes.activity.about.AboutActivity;
 import ar.com.delellis.quicknotes.activity.editor.EditorActivity;
+import ar.com.delellis.quicknotes.activity.error.ErrorActivity;
+import ar.com.delellis.quicknotes.activity.login.LoginActivity;
 import ar.com.delellis.quicknotes.activity.main.NavigationAdapter.NavigationItem;
 import ar.com.delellis.quicknotes.activity.main.NavigationAdapter.TagNavigationItem;
 import ar.com.delellis.quicknotes.activity.main.SortingOrderDialogFragment.OnSortingOrderListener;
+import ar.com.delellis.quicknotes.activity.shares.SharesActivity;
 import ar.com.delellis.quicknotes.api.ApiProvider;
 import ar.com.delellis.quicknotes.api.helper.IResponseCallback;
-import ar.com.delellis.quicknotes.model.Capabilities;
+import ar.com.delellis.quicknotes.databinding.ActivityListViewBinding;
+import ar.com.delellis.quicknotes.databinding.ActivityMainBinding;
 import ar.com.delellis.quicknotes.model.Note;
 import ar.com.delellis.quicknotes.model.Tag;
+import ar.com.delellis.quicknotes.shared.NoteActionsDialog;
+import ar.com.delellis.quicknotes.shared.ReminderPicker;
 import ar.com.delellis.quicknotes.util.CapabilitiesService;
+import ar.com.delellis.quicknotes.util.DateUtil;
+import ar.com.delellis.quicknotes.util.InsetsUtil;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static ar.com.delellis.quicknotes.activity.main.NoteAdapter.*;
-import static ar.com.delellis.quicknotes.activity.main.NoteAdapter.SORT_BY_TITLE;
-import static ar.com.delellis.quicknotes.activity.main.NoteAdapter.SORT_BY_UPDATED;
-
-public class MainActivity extends AppCompatActivity implements MainView, OnSortingOrderListener {
-
-    private static final int INTENT_ADD = 100;
-    private static final int INTENT_EDIT = 200;
+public class MainActivity extends AppCompatActivity implements MainView, OnSortingOrderListener,
+        NoteAdapter.ItemClickListener, NoteActionsDialog.Callback {
 
     public static final String ADAPTER_KEY_ALL = "all_notes";
     public static final String ADAPTER_KEY_PINNED = "pinned";
     public static final String ADAPTER_KEY_SHARED_BY = "shared_by";
     public static final String ADAPTER_KEY_SHARED_WITH = "shared_with";
+    public static final String ADAPTER_KEY_REMINDERS = "reminders";
+    public static final String ADAPTER_KEY_ARCHIVED = "archived";
+    public static final String ADAPTER_KEY_TRASH = "trash";
     public static final String ADAPTER_KEY_TAG_PREFIX = "tag:";
     public static final String ADAPTER_KEY_ABOUT = "about";
     public static final String ADAPTER_KEY_DONATE = "donate";
     public static final String ADAPTER_KEY_SWITCH_ACCOUNT = "switch_account";
 
+    private ActivityMainBinding binding;
+    private ActivityListViewBinding listBinding;
+
     private SharedPreferences preferences;
 
-    private DrawerLayout drawerLayout;
-    private Toolbar toolbar;
-    private MaterialCardView homeToolbar;
-    private SearchView searchView;
-    private SwipeRefreshLayout swipeRefresh;
-    private RecyclerView recyclerView;
     private StaggeredGridLayoutManager layoutManager;
-    private FloatingActionButton fab;
 
     private MainPresenter presenter;
     private NoteAdapter noteAdapter;
-    private ItemClickListener itemClickListener;
 
-    NavigationAdapter navigationFilterAdapter;
-    NavigationAdapter navigationCommonAdapter;
+    private NavigationAdapter navigationFilterAdapter;
+    private NavigationAdapter navigationCommonAdapter;
 
-    private List<Tag> tags = new ArrayList<>();
+    private final List<Tag> tags = new ArrayList<>();
 
-    private List<String> colors = new ArrayList<>();
-
-    private ApiProvider mApi;
+    private ActivityResultLauncher<Intent> editorLauncher;
+    private ActivityResultLauncher<Intent> sharesLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        listBinding = binding.activityListView;
+        setContentView(binding.getRoot());
+        InsetsUtil.applySystemBarsPadding(listBinding.getRoot());
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -122,43 +125,73 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         boolean pinnedFirst = preferences.getBoolean(getString(R.string.setting_pinned_first), true);
         boolean gridViewEnabled = preferences.getBoolean(getString(R.string.setting_grid_view_enabled), true);
 
-        recyclerView = findViewById(R.id.recycler_view);
+        registerLaunchers();
+
         layoutManager = new StaggeredGridLayoutManager(gridViewEnabled ? 2 : 1, StaggeredGridLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
+        listBinding.recyclerView.setLayoutManager(layoutManager);
 
         presenter = new MainPresenter(this);
 
-        itemClickListener = ((view, position) -> {
-            Note note = noteAdapter.get(position);
-
-            Intent intent = new Intent(this, EditorActivity.class);
-            intent.putExtra("note", note);
-            intent.putExtra("tags", (Serializable) tags);
-
-            startActivityForResult(intent, INTENT_EDIT);
-        });
-
-        noteAdapter = new NoteAdapter(this, itemClickListener);
-        recyclerView.setAdapter(noteAdapter);
-
+        noteAdapter = new NoteAdapter(this, this);
         noteAdapter.setSortRule(sortRule);
         noteAdapter.setFirstPinned(pinnedFirst);
+        noteAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                updateEmptyState();
+            }
+        });
+        listBinding.recyclerView.setAdapter(noteAdapter);
 
-        swipeRefresh = findViewById(R.id.swipe_refresh);
-        swipeRefresh.setOnRefreshListener(() -> presenter.getNotes());
+        listBinding.swipeRefresh.setOnRefreshListener(() -> presenter.getNotes());
 
-        fab = findViewById(R.id.add);
-        fab.setOnClickListener(view -> {
+        listBinding.add.setOnClickListener(view -> {
             Intent intent = new Intent(this, EditorActivity.class);
-            intent.putExtra("tags", (Serializable) tags);
-            startActivityForResult(intent, INTENT_ADD);
+            intent.putExtra(EditorActivity.EXTRA_TAGS, (Serializable) tags);
+            editorLauncher.launch(intent);
         });
 
-        toolbar = findViewById(R.id.toolbar);
-        homeToolbar = findViewById(R.id.home_toolbar);
+        listBinding.emptyTrash.setOnClickListener(view -> confirmEmptyTrash());
 
-        searchView = findViewById(R.id.search_view);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        setupSearch();
+
+        setSupportActionBar(listBinding.toolbar);
+        setupNavigationMenu();
+
+        listBinding.homeToolbar.setOnClickListener(view -> updateToolbars(false));
+        listBinding.sortMode.setOnClickListener(view ->
+                openSortingOrderDialogFragment(getSupportFragmentManager(), noteAdapter.getSortRule()));
+        listBinding.menuButton.setOnClickListener(view -> binding.drawerLayout.openDrawer(GravityCompat.START));
+        listBinding.viewMode.setOnClickListener(view -> onGridIconChosen(layoutManager.getSpanCount() == 1));
+
+        updateSortingIcon(sortRule);
+        updateGridIcon(gridViewEnabled);
+
+        new ApiProvider(getApplicationContext());
+        if (!ApiProvider.isReady()) {
+            showError(getString(R.string.error_no_account));
+            return;
+        }
+
+        checkServerSupport();
+        presenter.getNotes();
+    }
+
+    private void registerLaunchers() {
+        editorLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                presenter.getNotes();
+            }
+        });
+        sharesLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            // Sharing a note changes what the list has to show about it, and
+            // sharing it with oneself is not a thing, so a plain reload does.
+            presenter.getNotes();
+        });
+    }
+
+    private void setupSearch() {
+        listBinding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -166,65 +199,68 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
             @Override
             public boolean onQueryTextChange(String query) {
-                noteAdapter.getFilter().filter(query);
+                noteAdapter.setQuery(query);
                 return false;
             }
         });
 
-        searchView.setOnCloseListener(() -> {
-            if (toolbar.getVisibility() == VISIBLE && TextUtils.isEmpty(searchView.getQuery())) {
+        listBinding.searchView.setOnCloseListener(() -> {
+            if (listBinding.toolbar.getVisibility() == VISIBLE && TextUtils.isEmpty(listBinding.searchView.getQuery())) {
                 updateToolbars(true);
                 return true;
             }
             return false;
         });
+    }
 
-        setSupportActionBar(toolbar);
-        setupNavigationMenu();
+    /**
+     * An older server answers a different shape on shares and knows nothing
+     * about reminders, archiving or the trash, so there is nothing sensible to
+     * show until it is updated.
+     */
+    private void checkServerSupport() {
+        CapabilitiesService capabilitiesService = new CapabilitiesService(this);
+        capabilitiesService.refresh(new IResponseCallback() {
+            @Override
+            public void onComplete() {
+                String message = capabilitiesService.getSupportMessage();
+                if (message != null) {
+                    showError(message);
+                }
+            }
 
-        homeToolbar.setOnClickListener(view -> updateToolbars(false));
-
-        AppCompatImageView sortButton = findViewById(R.id.sort_mode);
-        sortButton.setOnClickListener(view -> openSortingOrderDialogFragment(getSupportFragmentManager(), noteAdapter.getSortRule()));
-
-        drawerLayout = findViewById(R.id.drawerLayout);
-        AppCompatImageButton menuButton = findViewById(R.id.menu_button);
-        menuButton.setOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
-
-        AppCompatImageView viewButton = findViewById(R.id.view_mode);
-        viewButton.setOnClickListener(view -> {
-            boolean gridEnabled = layoutManager.getSpanCount() == 1;
-            onGridIconChosen(gridEnabled);
+            @Override
+            public void onError(Throwable throwable) {
+                // Nothing to say yet: reading the notes is what will tell.
+                throwable.printStackTrace();
+            }
         });
-
-        updateSortingIcon(sortRule);
-        updateGridIcon(gridViewEnabled);
-
-        mApi = new ApiProvider(getApplicationContext());
-        presenter.getNotes();
     }
 
     private void setupNavigationMenu() {
-        ArrayList<NavigationItem> navItems = new ArrayList<>();
-
         navigationFilterAdapter = new NavigationAdapter(this, item -> {
             if (item.id.equals(ADAPTER_KEY_ALL)) {
-                noteAdapter.getFilter().filter("");
+                noteAdapter.setScope(NoteAdapter.SCOPE_ALL);
             } else if (item.id.equals(ADAPTER_KEY_PINNED)) {
-                noteAdapter.getPinnedFilter().filter("");
+                noteAdapter.setScope(NoteAdapter.SCOPE_PINNED);
             } else if (item.id.equals(ADAPTER_KEY_SHARED_BY)) {
-                noteAdapter.getIsSharedFilter().filter("");
+                noteAdapter.setScope(NoteAdapter.SCOPE_SHARED_WITH_ME);
             } else if (item.id.equals(ADAPTER_KEY_SHARED_WITH)) {
-                noteAdapter.getSharedWithOthersFilter().filter("");
+                noteAdapter.setScope(NoteAdapter.SCOPE_SHARED_BY_ME);
+            } else if (item.id.equals(ADAPTER_KEY_REMINDERS)) {
+                noteAdapter.setScope(NoteAdapter.SCOPE_REMINDERS);
+            } else if (item.id.equals(ADAPTER_KEY_ARCHIVED)) {
+                noteAdapter.setScope(NoteAdapter.SCOPE_ARCHIVED);
+            } else if (item.id.equals(ADAPTER_KEY_TRASH)) {
+                noteAdapter.setScope(NoteAdapter.SCOPE_TRASH);
             } else if (item.id.startsWith(ADAPTER_KEY_TAG_PREFIX)) {
-                noteAdapter.getTagFilter().filter(item.label);
+                noteAdapter.setTagScope(item.label);
             }
             navigationFilterAdapter.setSelectedItem(item.id);
-            drawerLayout.closeDrawer(GravityCompat.START);
+            updateScopeChrome();
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
         });
-
-        RecyclerView navigationMenuFilter = findViewById(R.id.navigationFilter);
-        navigationMenuFilter.setAdapter(navigationFilterAdapter);
+        binding.navigationFilter.setAdapter(navigationFilterAdapter);
 
         navigationCommonAdapter = new NavigationAdapter(this, item -> {
             switch (item.id) {
@@ -235,71 +271,125 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_donate))));
                     break;
                 case ADAPTER_KEY_SWITCH_ACCOUNT:
-                    switch_account();
+                    switchAccount();
                     break;
             }
         });
 
+        ArrayList<NavigationItem> navItems = new ArrayList<>();
         navItems.add(new NavigationItem(ADAPTER_KEY_ABOUT, getString(R.string.about), NavigationAdapter.ICON_INFO));
         if (!BuildConfig.FLAVOR.equals("play"))
             navItems.add(new NavigationItem(ADAPTER_KEY_DONATE, getString(R.string.donate), NavigationAdapter.ICON_FAVORITE));
         navItems.add(new NavigationItem(ADAPTER_KEY_SWITCH_ACCOUNT, getString(R.string.switch_account), NavigationAdapter.ICON_LOGOUT));
         navigationCommonAdapter.setItems(navItems);
 
-        RecyclerView navigationMenuCommon = findViewById(R.id.navigationCommon);
-
-        navigationCommonAdapter.setSelectedItem(ADAPTER_KEY_ALL);
-        navigationMenuCommon.setAdapter(navigationCommonAdapter);
+        // The starting selection belongs to the filter list, not to this one.
+        navigationFilterAdapter.setSelectedItem(ADAPTER_KEY_ALL);
+        binding.navigationCommon.setAdapter(navigationCommonAdapter);
     }
 
+    /**
+     * The drawer only offers what there is something behind: no archive entry
+     * when nothing is archived, no trash entry when the trash is empty.
+     */
     private void updateNavigationMenu(List<Note> notes) {
         ArrayList<NavigationItem> navItems = new ArrayList<>();
-        NavigationItem homeNav = new NavigationItem(ADAPTER_KEY_ALL, getString(R.string.all_notes), NavigationAdapter.ICON_HOME);
-        navItems.add(homeNav);
+        navItems.add(new NavigationItem(ADAPTER_KEY_ALL, getString(R.string.all_notes), NavigationAdapter.ICON_HOME));
 
-        for (Note note: notes) {
-            if (note.getIsPinned()) {
-                navItems.add(new NavigationItem(ADAPTER_KEY_PINNED, getString(R.string.pinned), NavigationAdapter.ICON_PINNED));
-                break;
+        boolean anyPinned = false;
+        boolean anySharedWithMe = false;
+        boolean anySharedByMe = false;
+        boolean anyReminder = false;
+        boolean anyArchived = false;
+        boolean anyTrashed = false;
+
+        for (Note note : notes) {
+            if (note.isTrashed()) {
+                anyTrashed = true;
+                continue;
             }
-        }
-
-        for (Note note: notes) {
-            if (note.getIsShared()) {
-                navItems.add(new NavigationItem(ADAPTER_KEY_SHARED_BY, getString(R.string.shared_with_you), NavigationAdapter.ICON_SHARED));
-                break;
+            if (note.isArchived()) {
+                anyArchived = true;
+                continue;
             }
+            anyPinned |= note.isPinned();
+            anySharedWithMe |= note.isSharedWithMe();
+            anySharedByMe |= note.isSharedByMe();
+            anyReminder |= note.hasReminder();
         }
 
-        for (Note note: notes) {
-            if (note.getShareWith().size() > 0) {
-                navItems.add(new NavigationItem(ADAPTER_KEY_SHARED_WITH, getString(R.string.shared_with_others), NavigationAdapter.ICON_SHARED));
-                break;
-            }
+        if (anyPinned)
+            navItems.add(new NavigationItem(ADAPTER_KEY_PINNED, getString(R.string.pinned), NavigationAdapter.ICON_PINNED));
+        if (anySharedWithMe)
+            navItems.add(new NavigationItem(ADAPTER_KEY_SHARED_BY, getString(R.string.shared_with_you), NavigationAdapter.ICON_SHARED));
+        if (anySharedByMe)
+            navItems.add(new NavigationItem(ADAPTER_KEY_SHARED_WITH, getString(R.string.shared_with_others), NavigationAdapter.ICON_SHARED));
+        if (anyReminder)
+            navItems.add(new NavigationItem(ADAPTER_KEY_REMINDERS, getString(R.string.with_reminder), NavigationAdapter.ICON_REMINDER));
+
+        for (Tag tag : tags) {
+            navItems.add(new TagNavigationItem(ADAPTER_KEY_TAG_PREFIX + tag.getId(), tag.getName(),
+                    NavigationAdapter.ICON_TAG, tag.getId()));
         }
 
-        for (Tag tag: tags) {
-            TagNavigationItem item = new TagNavigationItem(ADAPTER_KEY_TAG_PREFIX + tag.getId(), tag.getName(), NavigationAdapter.ICON_TAG, tag.getId());
-            navItems.add(item);
+        if (anyArchived)
+            navItems.add(new NavigationItem(ADAPTER_KEY_ARCHIVED, getString(R.string.archived), NavigationAdapter.ICON_ARCHIVE));
+        if (anyTrashed)
+            navItems.add(new NavigationItem(ADAPTER_KEY_TRASH, getString(R.string.trash), NavigationAdapter.ICON_TRASH));
+
+        // Whatever was being looked at may not be on the list any more.
+        String selected = navigationFilterAdapter.getSelectedItem();
+        boolean stillThere = false;
+        for (NavigationItem item : navItems) {
+            stillThere |= item.id.equals(selected);
+        }
+        if (!stillThere) {
+            noteAdapter.setScope(NoteAdapter.SCOPE_ALL);
+            navigationFilterAdapter.setSelectedItem(ADAPTER_KEY_ALL);
+            updateScopeChrome();
         }
 
-        navigationFilterAdapter.setSelectedItem(homeNav.id);
         navigationFilterAdapter.setItems(navItems);
     }
 
-    private void updateToolbars(boolean disableSearch) {
-        homeToolbar.setVisibility(disableSearch ? VISIBLE : GONE);
-        toolbar.setVisibility(disableSearch ? GONE : VISIBLE);
-        if (disableSearch) {
-            searchView.setQuery(null, true);
-        }
-        searchView.setIconified(disableSearch);
+    /** The trash is not a place to add notes to, but it is one to empty. */
+    private void updateScopeChrome() {
+        boolean inTrash = noteAdapter.getScope() == NoteAdapter.SCOPE_TRASH;
+        listBinding.add.setVisibility(inTrash ? GONE : VISIBLE);
+        listBinding.emptyTrash.setVisibility(inTrash ? VISIBLE : GONE);
+        updateEmptyState();
     }
 
-    private void switch_account() {
-        SingleAccountHelper.setCurrentAccount(this, null);
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(intent);
+    private void updateEmptyState() {
+        if (noteAdapter.getItemCount() > 0) {
+            listBinding.emptyState.setVisibility(GONE);
+            return;
+        }
+
+        int message;
+        if (!TextUtils.isEmpty(listBinding.searchView.getQuery())) {
+            message = R.string.no_notes_found;
+        } else if (noteAdapter.getScope() == NoteAdapter.SCOPE_TRASH) {
+            message = R.string.trash_is_empty;
+        } else {
+            message = R.string.no_notes_yet;
+        }
+        listBinding.emptyState.setText(message);
+        listBinding.emptyState.setVisibility(VISIBLE);
+    }
+
+    private void updateToolbars(boolean disableSearch) {
+        listBinding.homeToolbar.setVisibility(disableSearch ? VISIBLE : GONE);
+        listBinding.toolbar.setVisibility(disableSearch ? GONE : VISIBLE);
+        if (disableSearch) {
+            listBinding.searchView.setQuery(null, true);
+        }
+        listBinding.searchView.setIconified(disableSearch);
+    }
+
+    private void switchAccount() {
+        SingleAccountHelper.commitCurrentAccount(this, null);
+        startActivity(new Intent(MainActivity.this, LoginActivity.class));
     }
 
     private void openSortingOrderDialogFragment(FragmentManager supportFragmentManager, int sortOrder) {
@@ -309,50 +399,159 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         SortingOrderDialogFragment.newInstance(sortOrder).show(fragmentTransaction, SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
     }
 
+    private void confirmEmptyTrash() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.empty_trash)
+                .setMessage(R.string.sure_want_empty_trash)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.dismiss();
+                    presenter.emptyTrash();
+                })
+                .setNegativeButton(R.string.common_cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void showError(String errorMessage) {
+        Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
+        intent.putExtra(ErrorActivity.EXTRA_ERROR_MESSAGE, errorMessage);
+        startActivity(intent);
+        finish();
+    }
+
+    // ------------------------------------------------------------------
+    // What a note can be asked to do from the list
+    // ------------------------------------------------------------------
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == INTENT_ADD && resultCode == RESULT_OK) {
-            presenter.getNotes();
-        } else if (requestCode == INTENT_EDIT && resultCode == RESULT_OK) {
-            presenter.getNotes();
+    public void onItemClick(@NonNull Note note) {
+        // A note in the trash is not open for reading: what it offers is
+        // coming back, or going for good.
+        if (note.isTrashed()) {
+            NoteActionsDialog.show(this, note, false, this);
+            return;
+        }
+        onOpen(note);
+    }
+
+    @Override
+    public void onItemLongClick(@NonNull Note note) {
+        NoteActionsDialog.show(this, note, !note.isTrashed(), this);
+    }
+
+    @Override
+    public void onOpen(@NonNull Note note) {
+        Intent intent = new Intent(this, EditorActivity.class);
+        intent.putExtra(EditorActivity.EXTRA_NOTE, note);
+        intent.putExtra(EditorActivity.EXTRA_TAGS, (Serializable) tags);
+        editorLauncher.launch(intent);
+    }
+
+    @Override
+    public void onTogglePin(@NonNull Note note) {
+        presenter.setPinned(note, !note.isPinned());
+    }
+
+    @Override
+    public void onSetReminder(@NonNull Note note) {
+        ReminderPicker.pick(this, note.getReminderAt(), (reminderAt, isInTheFuture) -> {
+            if (!isInTheFuture) {
+                Toast.makeText(this, R.string.reminder_must_be_in_the_future, Toast.LENGTH_LONG).show();
+                return;
+            }
+            presenter.setReminder(note, reminderAt);
+            Toast.makeText(this, getString(R.string.reminder_set_for, DateUtil.toLocalDisplay(reminderAt)),
+                    Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    @Override
+    public void onRemoveReminder(@NonNull Note note) {
+        presenter.setReminder(note, null);
+        Toast.makeText(this, R.string.reminder_removed, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onShare(@NonNull Note note) {
+        Intent intent = new Intent(this, SharesActivity.class);
+        intent.putExtra(SharesActivity.EXTRA_NOTE, note);
+        sharesLauncher.launch(intent);
+    }
+
+    @Override
+    public void onToggleArchive(@NonNull Note note) {
+        if (note.isArchived()) {
+            presenter.unarchive(note);
+        } else {
+            presenter.archive(note);
         }
     }
 
     @Override
+    public void onTrash(@NonNull Note note) {
+        presenter.trash(note);
+    }
+
+    @Override
+    public void onRestore(@NonNull Note note) {
+        presenter.restore(note);
+    }
+
+    @Override
+    public void onDestroyForever(@NonNull Note note) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.delete_forever)
+                .setMessage(R.string.sure_want_destroy)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.dismiss();
+                    presenter.destroy(note);
+                })
+                .setNegativeButton(R.string.common_cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    @Override
+    public void onLeave(@NonNull Note note) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.leave_note)
+                .setMessage(R.string.sure_want_leave)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.dismiss();
+                    presenter.leave(note);
+                })
+                .setNegativeButton(R.string.common_cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    // ------------------------------------------------------------------
+    // MainView
+    // ------------------------------------------------------------------
+
+    @Override
     public void showLoading() {
-        swipeRefresh.setRefreshing(true);
+        listBinding.swipeRefresh.setRefreshing(true);
     }
 
     @Override
     public void hideLoading() {
-        swipeRefresh.setRefreshing(false);
+        listBinding.swipeRefresh.setRefreshing(false);
     }
 
     @Override
-    public void onGetResult(List<Note> note_list) {
-        noteAdapter.setNoteList(note_list);
+    public void onGetResult(List<Note> noteList) {
+        noteAdapter.setNoteList(noteList);
 
-        // Fill tags.
-        tags.clear();
-        for (Note note: note_list) {
-            tags.addAll(note.getTags());
+        // The tags of the drawer are whatever the notes on screen carry.
+        Set<Tag> uniqueTags = new LinkedHashSet<>();
+        for (Note note : noteList) {
+            if (!note.isTrashed() && !note.isArchived()) {
+                uniqueTags.addAll(note.getTags());
+            }
         }
-        HashSet<Tag> hTags = new HashSet<>(tags);
         tags.clear();
-        tags.addAll(hTags);
+        tags.addAll(uniqueTags);
 
-        // Fill colors
-        colors.clear();
-        for (Note note: note_list) {
-            colors.add(note.getColor());
-        }
-        HashSet<String> hColors = new HashSet<>(colors);
-        colors.clear();
-        colors.addAll(hColors);
-
-        // Update nav bar.
-        updateNavigationMenu(note_list);
+        updateNavigationMenu(noteList);
+        updateScopeChrome();
     }
 
     @Override
@@ -361,32 +560,55 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         capabilitiesService.refresh(new IResponseCallback() {
             @Override
             public void onComplete() {
-                Capabilities capabilities = capabilitiesService.getCapabilities();
-                if (capabilities.isMaintenanceEnabled()) {
-                    Intent intent = new Intent(MainActivity.this, ErrorActivity.class);
-                    intent.putExtra("errorMessage", getString(R.string.error_maintenance_mode));
-                    startActivity(intent);
-                    finish();
-                } else if (capabilities.getQuicknotesVersion().isEmpty()) {
-                    Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
-                    intent.putExtra("errorMessage", getString(R.string.error_not_installed));
-                    startActivity(intent);
-                    finish();
-                } else {
-                    String errorDetail = errorMessage != null && !errorMessage.isEmpty() ? errorMessage : getString(R.string.error_unknown);
-                    Intent intent = new Intent(getApplicationContext(), ErrorActivity.class);
-                    intent.putExtra("errorMessage", errorDetail);
-                    startActivity(intent);
-                    finish();
+                String message = capabilitiesService.getSupportMessage();
+                if (message == null) {
+                    message = errorMessage != null && !errorMessage.isEmpty()
+                            ? errorMessage
+                            : getString(R.string.error_unknown);
                 }
+                showError(message);
             }
 
             @Override
             public void onError(Throwable throwable) {
                 throwable.printStackTrace();
+                showError(errorMessage != null && !errorMessage.isEmpty()
+                        ? errorMessage
+                        : getString(R.string.error_unknown));
             }
         });
     }
+
+    @Override
+    public void onNoteUpdated(Note note) {
+        noteAdapter.replaceNote(note);
+        updateNavigationMenu(noteAdapter.getNoteList());
+        updateScopeChrome();
+    }
+
+    @Override
+    public void onNoteRemoved(int noteId) {
+        noteAdapter.removeNote(noteId);
+        updateNavigationMenu(noteAdapter.getNoteList());
+        updateScopeChrome();
+    }
+
+    @Override
+    public void onTrashEmptied(int destroyed) {
+        Toast.makeText(this, getResources().getQuantityString(R.plurals.trash_emptied, destroyed, destroyed),
+                Toast.LENGTH_SHORT).show();
+        presenter.getNotes();
+    }
+
+    @Override
+    public void onActionError(String errorMessage) {
+        Toast.makeText(this, errorMessage != null ? errorMessage : getString(R.string.error_unknown),
+                Toast.LENGTH_LONG).show();
+    }
+
+    // ------------------------------------------------------------------
+    // Sorting and layout
+    // ------------------------------------------------------------------
 
     @Override
     public void onSortingOrderChosen(int sortSelection) {
@@ -397,14 +619,13 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     }
 
     public void updateSortingIcon(int sortSelection) {
-        AppCompatImageView sortButton = findViewById(R.id.sort_mode);
         switch (sortSelection) {
             case SORT_BY_TITLE:
-                sortButton.setImageResource(R.drawable.ic_alphabetical_asc);
+                listBinding.sortMode.setImageResource(R.drawable.ic_alphabetical_asc);
                 break;
             case SORT_BY_CREATED:
             case SORT_BY_UPDATED:
-                sortButton.setImageResource(R.drawable.ic_modification_asc);
+                listBinding.sortMode.setImageResource(R.drawable.ic_modification_asc);
                 break;
         }
     }
@@ -417,8 +638,6 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     }
 
     public void updateGridIcon(boolean gridEnabled) {
-        AppCompatImageView viewButton = findViewById(R.id.view_mode);
-        viewButton.setImageResource(gridEnabled ? R.drawable.ic_view_list : R.drawable.ic_view_module);
+        listBinding.viewMode.setImageResource(gridEnabled ? R.drawable.ic_view_list : R.drawable.ic_view_module);
     }
-
 }

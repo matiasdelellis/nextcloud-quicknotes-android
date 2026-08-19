@@ -28,50 +28,89 @@ import com.google.gson.annotations.SerializedName;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A note, as whoever asked for it sees it.
+ *
+ * Some of what comes back is the note's and the same for everybody — title,
+ * content, color, attachments — and some belongs to the caller alone:
+ * isPinned, tags, reminderAt and archivedAt are read and written per user, so
+ * two people see their own on the same note. deletedAt is the note's, and only
+ * its owner can set it.
+ */
 public class Note implements Serializable {
-    @Expose
-    @SerializedName("id")
-    private int id;
+    /** A note that has not been saved yet. */
+    public static final int NO_ID = 0;
 
     @Expose
-    @SerializedName("title")
-    private String title;
+    @SerializedName("id") private int id = NO_ID;
 
     @Expose
-    @SerializedName("content")
-    private String content;
+    @SerializedName("title") private String title = "";
 
     @Expose
-    @SerializedName("isPinned")
-    private boolean is_pinned;
+    @SerializedName("content") private String content = "";
 
     @Expose
-    @SerializedName("color")
-    private String color;
+    @SerializedName("isPinned") private boolean isPinned;
 
     @Expose
-    @SerializedName("timestamp")
-    private int timestamp;
+    @SerializedName("timestamp") private int timestamp;
 
     @Expose
-    @SerializedName("sharedWith")
-    private List<Share> share_with;
+    @SerializedName("color") private String color;
 
     @Expose
-    @SerializedName("sharedBy")
-    private List<Share> share_by;
+    @SerializedName("tags") private List<Tag> tags = new ArrayList<>();
 
     @Expose
-    @SerializedName("tags")
-    private List<Tag> tags;
+    @SerializedName("attachments") private List<Attachment> attachments = new ArrayList<>();
 
     @Expose
-    @SerializedName("attachments")
-    private List<Attachment> attachments;
+    @SerializedName("archivedAt") private String archivedAt;
+
+    @Expose
+    @SerializedName("deletedAt") private String deletedAt;
+
+    @Expose
+    @SerializedName("reminderAt") private String reminderAt;
+
+    @Expose
+    @SerializedName("reminderNotifiedAt") private String reminderNotifiedAt;
+
+    @Expose
+    @SerializedName("owner") private User owner;
+
+    @Expose
+    @SerializedName("isOwner") private boolean isOwner = true;
+
+    @Expose
+    @SerializedName("canLeave") private boolean canLeave;
+
+    @Expose
+    @SerializedName("permissions") private int permissions = Permissions.CAN_EDIT_AND_RESHARE;
+
+    @Expose
+    @SerializedName("canEdit") private boolean canEdit = true;
+
+    @Expose
+    @SerializedName("canReshare") private boolean canReshare = true;
+
+    @Expose
+    @SerializedName("sharedWith") private List<Share> sharedWith = new ArrayList<>();
+
+    @Expose
+    @SerializedName("sharedBy") private User sharedBy;
+
+    @Expose
+    @SerializedName("sharedByMe") private boolean sharedByMe;
+
+    @Expose
+    @SerializedName("etag") private String etag;
 
     public int getId() {
         return id;
@@ -82,7 +121,7 @@ public class Note implements Serializable {
     }
 
     public String getTitle() {
-        return title;
+        return title != null ? title : "";
     }
 
     public void setTitle(String title) {
@@ -90,19 +129,23 @@ public class Note implements Serializable {
     }
 
     public String getContent() {
-        return content;
+        return content != null ? content : "";
     }
 
     public void setContent(String content) {
         this.content = content;
     }
 
-    public boolean getIsPinned() {
-        return is_pinned;
+    public boolean isPinned() {
+        return isPinned;
     }
 
-    public void setIsPinned(boolean is_pinned) {
-        this.is_pinned = is_pinned;
+    public void setPinned(boolean pinned) {
+        this.isPinned = pinned;
+    }
+
+    public int getTimestamp() {
+        return timestamp;
     }
 
     public String getColor() {
@@ -113,31 +156,11 @@ public class Note implements Serializable {
         this.color = color;
     }
 
-    public int getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(int timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public List<Share> getShareWith() {
-        return share_with;
-    }
-
-    public void setShareWith(List<Share> share) {
-        this.share_with = share;
-    }
-
-    public List<Share> getShareBy() {
-        return share_by;
-    }
-
-    public void setShareBy(List<Share> share) {
-        this.share_by = share;
-    }
-
+    @NotNull
     public List<Tag> getTags() {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
         return tags;
     }
 
@@ -145,7 +168,11 @@ public class Note implements Serializable {
         this.tags = tags;
     }
 
-    public List<Attachment> getAttachtments() {
+    @NotNull
+    public List<Attachment> getAttachments() {
+        if (attachments == null) {
+            attachments = new ArrayList<>();
+        }
         return attachments;
     }
 
@@ -153,57 +180,191 @@ public class Note implements Serializable {
         this.attachments = attachments;
     }
 
-    public boolean getIsShared() {
-        return share_by != null && !share_by.isEmpty();
+    /** When the caller archived it, in UTC, or null. */
+    public String getArchivedAt() {
+        return archivedAt;
     }
 
-    public static Comparator<Note> ByTitleAZ = (note, t1) -> note.title.compareTo(t1.title);
+    public boolean isArchived() {
+        return archivedAt != null && !archivedAt.isEmpty();
+    }
 
-    public static Comparator<Note> ByLastUpdated = (note, t1) -> t1.timestamp - note.timestamp;
+    /** When its owner moved it to the trash, in UTC, or null. */
+    public String getDeletedAt() {
+        return deletedAt;
+    }
 
-    public static Comparator<Note> ByLastCreated = (note, t1) -> t1.id - note.id;
+    public boolean isTrashed() {
+        return deletedAt != null && !deletedAt.isEmpty();
+    }
 
-    public static Comparator<Note> ByPinned = (note, t1) -> {
-        if (note.is_pinned && t1.is_pinned) {
-            return 0;
-        } else if (note.is_pinned) {
-            return -1;
-        } else if (t1.is_pinned) {
-            return 1;
-        }
-        return 0;
-    };
+    /** The caller's own reminder, in UTC, or null. */
+    public String getReminderAt() {
+        return reminderAt;
+    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, content, is_pinned, color, timestamp, share_with, share_by, tags, attachments);
+    public void setReminderAt(String reminderAt) {
+        this.reminderAt = reminderAt;
+    }
+
+    public boolean hasReminder() {
+        return reminderAt != null && !reminderAt.isEmpty();
+    }
+
+    public String getReminderNotifiedAt() {
+        return reminderNotifiedAt;
+    }
+
+    /** A reminder that is set and whose notification has not gone out yet. */
+    public boolean isReminderPending() {
+        return hasReminder() && (reminderNotifiedAt == null || reminderNotifiedAt.isEmpty());
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public boolean isOwner() {
+        return isOwner;
     }
 
     /**
-     * Compare specific fields from two Note elements.
-     * If there is any difference or fields are present in one,
-     * but not the other objects, this will return true.
+     * Whether there is a share of the caller's own to walk away from. A note
+     * reaching them through a group is archived instead.
+     */
+    public boolean canLeave() {
+        return canLeave;
+    }
+
+    public int getPermissions() {
+        return permissions;
+    }
+
+    public boolean canEdit() {
+        return canEdit;
+    }
+
+    public boolean canReshare() {
+        return canReshare;
+    }
+
+    /** Only filled in for the owner and for somebody who may reshare. */
+    @NotNull
+    public List<Share> getSharedWith() {
+        if (sharedWith == null) {
+            sharedWith = new ArrayList<>();
+        }
+        return sharedWith;
+    }
+
+    public void setSharedWith(List<Share> sharedWith) {
+        this.sharedWith = sharedWith;
+    }
+
+    /** Who shared it with the caller; null on their own note. */
+    public User getSharedBy() {
+        return sharedBy;
+    }
+
+    /** Whether somebody else shared this note with the caller. */
+    public boolean isSharedWithMe() {
+        return sharedBy != null;
+    }
+
+    /** Their own note, and somebody else has it. */
+    public boolean isSharedByMe() {
+        return sharedByMe || !getSharedWith().isEmpty();
+    }
+
+    /**
+     * Derived from the stored note, to send back in If-Match when saving so a
+     * concurrent edit is reported instead of silently overwritten.
+     */
+    public String getEtag() {
+        return etag;
+    }
+
+    /**
+     * Moves this note onto the version the server currently holds, so a save
+     * that lost a race can be retried on purpose rather than refused again.
+     */
+    public void setEtag(String etag) {
+        this.etag = etag;
+    }
+
+    /**
+     * Takes over everything the server owns about this note, and leaves alone
+     * everything the user is in the middle of writing.
+     *
+     * Setting a reminder, archiving or trashing a note all answer with the
+     * whole note. Swapping this object for that answer would throw away
+     * whatever is in the editor at the time, so only the fields the editor
+     * never writes are taken across. The etag is among them and stays right:
+     * the server derives it from the title, the content and the time of the
+     * last change, none of which any of those calls touch.
+     */
+    public void mergeServerState(@NotNull Note updated) {
+        this.timestamp = updated.timestamp;
+        this.etag = updated.etag;
+        this.archivedAt = updated.archivedAt;
+        this.deletedAt = updated.deletedAt;
+        this.reminderAt = updated.reminderAt;
+        this.reminderNotifiedAt = updated.reminderNotifiedAt;
+        this.owner = updated.owner;
+        this.isOwner = updated.isOwner;
+        this.canLeave = updated.canLeave;
+        this.permissions = updated.permissions;
+        this.canEdit = updated.canEdit;
+        this.canReshare = updated.canReshare;
+        this.sharedWith = updated.sharedWith;
+        this.sharedBy = updated.sharedBy;
+        this.sharedByMe = updated.sharedByMe;
+    }
+
+    public boolean isNew() {
+        return id == NO_ID;
+    }
+
+    public static final Comparator<Note> ByTitleAZ = (note, other) ->
+            note.getTitle().compareToIgnoreCase(other.getTitle());
+
+    public static final Comparator<Note> ByLastUpdated = (note, other) ->
+            Integer.compare(other.timestamp, note.timestamp);
+
+    public static final Comparator<Note> ByLastCreated = (note, other) ->
+            Integer.compare(other.id, note.id);
+
+    public static final Comparator<Note> ByPinned = (note, other) ->
+            Boolean.compare(other.isPinned, note.isPinned);
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, content, isPinned, color, tags, attachments);
+    }
+
+    /**
+     * Compare the fields the editor can change. Anything the server owns —
+     * timestamps, shares, permissions — is left out, so that reading a note
+     * back does not look like a modification.
      *
      * @param obj Note to compare with
      * @return true if there is no difference in the relevant fields
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
             return false;
 
         Note other = (Note) obj;
 
-        return ((Objects.equals(other.getTitle(), title)) &&
-                (Objects.equals(other.getContent(), content)) &&
-                (is_pinned == other.getIsPinned()) &&
-                (Objects.equals(other.getColor(), color)) &&
-                (Objects.equals(other.getShareWith(), share_with)) &&
-                (Objects.equals(other.getShareBy(), share_by)) &&
-                (Objects.equals(other.getTags(), tags)) &&
-                (Objects.equals(other.getAttachtments(), attachments)));
+        return Objects.equals(other.getTitle(), getTitle()) &&
+               Objects.equals(other.getContent(), getContent()) &&
+               isPinned == other.isPinned &&
+               Objects.equals(other.getColor(), color) &&
+               Objects.equals(other.getTags(), getTags()) &&
+               Objects.equals(other.getAttachments(), getAttachments());
     }
 
     /**
@@ -216,5 +377,4 @@ public class Note implements Serializable {
         Gson gson = new Gson(); // We create a new instance every time to save some memory... :)
         return gson.fromJson(gson.toJson(this), Note.class);
     }
-
 }

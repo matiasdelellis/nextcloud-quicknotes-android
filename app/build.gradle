@@ -19,100 +19,104 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    namespace "ar.com.delellis.quicknotes"
-    compileSdkVersion 34
+    namespace = "ar.com.delellis.quicknotes"
+    compileSdk = 37
 
     defaultConfig {
-        applicationId 'ar.com.delellis.quicknotes'
-        minSdkVersion 24
-        compileSdkVersion 34
-        versionCode 1
-        versionName "0.3.0"
+        applicationId = 'ar.com.delellis.quicknotes'
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 2
+        versionName = "0.4.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     buildFeatures {
-        buildConfig true
+        buildConfig = true
+        viewBinding = true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled = true
     }
 
-    lintOptions {
-        disable 'MissingTranslation'
+    lint {
+        disable += 'MissingTranslation'
+        // The SSO library can both show a dialog and post a notification for an
+        // exception. Only the dialog is used here, but lint sees the class.
+        disable += 'NotificationPermission'
     }
 
-    flavorDimensions "version"
+    flavorDimensions = ["version"]
     productFlavors {
         fdroid {
-            dimension "version"
+            dimension = "version"
         }
         dev {
-            dimension "version"
-            applicationIdSuffix ".dev"
+            dimension = "version"
+            applicationIdSuffix = ".dev"
         }
         play {
-            dimension "version"
-            applicationIdSuffix ".play"
+            dimension = "version"
+            applicationIdSuffix = ".play"
         }
     }
-
-}
-
-repositories {
-    // Needed for Nextcloud SSO
-    maven { url "https://jitpack.io" }
-    maven { url "https://a8c-libs.s3.amazonaws.com/android" }
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    // java.time and friends on minSdk 24.
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
-    implementation 'com.google.android.material:material:1.10.0'
-    implementation 'androidx.recyclerview:recyclerview:1.3.1'
-    implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "androidx.preference:preference:1.2.1"
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'androidx.activity:activity:1.13.0'
+    implementation 'androidx.fragment:fragment:1.9.0'
+    implementation 'androidx.core:core:1.19.0'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.2.0'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 
-    // Retrofif2
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava:2.9.0'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+    // Retrofit2. The version has to match the one the Nextcloud SSO library was built against.
+    implementation 'com.squareup.retrofit2:retrofit:3.0.0'
+    implementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+
+    // RxJava3, only used to read the capabilities of the server.
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.12'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
 
     // Wordpress mobile html editor
-    api ('org.wordpress:aztec:v1.6.2')
+    api 'org.wordpress:aztec:v2.1.7'
 
     // Parse and clean HTML tags.
-    implementation 'org.jsoup:jsoup:1.15.4'
-
-    //Palette
-    implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
+    implementation 'org.jsoup:jsoup:1.21.2'
 
     // Nextcloud SSO
-    implementation "com.github.nextcloud:Android-SingleSignOn:0.8.1"
+    implementation 'com.github.nextcloud:Android-SingleSignOn:1.3.4'
 
     // Glide integration
-    implementation 'com.github.bumptech.glide:glide:4.11.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
+    implementation 'com.github.bumptech.glide:glide:5.0.9'
+    annotationProcessor 'com.github.bumptech.glide:compiler:5.0.9'
 
-    implementation 'com.github.stefan-niedermann.nextcloud-commons:sso-glide:1.8.2'
+    implementation 'com.github.stefan-niedermann.nextcloud-commons:sso-glide:2.4.1'
 }

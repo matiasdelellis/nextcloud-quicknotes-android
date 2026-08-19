@@ -28,8 +28,14 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Tag implements Serializable {
+    /** A tag the user is about to create, and that the server has not seen yet. */
+    public static final int NO_ID = -1;
+
     @Expose
-    @SerializedName("id") private int id;
+    @SerializedName("id") private int id = NO_ID;
+
+    @Expose
+    @SerializedName("userid") private String userId;
 
     @Expose
     @SerializedName("name") private String name;
@@ -42,6 +48,14 @@ public class Tag implements Serializable {
         this.id = id;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getName() {
         return name;
     }
@@ -50,17 +64,22 @@ public class Tag implements Serializable {
         this.name = name;
     }
 
+    public boolean isNew() {
+        return id <= 0;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(name);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (getClass() != obj.getClass())
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        Tag oTag = (Tag) obj;
         // The important is the name since the new tags always use the same empty id.
-        return  (Objects.equals(this.name, oTag.getName()));
+        return Objects.equals(this.name, ((Tag) obj).getName());
     }
 }

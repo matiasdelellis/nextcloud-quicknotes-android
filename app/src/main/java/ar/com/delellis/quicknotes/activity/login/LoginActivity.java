@@ -21,18 +21,15 @@
 
 package ar.com.delellis.quicknotes.activity.login;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.nextcloud.android.sso.AccountImporter;
-import com.nextcloud.android.sso.api.NextcloudAPI;
 import com.nextcloud.android.sso.exceptions.AccountImportCancelledException;
 import com.nextcloud.android.sso.exceptions.AndroidGetAccountsPermissionNotGranted;
 import com.nextcloud.android.sso.exceptions.NextcloudFilesAppNotInstalledException;
@@ -40,23 +37,31 @@ import com.nextcloud.android.sso.helper.SingleAccountHelper;
 import com.nextcloud.android.sso.model.SingleSignOnAccount;
 import com.nextcloud.android.sso.ui.UiExceptionManager;
 
-import ar.com.delellis.quicknotes.R;
 import ar.com.delellis.quicknotes.activity.main.MainActivity;
+import ar.com.delellis.quicknotes.databinding.ActivityLoginBinding;
+import ar.com.delellis.quicknotes.util.InsetsUtil;
 
+/**
+ * Picking the Nextcloud account to work with.
+ *
+ * The account chooser belongs to the Files app and is driven through the SSO
+ * library, which still hands its answer back the old way, so this is one of
+ * the few places where onActivityResult is what there is.
+ */
 public class LoginActivity extends AppCompatActivity {
 
-    protected ProgressBar progress;
-    protected Button button;
+    private ActivityLoginBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
-        progress = findViewById(R.id.progress);
-        button = findViewById(R.id.chose_button);
-        button.setOnClickListener(view -> {
-            progress.setVisibility(View.VISIBLE);
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        InsetsUtil.applySystemBarsPadding(binding.getRoot());
+
+        binding.choseButton.setOnClickListener(view -> {
+            binding.progress.setVisibility(View.VISIBLE);
             openAccountChooser();
         });
     }
@@ -65,40 +70,26 @@ public class LoginActivity extends AppCompatActivity {
         try {
             AccountImporter.pickNewAccount(this);
         } catch (NextcloudFilesAppNotInstalledException | AndroidGetAccountsPermissionNotGranted e) {
+            binding.progress.setVisibility(View.GONE);
             UiExceptionManager.showDialogForException(this, e);
         }
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         try {
-            AccountImporter.onActivityResult(requestCode, resultCode, data, this, new AccountImporter.IAccountAccessGranted() {
-                NextcloudAPI.ApiConnectedListener callback = new NextcloudAPI.ApiConnectedListener() {
-                    @Override
-                    public void onConnected() {
-                        // ignore this one… see 5)
-                    }
+            AccountImporter.onActivityResult(requestCode, resultCode, data, this, account -> {
+                Context context = getApplicationContext();
+                SingleAccountHelper.commitCurrentAccount(context, account.name);
 
-                    @Override
-                    public void onError(Exception ex) {
-                        // TODO handle errors
-                    }
-                };
-
-                @Override
-                public void accountAccessGranted(SingleSignOnAccount account) {
-                    Context l_context = getApplicationContext();
-                    SingleAccountHelper.setCurrentAccount(l_context, account.name);
-
-                    /* Open main view. */
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
             });
         } catch (AccountImportCancelledException e) {
-            e.printStackTrace();
+            binding.progress.setVisibility(View.GONE);
         }
     }
 

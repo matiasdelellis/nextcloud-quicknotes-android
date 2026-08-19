@@ -21,6 +21,9 @@
 
 package ar.com.delellis.quicknotes.util;
 
+import static java.net.HttpURLConnection.HTTP_NOT_MODIFIED;
+import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -34,23 +37,39 @@ import ar.com.delellis.quicknotes.R;
 import ar.com.delellis.quicknotes.api.ApiProvider;
 import ar.com.delellis.quicknotes.api.helper.IResponseCallback;
 import ar.com.delellis.quicknotes.model.Capabilities;
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
-import static java.net.HttpURLConnection.HTTP_NOT_MODIFIED;
-import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
-
+/**
+ * What the server says about itself, kept in the preferences between runs and
+ * refreshed with an ETag so asking again is cheap.
+ */
 public class CapabilitiesService {
     private static final String TAG = CapabilitiesService.class.getCanonicalName();
 
     private final String FAKE_ETAG = "ETAG_NONE";
 
-    private SharedPreferences preferences;
+    private final SharedPreferences preferences;
 
-    private Context context;
-    IResponseCallback responseCallback;
+    private final Context context;
+
+    private IResponseCallback responseCallback;
+
+    /**
+     * Whether this server is one this client can work with at all.
+     */
+    public enum Support {
+        /** Good to go. */
+        OK,
+        /** The server is in maintenance mode. */
+        MAINTENANCE,
+        /** The Quick notes app is not installed or not enabled there. */
+        NOT_INSTALLED,
+        /** It is there, but it speaks an api older than this client's. */
+        API_TOO_OLD
+    }
 
     public CapabilitiesService(Context context) {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -90,23 +109,55 @@ public class CapabilitiesService {
         return capabilities;
     }
 
-    private void putCapabilities(Capabilities capabilities, String etag) {
-        preferences.edit().putString(context.getString(R.string.cache_capabilities_etag), etag).apply();
-
-        boolean isMaintenanceEnabled = capabilities.isMaintenanceEnabled();
-        preferences.edit().putBoolean(context.getString(R.string.cache_maintenance_enabled), isMaintenanceEnabled).apply();
-
-        String nextcloudVersion = capabilities.getNextcloudVersion();
-        preferences.edit().putString(context.getString(R.string.cache_nextcloud_version), nextcloudVersion).apply();
-
-        String quicknotesVersion = capabilities.getQuicknotesVersion();
-        preferences.edit().putString(context.getString(R.string.cache_quicknotes_version), quicknotesVersion).apply();
-
-        String quicknotesApiVersion = capabilities.getQuicknotesApiVersion();
-        preferences.edit().putString(context.getString(R.string.cache_quicknotes_api_version), quicknotesApiVersion).apply();
+    /**
+     * Reads the cached capabilities and says whether this server can be
+     * talked to, and if not, what is in the way.
+     */
+    public Support getSupport() {
+        Capabilities capabilities = getCapabilities();
+        if (capabilities.isMaintenanceEnabled()) {
+            return Support.MAINTENANCE;
+        }
+        if (!capabilities.isQuicknotesInstalled()) {
+            return Support.NOT_INSTALLED;
+        }
+        if (!capabilities.isApiVersionSupported()) {
+            return Support.API_TOO_OLD;
+        }
+        return Support.OK;
     }
 
-    private Observer<ParsedResponse<Capabilities>> subscribeCapabilities = new Observer<ParsedResponse<Capabilities>>() {
+    /**
+     * What to put in front of the user about {@link #getSupport()}, or null
+     * when there is nothing in the way.
+     */
+    public String getSupportMessage() {
+        switch (getSupport()) {
+            case MAINTENANCE:
+                return context.getString(R.string.error_maintenance_mode);
+            case NOT_INSTALLED:
+                return context.getString(R.string.error_not_installed);
+            case API_TOO_OLD:
+                return context.getString(R.string.error_api_too_old,
+                        getCapabilities().getQuicknotesVersion(),
+                        Capabilities.REQUIRED_API_VERSION);
+            case OK:
+            default:
+                return null;
+        }
+    }
+
+    private void putCapabilities(Capabilities capabilities, String etag) {
+        preferences.edit()
+                .putString(context.getString(R.string.cache_capabilities_etag), etag)
+                .putBoolean(context.getString(R.string.cache_maintenance_enabled), capabilities.isMaintenanceEnabled())
+                .putString(context.getString(R.string.cache_nextcloud_version), capabilities.getNextcloudVersion())
+                .putString(context.getString(R.string.cache_quicknotes_version), capabilities.getQuicknotesVersion())
+                .putString(context.getString(R.string.cache_quicknotes_api_version), capabilities.getQuicknotesApiVersion())
+                .apply();
+    }
+
+    private final Observer<ParsedResponse<Capabilities>> subscribeCapabilities = new Observer<ParsedResponse<Capabilities>>() {
         @Override
         public void onSubscribe(Disposable d) {
             Log.d(TAG, "onSubscribe");
@@ -125,17 +176,20 @@ public class CapabilitiesService {
                 if (requestFailedException.getStatusCode() == HTTP_NOT_MODIFIED) {
                     Log.d(TAG, "onError HTTP_NOT_MODIFIED");
                     responseCallback.onComplete();
+                    return;
                 } else if (requestFailedException.getStatusCode() == HTTP_UNAVAILABLE) {
                     Log.d(TAG, "onError HTTP_UNAVAILABLE");
                     // Retrofit don't handle response when 503. Save Fake capabilities response.
-                    preferences.edit().putString(context.getString(R.string.cache_capabilities_etag), String.valueOf(System.currentTimeMillis())).apply();
-                    preferences.edit().putBoolean(context.getString(R.string.cache_maintenance_enabled), true).apply();
+                    preferences.edit()
+                            .putString(context.getString(R.string.cache_capabilities_etag), String.valueOf(System.currentTimeMillis()))
+                            .putBoolean(context.getString(R.string.cache_maintenance_enabled), true)
+                            .apply();
                     responseCallback.onComplete();
+                    return;
                 }
-            } else {
-                Log.d(TAG, "onError unknown");
-                responseCallback.onError(e);
             }
+            Log.d(TAG, "onError unknown", e);
+            responseCallback.onError(e);
         }
 
         @Override

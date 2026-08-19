@@ -91,6 +91,26 @@
                     app:tint="@color/defaultNoteTint" />
 
                 <ImageView
+                    android:id="@+id/item_reminder"
+                    android:contentDescription="@string/with_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_alarm"
+                    app:tint="@color/defaultNoteTint"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/item_archived"
+                    android:contentDescription="@string/archived"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_archive"
+                    app:tint="@color/defaultNoteTint"
+                    tools:visibility="visible" />
+
+                <ImageView
                     android:id="@+id/item_shared"
                     android:contentDescription="@string/shared_note"
                     android:layout_width="wrap_content"
@@ -120,6 +140,17 @@
                 tools:maxHeight="256dp"
                 tools:text="@tools:sample/lorem/random">
             </org.wordpress.aztec.AztecText>
+
+            <TextView
+                android:id="@+id/item_reminder_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:visibility="gone"
+                android:textSize="@dimen/note_font_size_small"
+                android:textColor="@color/defaultNoteTint"
+                tools:text="Reminder: 24 Aug 2026, 12:00"
+                tools:visibility="visible" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/item_recyclerShares"

@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import ar.com.delellis.quicknotes.R;
 import ar.com.delellis.quicknotes.model.Tag;
@@ -107,7 +108,7 @@ public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapte
 
     public boolean tagExists(String tagName) {
         for (Tag tag: tagsFiltered) {
-            if (tag.getName().toLowerCase().equals(tagName.toLowerCase())) {
+            if (tag.getName().equalsIgnoreCase(tagName)) {
                 return true;
             }
         }
@@ -144,8 +145,8 @@ public class TagSelectionAdapter extends RecyclerView.Adapter<TagSelectionAdapte
                 filteredTags.addAll(tags);
             } else {
                 for (Tag tag: tags) {
-                    String query = charSequence.toString().toLowerCase();
-                    if (tag.getName().toLowerCase().contains(query)) {
+                    String query = charSequence.toString().toLowerCase(Locale.getDefault());
+                    if (tag.getName().toLowerCase(Locale.getDefault()).contains(query)) {
                         filteredTags.add(tag);
                     }
                 }

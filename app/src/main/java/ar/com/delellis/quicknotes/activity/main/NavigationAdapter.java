@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -51,6 +51,12 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
     public static final int ICON_TAG = R.drawable.ic_tag_grey;
     @DrawableRes
     public static final int ICON_SHARED = R.drawable.ic_shared_grey;
+    @DrawableRes
+    public static final int ICON_REMINDER = R.drawable.ic_alarm;
+    @DrawableRes
+    public static final int ICON_ARCHIVE = R.drawable.ic_archive;
+    @DrawableRes
+    public static final int ICON_TRASH = R.drawable.ic_trash;
     @DrawableRes
     public static final int ICON_FAVORITE = R.drawable.ic_favorite;
     @DrawableRes
@@ -108,9 +114,10 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
             boolean isSelected = item.id.equals(selectedItem);
 
             name.setText(item.label);
-            icon.setImageDrawable(DrawableCompat.wrap(icon.getResources().getDrawable(item.icon)));
+            icon.setImageResource(item.icon);
 
-            int tintColor = isSelected ? view.getResources().getColor(R.color.defaultBrand) : view.getResources().getColor(R.color.fg_default_selection);
+            int tintColor = ContextCompat.getColor(view.getContext(),
+                    isSelected ? R.color.defaultBrand : R.color.fg_default_selection);
 
             name.setTextColor(tintColor);
             icon.setColorFilter(tintColor);

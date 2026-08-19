@@ -155,8 +155,34 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <TextView
+        android:id="@+id/empty_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="@dimen/spacer_3x"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="@dimen/note_font_size_medium"
+        android:textColor="?android:textColorSecondary"
+        tools:text="@string/no_notes_yet"
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/empty_trash"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_margin="@dimen/spacer_2x"
+        android:visibility="gone"
+        android:text="@string/empty_trash"
+        app:icon="@drawable/ic_delete_forever"
+        tools:visibility="visible" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add"
+        android:contentDescription="@string/new_note"
         android:layout_margin="16dp"
         android:layout_gravity="bottom|end"
         android:layout_width="wrap_content"

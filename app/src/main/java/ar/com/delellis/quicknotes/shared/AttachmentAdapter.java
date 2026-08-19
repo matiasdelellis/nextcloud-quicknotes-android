@@ -21,12 +21,13 @@
 
 package ar.com.delellis.quicknotes.shared;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,9 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.com.delellis.quicknotes.R;
+import ar.com.delellis.quicknotes.databinding.ItemAttachmentBinding;
 import ar.com.delellis.quicknotes.model.Attachment;
+import ar.com.delellis.quicknotes.util.SsoUrlUtil;
 
-public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.ViewHolder>{
+public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.ViewHolder> {
 
     private ImageItemClickListener imageItemClickListener;
     private DeleteItemClickListener deleteItemClickListener;
@@ -47,37 +50,70 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
 
     class ViewHolder extends RecyclerView.ViewHolder {
         @NonNull
-        private final View view;
+        private final ItemAttachmentBinding binding;
 
-        @NonNull
-        private final ImageView ivThumbnail;
+        ViewHolder(@NonNull ItemAttachmentBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
 
-        @NonNull
-        private final ImageButton imDelete;
-
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            view = itemView;
-
-            this.ivThumbnail = itemView.findViewById(R.id.attachment_thumbnail);
-            this.ivThumbnail.setOnClickListener(v -> {
-                int itemIndex = getAdapterPosition();
-                imageItemClickListener.onImageItemClick(itemIndex);
+            binding.attachmentThumbnail.setOnClickListener(v -> {
+                int itemIndex = getBindingAdapterPosition();
+                if (itemIndex != RecyclerView.NO_POSITION && imageItemClickListener != null) {
+                    imageItemClickListener.onImageItemClick(itemIndex);
+                }
             });
 
-            this.imDelete = itemView.findViewById(R.id.delete_attachment);
-            this.imDelete.setVisibility(deleteItemClickListener != null && !disableDeletion ? View.VISIBLE : View.GONE);
-            this.imDelete.setOnClickListener(v -> {
-                int itemIndex = getAdapterPosition();
-                deleteItemClickListener.onDeleteItemClick(itemIndex);
+            binding.deleteAttachment.setOnClickListener(v -> {
+                int itemIndex = getBindingAdapterPosition();
+                if (itemIndex != RecyclerView.NO_POSITION && deleteItemClickListener != null) {
+                    deleteItemClickListener.onDeleteItemClick(itemIndex);
+                }
             });
         }
 
         private void bind(@NonNull Attachment attachment) {
-            Glide.with(view.getContext())
-                    .load(attachment.getPreviewUrl())
-                    .error(R.drawable.ic_attach_file)
-                    .into(ivThumbnail);
+            // Somebody else's attachment is not the caller's to take off the
+            // note: the server only ever detaches rows of whoever is saving.
+            boolean canDelete = deleteItemClickListener != null && !disableDeletion && attachment.isMine();
+            binding.deleteAttachment.setVisibility(canDelete ? View.VISIBLE : View.GONE);
+
+            Context context = binding.getRoot().getContext();
+            binding.attachmentThumbnail.setContentDescription(attachment.getBasename() != null
+                    ? attachment.getBasename()
+                    : context.getString(R.string.attachment_thumbnail));
+
+            // A file the preview manager cannot draw is answered with a 303 to
+            // the icon of its mime type, and the SSO transport does not follow
+            // redirects: asking for that preview can only fail, and failing
+            // sends Glide to its plain http loader, which has no credentials
+            // and is answered 401. That is what has_preview is there to avoid,
+            // so draw the icon from here and make no request at all.
+            if (!attachment.hasPreview()) {
+                Glide.with(context).clear(binding.attachmentThumbnail);
+                binding.attachmentThumbnail.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                binding.attachmentThumbnail.setImageResource(iconFor(attachment.getMime()));
+                return;
+            }
+
+            binding.attachmentThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            Glide.with(context)
+                    .load(SsoUrlUtil.withFrontController(attachment.getPreviewUrl()))
+                    .error(iconFor(attachment.getMime()))
+                    .into(binding.attachmentThumbnail);
+        }
+
+        /** What to show for a file there is no thumbnail of. */
+        @DrawableRes
+        private int iconFor(String mime) {
+            if (mime != null) {
+                if (mime.startsWith("image/")) {
+                    return R.drawable.ic_attach_photo;
+                }
+                if (mime.startsWith("video/")) {
+                    return R.drawable.ic_attach_video;
+                }
+            }
+            return R.drawable.ic_attach_file;
         }
     }
 
@@ -87,8 +123,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_attachment, parent, false);
-        return new ViewHolder(v);
+        return new ViewHolder(ItemAttachmentBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
@@ -108,12 +144,20 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
 
     public void addItem(Attachment attachment) {
         this.attachments.add(attachment);
-        notifyDataSetChanged();
+        notifyItemInserted(this.attachments.size() - 1);
     }
 
     public void removeItem(Attachment attachment) {
-        this.attachments.remove(attachment);
-        notifyDataSetChanged();
+        int index = this.attachments.indexOf(attachment);
+        if (index >= 0) {
+            this.attachments.remove(index);
+            notifyItemRemoved(index);
+        }
+    }
+
+    @NonNull
+    public List<Attachment> getItems() {
+        return attachments;
     }
 
     public Attachment get(int position) {

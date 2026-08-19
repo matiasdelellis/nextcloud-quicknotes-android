@@ -1,44 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Nextcloud Quicknotes Android client application.
-  ~
-  ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
-  ~
-  ~ @author Matias De lellis <mati86dl@gmail.com>
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
+ ~ Nextcloud Quicknotes Android client application.
+ ~
+ ~ @copyright Copyright (c) 2020 Matias De lellis <mati86dl@gmail.com>
+ ~
+ ~ @author Matias De lellis <mati86dl@gmail.com>
+ ~
+ ~ This program is free software: you can redistribute it and/or modify
+ ~ it under the terms of the GNU General Public License as published by
+ ~ the Free Software Foundation, either version 3 of the License, or
+ ~ (at your option) any later version.
+ ~
+ ~ This program is distributed in the hope that it will be useful,
+ ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ ~ GNU General Public License for more details.
+ ~
+ ~ You should have received a copy of the GNU General Public License
+ ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ar.com.delellis.quicknotes">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:requestLegacyExternalStorage="true">
+        android:theme="@style/AppTheme">
 
         <activity
             android:exported="true"
@@ -62,6 +57,9 @@
             android:theme="@style/EditorTheme" />
         <activity android:name=".activity.tags.TagsActivity"/>
         <activity
+            android:name=".activity.shares.SharesActivity"
+            android:theme="@style/AppTheme"/>
+        <activity
             android:name=".activity.about.AboutActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme">
@@ -73,7 +71,7 @@
         </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="ar.com.delellis.quicknotes.fileProvider"
+            android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

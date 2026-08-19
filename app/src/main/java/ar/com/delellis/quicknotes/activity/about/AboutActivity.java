@@ -24,31 +24,35 @@ package ar.com.delellis.quicknotes.activity.about;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
 
 import ar.com.delellis.quicknotes.BuildConfig;
 import ar.com.delellis.quicknotes.R;
 import ar.com.delellis.quicknotes.api.helper.IResponseCallback;
+import ar.com.delellis.quicknotes.databinding.ActivityAboutBinding;
 import ar.com.delellis.quicknotes.model.Capabilities;
 import ar.com.delellis.quicknotes.util.CapabilitiesService;
+import ar.com.delellis.quicknotes.util.InsetsUtil;
 
 public class AboutActivity extends AppCompatActivity {
+
+    private ActivityAboutBinding binding;
+
     private CapabilitiesService capabilitiesService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_about);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        binding = ActivityAboutBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        InsetsUtil.applySystemBarsPadding(binding.getRoot());
+
+        setSupportActionBar(binding.toolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -67,6 +71,7 @@ public class AboutActivity extends AppCompatActivity {
             public void onComplete() {
                 fillCapabilities(capabilitiesService.getCapabilities());
             }
+
             @Override
             public void onError(Throwable throwable) {
                 throwable.printStackTrace();
@@ -74,37 +79,36 @@ public class AboutActivity extends AppCompatActivity {
         });
     }
 
-    private void fillAboutActivity () {
-        findViewById(R.id.about_nextcloud_version).setVisibility(View.GONE);
-        findViewById(R.id.about_quicknotes_version).setVisibility(View.GONE);
+    private void fillAboutActivity() {
+        binding.aboutNextcloudVersion.setVisibility(View.GONE);
+        binding.aboutQuicknotesVersion.setVisibility(View.GONE);
 
-        TextView tvVersion = findViewById(R.id.about_version);
-        tvVersion.setText(Html.fromHtml(getString(R.string.about_version, "v" + BuildConfig.VERSION_NAME)));
+        binding.aboutVersion.setText(fromHtml(getString(R.string.about_version, "v" + BuildConfig.VERSION_NAME)));
 
-        Button btLicence = findViewById(R.id.about_app_license_button);
-        btLicence.setOnClickListener(view -> openUtl(getString(R.string.url_license)));
+        binding.aboutAppLicenseButton.setOnClickListener(view -> openUrl(getString(R.string.url_license)));
 
-        TextView tvTranslate = findViewById(R.id.about_translate);
-        tvTranslate.setText(Html.fromHtml(getString(R.string.about_translate, getString(R.string.url_translations))));
-        tvTranslate.setOnClickListener(view -> openUtl(getString(R.string.url_translations)));
+        binding.aboutTranslate.setText(fromHtml(getString(R.string.about_translate, getString(R.string.url_translations))));
+        binding.aboutTranslate.setOnClickListener(view -> openUrl(getString(R.string.url_translations)));
 
-        TextView tvSource = findViewById(R.id.about_source);
-        tvSource.setText(Html.fromHtml(getString(R.string.about_source, getString(R.string.url_source))));
-        tvSource.setOnClickListener(view -> openUtl(getString(R.string.url_source)));
+        binding.aboutSource.setText(fromHtml(getString(R.string.about_source, getString(R.string.url_source))));
+        binding.aboutSource.setOnClickListener(view -> openUrl(getString(R.string.url_source)));
 
-        TextView tvIssues = findViewById(R.id.about_issues);
-        tvIssues.setText(Html.fromHtml(getString(R.string.about_issues, getString(R.string.url_issues))));
-        tvIssues.setOnClickListener(view -> openUtl(getString(R.string.url_issues)));
+        binding.aboutIssues.setText(fromHtml(getString(R.string.about_issues, getString(R.string.url_issues))));
+        binding.aboutIssues.setOnClickListener(view -> openUrl(getString(R.string.url_issues)));
     }
 
     private void fillCapabilities(Capabilities capabilities) {
-        TextView tvVersion = findViewById(R.id.about_nextcloud_version);
-        tvVersion.setText(Html.fromHtml(getString(R.string.about_nextcloud_version, "v" + capabilities.getNextcloudVersion())));
-        tvVersion.setVisibility(View.VISIBLE);
+        binding.aboutNextcloudVersion.setText(fromHtml(
+                getString(R.string.about_nextcloud_version, "v" + capabilities.getNextcloudVersion())));
+        binding.aboutNextcloudVersion.setVisibility(View.VISIBLE);
 
-        tvVersion = findViewById(R.id.about_quicknotes_version);
-        tvVersion.setText(Html.fromHtml(getString(R.string.about_quicknotes_version, "v" + capabilities.getQuicknotesVersion())));
-        tvVersion.setVisibility(View.VISIBLE);
+        binding.aboutQuicknotesVersion.setText(fromHtml(
+                getString(R.string.about_quicknotes_version, "v" + capabilities.getQuicknotesVersion())));
+        binding.aboutQuicknotesVersion.setVisibility(View.VISIBLE);
+    }
+
+    private static CharSequence fromHtml(String source) {
+        return HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     @Override
@@ -113,7 +117,7 @@ public class AboutActivity extends AppCompatActivity {
         return true;
     }
 
-    private void openUtl(String url) {
+    private void openUrl(String url) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
     }
 }

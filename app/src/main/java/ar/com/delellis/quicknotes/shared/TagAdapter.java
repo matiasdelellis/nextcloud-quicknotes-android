@@ -22,9 +22,7 @@
 package ar.com.delellis.quicknotes.shared;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,29 +30,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.com.delellis.quicknotes.R;
+import ar.com.delellis.quicknotes.databinding.ItemTagBinding;
 import ar.com.delellis.quicknotes.model.Tag;
 
 public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         @NonNull
-        private final View view;
+        private final ItemTagBinding binding;
 
-        @NonNull
-        private final TextView name;
-
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            view = itemView;
-
-            this.name = itemView.findViewById(R.id.tag_name);
+        ViewHolder(@NonNull ItemTagBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         private void bind(@NonNull Tag tag) {
-            name.setText(tag.getName());
+            binding.tagName.setText(tag.getName());
         }
-
     }
 
     @NonNull
@@ -63,8 +55,8 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tag, parent, false);
-        return new ViewHolder(v);
+        return new ViewHolder(ItemTagBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override

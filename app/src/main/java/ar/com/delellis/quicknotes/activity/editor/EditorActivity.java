@@ -21,34 +21,26 @@
 
 package ar.com.delellis.quicknotes.activity.editor;
 
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.M;
-import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_ADD_FILE;
 import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_PHOTO;
 import static ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.ATTACH_TAKE_VIDEO;
 
-import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -57,282 +49,407 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import ar.com.delellis.quicknotes.BuildConfig;
 import ar.com.delellis.quicknotes.R;
 import ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.OnAttachOptionListener;
+import ar.com.delellis.quicknotes.activity.shares.SharesActivity;
 import ar.com.delellis.quicknotes.activity.tags.TagsActivity;
 import ar.com.delellis.quicknotes.api.ApiProvider;
+import ar.com.delellis.quicknotes.databinding.ActivityEditorBinding;
 import ar.com.delellis.quicknotes.model.Attachment;
+import ar.com.delellis.quicknotes.model.AttachmentInfo;
 import ar.com.delellis.quicknotes.model.Note;
 import ar.com.delellis.quicknotes.model.Tag;
 import ar.com.delellis.quicknotes.shared.AttachmentAdapter;
+import ar.com.delellis.quicknotes.shared.ColorPickerDialog;
+import ar.com.delellis.quicknotes.shared.ReminderPicker;
 import ar.com.delellis.quicknotes.shared.ShareAdapter;
 import ar.com.delellis.quicknotes.shared.TagAdapter;
 import ar.com.delellis.quicknotes.util.ColorUtil;
-import ar.com.delellis.quicknotes.util.FileUtils;
+import ar.com.delellis.quicknotes.util.DateUtil;
 import ar.com.delellis.quicknotes.util.HtmlUtil;
-import okhttp3.MediaType;
+import ar.com.delellis.quicknotes.util.InsetsUtil;
+import ar.com.delellis.quicknotes.util.UploadUtil;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class EditorActivity extends AppCompatActivity implements EditorView, OnAttachOptionListener {
-    private final String TAG = EditorActivity.class.getCanonicalName();
+    private static final String TAG = EditorActivity.class.getCanonicalName();
 
-    private static final int REQUEST_CODE_EDIT_TAGS = 100;
-    private static final int REQUEST_CODE_ADD_FILE = 101;
-    private static final int REQUEST_CODE_IMAGE_CAPTURE = 102;
-    private static final int REQUEST_CODE_VIDEO_CAPTURE = 103;
-
-    private static final int REQUEST_CODE_ADD_FILE_PERMISSION = 200;
-    private static final int REQUEST_CODE_ADD_CAMERA_PERMISSION = 201;
-    private static final int REQUEST_CODE_ADD_VIDEO_PERMISSION = 202;
+    public static final String EXTRA_NOTE = "note";
+    public static final String EXTRA_TAGS = "tags";
 
     private static final String KEY_ACTION_VIEW_FILE_ID = "KEY_FILE_ID";
     private static final String KEY_ACTION_VIEW_ACCOUNT = "KEY_ACCOUNT";
 
-    EditorPresenter presenter;
-    ProgressDialog progressDialog;
+    private ActivityEditorBinding binding;
 
-    protected ApiProvider mApi;
+    private EditorPresenter presenter;
 
-    AttachmentAdapter attachmentAdapter;
-    RecyclerView attachmentRecyclerView;
+    private AttachmentAdapter attachmentAdapter;
+    private TagAdapter tagAdapter;
+    private ShareAdapter shareAdapter;
 
-    EditText et_title;
-    AztecText et_content;
-
-    TagAdapter tagAdapter;
-    RecyclerView tagRecyclerView;
-
-    ShareAdapter shareAdapter;
-    RecyclerView shareRecyclerView;
-
-    HorizontalScrollView rich_toolbar;
-
-    Note note = new Note();
-    Note shadowCopyNote;
+    private Note note = new Note();
+    private Note shadowCopyNote;
 
     private List<Tag> tags = new ArrayList<>();
     private List<Tag> tagSelection = new ArrayList<>();
+
+    /** Whether the share this note reaches the user through lets them write. */
+    private boolean readOnly = false;
 
     // Temporary files to capture from the camera
     private File tempPhotoCamera = null;
     private File tempVideoCamera = null;
 
+    private ActivityResultLauncher<Intent> tagsLauncher;
+    private ActivityResultLauncher<Intent> sharesLauncher;
+    private ActivityResultLauncher<String> pickFileLauncher;
+    private ActivityResultLauncher<Uri> takePhotoLauncher;
+    private ActivityResultLauncher<Uri> takeVideoLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editor);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        binding = ActivityEditorBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        InsetsUtil.applySystemBarsPadding(binding.getRoot());
 
-            Drawable drawable = ResourcesCompat.getDrawable(this.getResources(), R.drawable.ic_back_grey, null);
-            if (drawable != null) {
-                DrawableCompat.setTint(drawable, getResources().getColor(R.color.defaultNoteTint));
-                actionBar.setHomeAsUpIndicator(drawable);
-            } else {
-                actionBar.setHomeAsUpIndicator(R.drawable.ic_back_grey);
-            }
-        }
+        setupActionBar();
+        registerLaunchers();
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
-        mApi = new ApiProvider(getApplicationContext());
+        new ApiProvider(getApplicationContext());
 
         attachmentAdapter = new AttachmentAdapter();
-        attachmentRecyclerView = findViewById(R.id.editor_recyclerAttachments);
+        attachmentAdapter.setOnImageClickListener(position -> openAttachment(attachmentAdapter.get(position)));
+        attachmentAdapter.setOnDeleteClickListener(position ->
+                attachmentAdapter.removeItem(attachmentAdapter.get(position)));
+        binding.editorRecyclerAttachments.setAdapter(attachmentAdapter);
 
-        attachmentAdapter.setOnImageClickListener(position -> {
-            Attachment attachment = attachmentAdapter.get(position);
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(attachment.getDeepLinkUrl()));
-            intent.putExtra(KEY_ACTION_VIEW_FILE_ID, attachment.getFileId());
-            intent.putExtra(KEY_ACTION_VIEW_ACCOUNT, ApiProvider.getUsername());
-            startActivity(intent);
-        });
-
-        attachmentAdapter.setOnDeleteClickListener(position -> {
-            Attachment attachment = attachmentAdapter.get(position);
-            attachmentAdapter.removeItem(attachment);
-        });
-
-        et_title = findViewById(R.id.editor_title);
-        et_content = findViewById(R.id.editor_content);
-        et_content.setCalypsoMode(false);
-        rich_toolbar = findViewById(R.id.editor_rich_toolbar);
+        binding.editorContent.setCalypsoMode(false);
 
         tagAdapter = new TagAdapter();
-        tagRecyclerView = findViewById(R.id.editor_recyclerTags);
+        binding.editorRecyclerTags.setAdapter(tagAdapter);
 
         shareAdapter = new ShareAdapter();
-        shareRecyclerView = findViewById(R.id.editor_recyclerShares);
+        binding.editorRecyclerShares.setAdapter(shareAdapter);
 
         initToolbar();
-
-        // Create progress dialog.
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.please_wait));
 
         presenter = new EditorPresenter(this);
 
         Intent intent = getIntent();
-        if (intent.hasExtra("note")) {
-            note = (Note) Objects.requireNonNull(intent.getSerializableExtra("note"));
+        if (intent.hasExtra(EXTRA_NOTE)) {
+            note = (Note) Objects.requireNonNull(intent.getSerializableExtra(EXTRA_NOTE));
+        }
+        Serializable extraTags = intent.getSerializableExtra(EXTRA_TAGS);
+        if (extraTags != null) {
+            tags = (List<Tag>) extraTags;
         }
 
-        tags = (List<Tag>) Objects.requireNonNull(intent.getSerializableExtra("tags"));
+        showNote();
 
-        setDataFromIntentExtra();
-
-        // Store the either loaded or just created note as a copy so we can compare for modifications later
+        // Store the either loaded or just created note as a copy so we can
+        // compare for modifications later.
         shadowCopyNote = note.clone();
-        getSupportActionBar().setElevation(0);
+
+        getOnBackPressedDispatcher().addCallback(this, onBackPressed);
     }
 
+    private void setupActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
+
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setElevation(0);
+
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_back_grey, null);
+        if (drawable != null) {
+            DrawableCompat.setTint(drawable, ContextCompat.getColor(this, R.color.defaultNoteTint));
+            actionBar.setHomeAsUpIndicator(drawable);
+        } else {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_back_grey);
+        }
+    }
+
+    private void registerLaunchers() {
+        tagsLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() != RESULT_OK || result.getData() == null) {
+                return;
+            }
+            tagSelection = (List<Tag>) Objects.requireNonNull(
+                    result.getData().getSerializableExtra(TagsActivity.EXTRA_TAG_SELECTION));
+            note.setTags(tagSelection);
+            tagAdapter.setItems(tagSelection);
+        });
+
+        sharesLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            // Who has the note is the server's to tell; nothing of the note
+            // being edited here changed.
+        });
+
+        // The picker hands back a content uri and nothing else: no storage
+        // permission is asked for, and none is needed.
+        pickFileLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
+            if (uri == null) {
+                return;
+            }
+            try {
+                presenter.uploadAttachment(UploadUtil.partFromUri(this, uri));
+            } catch (IOException e) {
+                Log.w(TAG, "Could not read the picked file", e);
+                onRequestError(getString(R.string.error_uploading_attachment));
+            }
+        });
+
+        takePhotoLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(), taken -> {
+            if (Boolean.TRUE.equals(taken) && tempPhotoCamera != null) {
+                presenter.uploadAttachment(UploadUtil.partFromFile(tempPhotoCamera, tempPhotoCamera.getName(), "image/jpeg"));
+            }
+        });
+
+        takeVideoLauncher = registerForActivityResult(new ActivityResultContracts.CaptureVideo(), taken -> {
+            if (Boolean.TRUE.equals(taken) && tempVideoCamera != null) {
+                presenter.uploadAttachment(UploadUtil.partFromFile(tempVideoCamera, tempVideoCamera.getName(), "video/mp4"));
+            }
+        });
+    }
+
+    private final OnBackPressedCallback onBackPressed = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if (hasModifications()) {
+                showDiscardDialog();
+            } else {
+                setResult(RESULT_OK);
+                finish();
+            }
+        }
+    };
+
+    // ------------------------------------------------------------------
+    // Menu
+    // ------------------------------------------------------------------
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        int tintColor = this.getResources().getColor(R.color.defaultNoteTint);
-
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_editor, menu);
-
-        MenuItem deleteItem = menu.findItem(R.id.delete);
-        deleteItem.setVisible(note.getId() != 0 && !note.getIsShared());
-        ColorUtil.menuItemTintColor(deleteItem, tintColor);
-
-        MenuItem pinItem = menu.findItem(R.id.pin);
-        pinItem.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
-        pinItem.setVisible(!note.getIsShared());
-        ColorUtil.menuItemTintColor(pinItem, tintColor);
-
-        ColorUtil.menuItemTintColor(menu.findItem(R.id.save), tintColor);
-
+        getMenuInflater().inflate(R.menu.menu_editor, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        int tintColor = ContextCompat.getColor(this, R.color.defaultNoteTint);
+        boolean isSaved = !note.isNew();
+
+        // The pin and the reminder are the caller's own, so they are offered
+        // on anybody's note; the trash belongs to whoever owns it.
+        setItem(menu, R.id.pin, !readOnly, note.isPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin, tintColor);
+        setItem(menu, R.id.save, !readOnly, tintColor);
+        setItem(menu, R.id.reminder, isSaved, tintColor);
+        setItem(menu, R.id.remove_reminder, isSaved && note.hasReminder(), tintColor);
+        setItem(menu, R.id.share, isSaved && (note.isOwner() || note.canReshare()), tintColor);
+        setItem(menu, R.id.archive, isSaved && !note.isArchived() && !note.isTrashed(), tintColor);
+        setItem(menu, R.id.unarchive, isSaved && note.isArchived(), tintColor);
+        setItem(menu, R.id.trash, isSaved && note.isOwner() && !note.isTrashed(), tintColor);
+        setItem(menu, R.id.restore, isSaved && note.isTrashed(), tintColor);
+        setItem(menu, R.id.leave, isSaved && note.canLeave(), tintColor);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void setItem(Menu menu, int itemId, boolean visible, int tintColor) {
+        setItem(menu, itemId, visible, 0, tintColor);
+    }
+
+    private void setItem(Menu menu, int itemId, boolean visible, int iconRes, int tintColor) {
+        MenuItem item = menu.findItem(itemId);
+        if (item == null) {
+            return;
+        }
+        item.setVisible(visible);
+        if (iconRes != 0) {
+            item.setIcon(iconRes);
+        }
+        if (visible && item.getIcon() != null) {
+            ColorUtil.menuItemTintColor(item, tintColor);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
+
         if (itemId == R.id.pin) {
-            note.setIsPinned(!note.getIsPinned());
-            item.setIcon(note.getIsPinned() ? R.drawable.ic_pinned : R.drawable.ic_pin);
-            ColorUtil.menuItemTintColor(item, this.getResources().getColor(R.color.defaultNoteTint));
+            note.setPinned(!note.isPinned());
+            invalidateOptionsMenu();
             return true;
         } else if (itemId == R.id.save) {
-            if (note.getIsShared()) {
-                closeEdition();
-                return true;
-            }
-
-            fetchDataToNoteObject();
-
-            if (note.getTitle().isEmpty()) {
-                et_title.setError(getString(R.string.must_enter_title));
-            } else {
-                if (note.getId() == 0)
-                    presenter.createNote(note);
-                else
-                    presenter.updateNote(note);
-            }
+            saveNote();
             return true;
-        } else if (itemId == R.id.delete) {
-            new MaterialAlertDialogBuilder(this).setTitle(R.string.delete_note)
-                    .setMessage(R.string.sure_want_delete)
-                    .setPositiveButton(R.string.common_yes, ((dialog, which) -> {
-                        dialog.dismiss();
-                        presenter.deleteNote(note.getId());
-                    }))
-                    .setNegativeButton(R.string.common_cancel, (dialog, which) -> {
-                        dialog.dismiss();
-                    })
-                    .show();
+        } else if (itemId == R.id.reminder) {
+            pickReminder();
+            return true;
+        } else if (itemId == R.id.remove_reminder) {
+            presenter.setReminder(note.getId(), null);
+            return true;
+        } else if (itemId == R.id.share) {
+            Intent intent = new Intent(this, SharesActivity.class);
+            intent.putExtra(SharesActivity.EXTRA_NOTE, note);
+            sharesLauncher.launch(intent);
+            return true;
+        } else if (itemId == R.id.archive) {
+            presenter.archiveNote(note.getId());
+            return true;
+        } else if (itemId == R.id.unarchive) {
+            presenter.unarchiveNote(note.getId());
+            return true;
+        } else if (itemId == R.id.trash) {
+            confirm(R.string.move_to_trash, R.string.sure_want_delete, () -> presenter.trashNote(note.getId()));
+            return true;
+        } else if (itemId == R.id.restore) {
+            presenter.restoreNote(note.getId());
+            return true;
+        } else if (itemId == R.id.leave) {
+            confirm(R.string.leave_note, R.string.sure_want_leave, () -> presenter.leaveNote(note.getId()));
             return true;
         } else if (itemId == android.R.id.home) {
-            if (hasModifications()) {
-                showDiscardDialog(() -> {
-                    setResult(RESULT_CANCELED);
-                    finish();
-                }, null);
-            } else {
-                setResult(RESULT_OK);
-                finish();
-            }
+            onBackPressed.handleOnBackPressed();
             return true;
-        } else {
-            return super.onOptionsItemSelected(item);
         }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void saveNote() {
+        if (readOnly) {
+            // Nothing of this note is the caller's to write, but their pin and
+            // their tags are: those are saved through the same call, which the
+            // server allows on a read only share.
+            setResult(RESULT_OK);
+            finish();
+            return;
+        }
+
+        fetchDataToNoteObject();
+
+        if (note.getTitle().isEmpty()) {
+            binding.editorTitle.setError(getString(R.string.must_enter_title));
+            return;
+        }
+
+        if (note.isNew()) {
+            presenter.createNote(note);
+        } else {
+            presenter.updateNote(note);
+        }
+    }
+
+    private void confirm(int title, int message, Runnable action) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.dismiss();
+                    action.run();
+                })
+                .setNegativeButton(R.string.common_cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    private void pickReminder() {
+        ReminderPicker.pick(this, note.getReminderAt(), (reminderAt, isInTheFuture) -> {
+            if (!isInTheFuture) {
+                Toast.makeText(this, R.string.reminder_must_be_in_the_future, Toast.LENGTH_LONG).show();
+                return;
+            }
+            presenter.setReminder(note.getId(), reminderAt);
+        });
     }
 
     private void fetchDataToNoteObject() {
         // Clean html from view and update note to save.
-        note.setTitle(HtmlUtil.cleanString(et_title.getText().toString()));
-        note.setContent(HtmlUtil.cleanHtml(et_content.toPlainHtml(false)));
+        note.setTitle(HtmlUtil.cleanString(binding.editorTitle.getText().toString()));
+        note.setContent(HtmlUtil.cleanHtml(binding.editorContent.toPlainHtml(false)));
+        note.setTags(tagSelection);
+        note.setAttachments(attachmentAdapter.getItems());
+    }
+
+    private boolean hasModifications() {
+        if (readOnly) {
+            return false;
+        }
+        fetchDataToNoteObject();
+        return !note.equals(shadowCopyNote);
+    }
+
+    private void showDiscardDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.note_confirm_discard_unsaved_changes_title)
+                .setMessage(R.string.note_confirm_discard_unsaved_changes_text)
+                .setPositiveButton(R.string.common_yes, (dialog, which) -> {
+                    dialog.dismiss();
+                    setResult(RESULT_CANCELED);
+                    finish();
+                })
+                .setNegativeButton(R.string.common_cancel, (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     public void initToolbar() {
-        ImageButton button = findViewById(R.id.action_bold);
-        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_BOLD));
+        binding.editorToolbar.actionBold.setOnClickListener(view ->
+                binding.editorContent.toggleFormatting(AztecTextFormat.FORMAT_BOLD));
+        binding.editorToolbar.actionItalic.setOnClickListener(view ->
+                binding.editorContent.toggleFormatting(AztecTextFormat.FORMAT_ITALIC));
+        binding.editorToolbar.actionUnderline.setOnClickListener(view ->
+                binding.editorContent.toggleFormatting(AztecTextFormat.FORMAT_UNDERLINE));
+        binding.editorToolbar.actionStrike.setOnClickListener(view ->
+                binding.editorContent.toggleFormatting(AztecTextFormat.FORMAT_STRIKETHROUGH));
+        binding.editorToolbar.actionQuote.setOnClickListener(view ->
+                binding.editorContent.toggleFormatting(AztecTextFormat.FORMAT_QUOTE));
+        binding.editorToolbar.actionNumberedList.setOnClickListener(view ->
+                binding.editorContent.toggleFormatting(AztecTextFormat.FORMAT_ORDERED_LIST));
+        binding.editorToolbar.actionBulletedList.setOnClickListener(view ->
+                binding.editorContent.toggleFormatting(AztecTextFormat.FORMAT_UNORDERED_LIST));
 
-        button = findViewById(R.id.action_italic);
-        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_ITALIC));
-
-        button = findViewById(R.id.action_underline);
-        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_UNDERLINE));
-
-        button = findViewById(R.id.action_strike);
-        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_STRIKETHROUGH));
-
-        button = findViewById(R.id.action_quote);
-        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_QUOTE));
-
-        button = findViewById(R.id.action_numbered_list);
-        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_ORDERED_LIST));
-
-        button = findViewById(R.id.action_bulleted_list);
-        button.setOnClickListener(view -> et_content.toggleFormatting(AztecTextFormat.FORMAT_UNORDERED_LIST));
-
-        button = findViewById(R.id.action_note_color);
-        button.setOnClickListener(view -> showColorPicker());
-
-        button = findViewById(R.id.action_attach);
-        button.setOnClickListener(view -> showAttachOptions());
-
-        button = findViewById(R.id.action_tags);
-        button.setOnClickListener(view -> showTagsSelection());
+        binding.editorToolbar.actionNoteColor.setOnClickListener(view -> showColorPicker());
+        binding.editorToolbar.actionAttach.setOnClickListener(view -> showAttachOptions());
+        binding.editorToolbar.actionTags.setOnClickListener(view -> showTagsSelection());
     }
+
+    // ------------------------------------------------------------------
+    // EditorView
+    // ------------------------------------------------------------------
 
     @Override
     public void showProgress() {
-        progressDialog.show();
+        binding.editorProgress.setVisibility(VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        progressDialog.dismiss();
+        binding.editorProgress.setVisibility(GONE);
     }
 
     @Override
-    public void addAttachment(Attachment attachment) {
-        attachmentAdapter.addItem(attachment);
+    public void addAttachment(AttachmentInfo info) {
+        attachmentAdapter.addItem(Attachment.fromInfo(info));
 
         if (tempPhotoCamera != null) {
             tempPhotoCamera.delete();
@@ -346,21 +463,59 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
     @Override
     public void onRequestSuccess(String message) {
-        Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
     }
 
     @Override
     public void onRequestError(String message) {
-        Toast.makeText(EditorActivity.this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public void onNoteUpdated(Note updated) {
+        // Whatever is half written here stays: only what the call actually
+        // changed is taken from the answer.
+        note.mergeServerState(updated);
+        shareAdapter.setItems(note.getSharedWith());
+        showReminder();
+        invalidateOptionsMenu();
+    }
+
+    /**
+     * Somebody else saved this note while it was open here. Neither version is
+     * the right one to pick for the user, so both are offered: keeping theirs
+     * saves on top of what is on the server now, taking theirs throws away
+     * what was written here.
+     */
+    @Override
+    public void onConflict(Note current) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.conflict_title)
+                .setMessage(R.string.conflict_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.conflict_keep_mine, (dialog, which) -> {
+                    dialog.dismiss();
+                    note.setEtag(current.getEtag());
+                    presenter.updateNote(note);
+                })
+                .setNegativeButton(R.string.conflict_take_theirs, (dialog, which) -> {
+                    dialog.dismiss();
+                    onNoteUpdated(current);
+                })
+                .show();
+    }
+
+    // ------------------------------------------------------------------
+    // Attaching
+    // ------------------------------------------------------------------
 
     @Override
     public void onAttachOptionSelection(int attachOption) {
         switch (attachOption) {
             case ATTACH_ADD_FILE:
-                pickFile();
+                pickFileLauncher.launch("*/*");
                 break;
             case ATTACH_TAKE_PHOTO:
                 takePhoto();
@@ -374,296 +529,146 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
     }
 
     private void showAttachOptions() {
-        AttachBottomSheetDialog attachBottomSheetDialog = new AttachBottomSheetDialog();
-        attachBottomSheetDialog.show(getSupportFragmentManager(), "AttachBottomSheetDialog");
-    }
-
-    private void showTagsSelection() {
-        Intent intent = new Intent(this, TagsActivity.class);
-        intent.putExtra("tags", (Serializable) tags);
-        intent.putExtra("tagSelection", (Serializable) tagSelection);
-        startActivityForResult(intent, REQUEST_CODE_EDIT_TAGS);
-    }
-
-    private void showColorPicker() {
-        String[] colors = getResources().getStringArray(R.array.pallete_colors);
-        ArrayList<String> palette_colors = new ArrayList<>(Arrays.asList(colors));
-
-        ColorPicker colorPicker = new ColorPicker(this);
-        colorPicker.setColors(palette_colors);
-        colorPicker.setTitle(getString(R.string.select_note_color));
-        colorPicker.setDefaultColorButton(Color.parseColor(note.getColor()));
-        colorPicker.setRoundColorButton(true);
-        colorPicker.disableDefaultButtons(true);
-        colorPicker.setOnFastChooseColorListener(new ColorPicker.OnFastChooseColorListener() {
-            @Override
-            public void setOnFastChooseColorListener(int position, int color) {
-                note.setColor(ColorUtil.getRGBColorFromInt(color));
-                tintActivityColor(color);
-            }
-
-            @Override
-            public void onCancel() {
-                //
-            }
-        });
-        colorPicker.show();
+        new AttachBottomSheetDialog().show(getSupportFragmentManager(), "AttachBottomSheetDialog");
     }
 
     private void takePhoto() {
-        if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, CAMERA) != PERMISSION_GRANTED) {
-            requestPermissions(new String[]{CAMERA}, REQUEST_CODE_ADD_CAMERA_PERMISSION);
-            return;
-        }
-
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            try {
-                tempPhotoCamera = File.createTempFile("IMG_CAMERA_", ".jpg", getCacheDir());
-            } catch (IOException e) {
-                tempPhotoCamera = null;
-            }
-
-            if (tempPhotoCamera == null)
-                return;
-
-            Uri photoURI = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", tempPhotoCamera);
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-            startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE);
+        tempPhotoCamera = createTempFile("IMG_CAMERA_", ".jpg");
+        if (tempPhotoCamera != null) {
+            takePhotoLauncher.launch(uriFor(tempPhotoCamera));
         }
     }
 
     private void takeVideo() {
-        if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, CAMERA) != PERMISSION_GRANTED) {
-            requestPermissions(new String[]{CAMERA}, REQUEST_CODE_ADD_VIDEO_PERMISSION);
+        tempVideoCamera = createTempFile("VID_CAMERA_", ".mp4");
+        if (tempVideoCamera != null) {
+            takeVideoLauncher.launch(uriFor(tempVideoCamera));
+        }
+    }
+
+    @Nullable
+    private File createTempFile(String prefix, String suffix) {
+        try {
+            return File.createTempFile(prefix, suffix, getCacheDir());
+        } catch (IOException e) {
+            Log.w(TAG, "Could not make room for the capture", e);
+            onRequestError(getString(R.string.error_uploading_attachment));
+            return null;
+        }
+    }
+
+    private Uri uriFor(File file) {
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
+    }
+
+    private void openAttachment(Attachment attachment) {
+        String url = attachment.getLinkUrl();
+        if (url == null || url.isEmpty()) {
             return;
         }
 
-        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-            try {
-                tempVideoCamera = File.createTempFile("VID_CAMERA_", ".mp4", getCacheDir());
-            } catch (IOException e) {
-                tempVideoCamera = null;
-            }
-
-            if (tempVideoCamera == null)
-                return;
-
-            Uri videoURI = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", tempVideoCamera);
-            takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoURI);
-            startActivityForResult(takeVideoIntent, REQUEST_CODE_VIDEO_CAPTURE);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.putExtra(KEY_ACTION_VIEW_FILE_ID, String.valueOf(attachment.getFileId()));
+        intent.putExtra(KEY_ACTION_VIEW_ACCOUNT, ApiProvider.getUsername());
+        try {
+            startActivity(intent);
+        } catch (Exception e) {
+            Log.w(TAG, "Nothing could open " + url, e);
+            onRequestError(getString(R.string.error_unknown));
         }
     }
 
-    public void pickFile() {
-        if (SDK_INT >= M && ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
-            requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_CODE_ADD_FILE_PERMISSION);
-        } else {
-            startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .setType("*/*"), REQUEST_CODE_ADD_FILE);
-        }
+    private void showTagsSelection() {
+        Intent intent = new Intent(this, TagsActivity.class);
+        intent.putExtra(TagsActivity.EXTRA_TAGS, (Serializable) tags);
+        intent.putExtra(TagsActivity.EXTRA_TAG_SELECTION, (Serializable) tagSelection);
+        tagsLauncher.launch(intent);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_ADD_FILE_PERMISSION:
-                if (ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED) {
-                    pickFile();
-                } else {
-                    Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
-                }
-                break;
-            case REQUEST_CODE_ADD_CAMERA_PERMISSION:
-                if (ContextCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED) {
-                    takePhoto();
-                } else {
-                    Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
-                }
-                break;
-            case REQUEST_CODE_ADD_VIDEO_PERMISSION:
-                if (ContextCompat.checkSelfPermission(this, CAMERA) == PERMISSION_GRANTED) {
-                    takeVideo();
-                } else {
-                    Toast.makeText(this, getString(R.string.need_permission_to_attach), Toast.LENGTH_LONG).show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
+    private void showColorPicker() {
+        ColorPickerDialog.show(this, note.getColor(), (color, colorInt) -> {
+            note.setColor(color);
+            tintActivityColor(colorInt);
+        });
     }
 
-    private void setDataFromIntentExtra() {
-        if (note.getId() != 0) {
-            attachmentAdapter.setItems(note.getAttachtments());
-            attachmentAdapter.setDisableDeletion(note.getIsShared());
-            attachmentAdapter.notifyDataSetChanged();
-            attachmentRecyclerView.setAdapter(attachmentAdapter);
-            note.setTitle(HtmlUtil.cleanString(note.getTitle()));
-            et_title.setText(note.getTitle());
-            note.setContent(HtmlUtil.cleanHtml(note.getContent()));
-            et_content.fromHtml(note.getContent(), true);
+    // ------------------------------------------------------------------
+    // Filling the screen
+    // ------------------------------------------------------------------
 
-            tintActivityColor(Color.parseColor(note.getColor()));
-
-            tagSelection = note.getTags();
-
-            tagAdapter.setItems(tagSelection);
-            tagAdapter.notifyDataSetChanged();
-            tagRecyclerView.setAdapter(tagAdapter);
-
-            shareAdapter.setItems(note.getShareWith());
-            shareAdapter.notifyDataSetChanged();
-            shareRecyclerView.setAdapter(shareAdapter);
-
-            if (note.getIsShared()) {
-                readMode();
-            } else {
-                editMode();
-            }
-        } else {
-            // Default color.
-            int defaultColor = getResources().getColor(R.color.defaultNoteColor);
+    private void showNote() {
+        if (note.isNew()) {
+            int defaultColor = ContextCompat.getColor(this, R.color.defaultNoteColor);
+            note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
             tintActivityColor(defaultColor);
 
-            // Fill default note.
-            note.setTitle("");
-            note.setContent("");
-            note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
-
-            // Focus to title and edit
-            et_title.requestFocus();
+            binding.editorTitle.requestFocus();
             editMode();
-
-            shareRecyclerView.setAdapter(shareAdapter);
-            tagRecyclerView.setAdapter(tagAdapter);
+            return;
         }
+
+        readOnly = !note.canEdit();
+
+        attachmentAdapter.setDisableDeletion(readOnly);
+        attachmentAdapter.setItems(new ArrayList<>(note.getAttachments()));
+
+        note.setTitle(HtmlUtil.cleanString(note.getTitle()));
+        binding.editorTitle.setText(note.getTitle());
+
+        note.setContent(HtmlUtil.cleanHtml(note.getContent()));
+        binding.editorContent.fromHtml(note.getContent(), true);
+
+        tintActivityColor(ColorUtil.parseColorOr(note.getColor(),
+                ContextCompat.getColor(this, R.color.defaultNoteColor)));
+
+        tagSelection = note.getTags();
+        tagAdapter.setItems(tagSelection);
+        shareAdapter.setItems(note.getSharedWith());
+
+        showReminder();
+
+        if (readOnly) {
+            readMode();
+        } else {
+            editMode();
+        }
+    }
+
+    private void showReminder() {
+        String reminder = note.hasReminder() ? DateUtil.toLocalDisplay(note.getReminderAt()) : null;
+        if (reminder == null) {
+            binding.editorReminderBar.setVisibility(GONE);
+            return;
+        }
+
+        binding.editorReminderText.setText(getString(
+                note.isReminderPending() ? R.string.reminder_at : R.string.reminder_notified, reminder));
+        binding.editorReminderBar.setVisibility(VISIBLE);
     }
 
     private void editMode() {
-        et_title.setFocusableInTouchMode(true);
-        et_content.setFocusableInTouchMode(true);
-        rich_toolbar.setVisibility(View.VISIBLE);
+        binding.editorTitle.setFocusableInTouchMode(true);
+        binding.editorContent.setFocusableInTouchMode(true);
+        binding.editorRichToolbar.setVisibility(VISIBLE);
+
+        // The colour is a property of the note, and the note is its owner's.
+        binding.editorToolbar.actionNoteColor.setVisibility(note.isNew() || note.isOwner() ? VISIBLE : GONE);
     }
 
     private void readMode() {
-        et_title.setFocusableInTouchMode(false);
-        et_content.setFocusableInTouchMode(false);
-        et_title.setFocusable(false);
-        et_content.setFocusable(false);
-        rich_toolbar.setVisibility(View.GONE);
+        binding.editorTitle.setFocusableInTouchMode(false);
+        binding.editorContent.setFocusableInTouchMode(false);
+        binding.editorTitle.setFocusable(false);
+        binding.editorContent.setFocusable(false);
+        binding.editorRichToolbar.setVisibility(GONE);
     }
 
     private void tintActivityColor(int noteColor) {
-        et_content.getRootView().setBackgroundColor(noteColor);
-        getWindow().setStatusBarColor(noteColor);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(noteColor));
-    }
+        binding.editorContent.getRootView().setBackgroundColor(noteColor);
 
-    private void closeEdition() {
-        setResult(RESULT_CANCELED);
-        finish();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE_EDIT_TAGS:
-                if (resultCode == RESULT_OK) {
-                    tagSelection = (List<Tag>) Objects.requireNonNull(data.getSerializableExtra("tagSelection"));
-                    note.setTags(tagSelection);
-                    tagAdapter.setItems(tagSelection);
-                    tagAdapter.notifyDataSetChanged();
-                }
-                break;
-            case REQUEST_CODE_ADD_FILE:
-                if (resultCode == RESULT_OK) {
-                    if (data == null) {
-                        return;
-                    }
-
-                    final Uri fileUri = data.getData();
-                    if (fileUri == null) {
-                        return;
-                    }
-
-                    if (!ContentResolver.SCHEME_CONTENT.equals(fileUri.getScheme())) {
-                        return;
-                    }
-
-                    File file = FileUtils.getFile(this, fileUri);
-
-                    RequestBody requestBody = RequestBody.create(MediaType.parse(getContentResolver().getType(fileUri)), file);
-                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-
-                    presenter.uploadAttachment(filePart);
-                }
-                break;
-            case REQUEST_CODE_IMAGE_CAPTURE:
-                if (resultCode == RESULT_OK) {
-                    RequestBody requestBody = RequestBody.create(MediaType.parse("image/jpeg"), tempPhotoCamera);
-                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", tempPhotoCamera.getName(), requestBody);
-                    presenter.uploadAttachment(filePart);
-                }
-                break;
-            case REQUEST_CODE_VIDEO_CAPTURE:
-                if (resultCode == RESULT_OK) {
-                    RequestBody requestBody = RequestBody.create(MediaType.parse("video/mp4"), tempVideoCamera);
-                    MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", tempVideoCamera.getName(), requestBody);
-                    presenter.uploadAttachment(filePart);
-                }
-                break;
-            default:
-                super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    /**
-     * Checks if the note has been modified (only comparing major fields);
-     */
-    private boolean hasModifications() {
-        if (shadowCopyNote == null || note == null) {
-            return false;
-        }
-
-        if (note.getIsShared()) {
-            return false;
-        }
-
-        fetchDataToNoteObject();
-
-        return !note.equals(shadowCopyNote);
-    }
-
-    /**
-     * Presents a dialog to the user which then can decide if he wants to discard the changes or not.
-     * If discard or stay is chosen, the Runnable given as parameter is executed
-     *
-     * @param discardAction What to execute when user wants to discard
-     * @param stayAction    What to do when user wants to stay (can be null)
-     */
-    private void showDiscardDialog(Runnable discardAction, Runnable stayAction) {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.note_confirm_discard_unsaved_changes_title)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setMessage(R.string.note_confirm_discard_unsaved_changes_text)
-                .setPositiveButton(R.string.common_yes, ((dialog, which) -> {
-                    discardAction.run();
-                }))
-                .setNegativeButton(R.string.common_cancel, (dialog, which) -> {
-                    if (stayAction != null) stayAction.run();
-                })
-                .show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (hasModifications()) {
-            showDiscardDialog(EditorActivity.super::onBackPressed, null);
-        } else {
-            super.onBackPressed();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(noteColor));
         }
     }
 }

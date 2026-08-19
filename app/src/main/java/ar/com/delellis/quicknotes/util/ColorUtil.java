@@ -21,6 +21,7 @@
 
 package ar.com.delellis.quicknotes.util;
 
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -42,6 +43,22 @@ public class ColorUtil {
         Drawable wrapDrawable = DrawableCompat.wrap(normalDrawable);
         DrawableCompat.setTint(wrapDrawable, color);
         item.setIcon(wrapDrawable);
+    }
+
+    /**
+     * Reads a colour the server sent, falling back rather than throwing: a
+     * note whose colour is missing or malformed is still a note.
+     */
+    @ColorInt
+    public static int parseColorOr(String color, @ColorInt int fallback) {
+        if (color == null || color.isEmpty()) {
+            return fallback;
+        }
+        try {
+            return Color.parseColor(color);
+        } catch (IllegalArgumentException e) {
+            return fallback;
+        }
     }
 
     public static String getRGBColorFromInt (@ColorInt int color) {
