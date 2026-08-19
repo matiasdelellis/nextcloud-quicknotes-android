@@ -23,6 +23,14 @@ plugins {
     id 'com.android.application'
 }
 
+// Signing is read from properties rather than written here, so the keystore
+// stays out of the repository. Set STORE_FILE, STORE_PASSWORD, KEY_ALIAS and
+// KEY_PASSWORD in ~/.gradle/gradle.properties to sign a release build. Where
+// they are absent — on CI, and on the F-Droid builder, which signs the apps it
+// builds itself — the release comes out unsigned, as it did before.
+def keystorePath = project.findProperty('STORE_FILE')
+def hasKeystore = keystorePath != null && file(keystorePath).exists()
+
 android {
     namespace = "ar.com.delellis.quicknotes"
     compileSdk = 37
@@ -37,8 +45,22 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            if (hasKeystore) {
+                storeFile = file(keystorePath)
+                storePassword = project.findProperty('STORE_PASSWORD')
+                keyAlias = project.findProperty('KEY_ALIAS')
+                keyPassword = project.findProperty('KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasKeystore) {
+                signingConfig = signingConfigs.release
+            }
             minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -86,6 +108,7 @@ dependencies {
     implementation 'androidx.activity:activity:1.13.0'
     implementation 'androidx.fragment:fragment:1.9.0'
     implementation 'androidx.core:core:1.19.0'
+    implementation 'androidx.core:core-splashscreen:1.2.0'
     implementation 'com.google.android.material:material:1.14.0'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.cardview:cardview:1.0.0'

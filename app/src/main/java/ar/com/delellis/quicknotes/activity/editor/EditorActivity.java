@@ -80,6 +80,7 @@ import ar.com.delellis.quicknotes.shared.ColorPickerDialog;
 import ar.com.delellis.quicknotes.shared.ReminderPicker;
 import ar.com.delellis.quicknotes.shared.ShareAdapter;
 import ar.com.delellis.quicknotes.shared.TagAdapter;
+import ar.com.delellis.quicknotes.util.AttachmentDownloader;
 import ar.com.delellis.quicknotes.util.ColorUtil;
 import ar.com.delellis.quicknotes.util.DateUtil;
 import ar.com.delellis.quicknotes.util.HtmlUtil;
@@ -155,6 +156,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
         attachmentAdapter = new AttachmentAdapter();
         attachmentAdapter.setOnImageClickListener(position -> openAttachment(attachmentAdapter.get(position)));
+        attachmentAdapter.setOnImageLongClickListener(position -> showAttachmentActions(attachmentAdapter.get(position)));
         attachmentAdapter.setOnDeleteClickListener(position ->
                 attachmentAdapter.removeItem(attachmentAdapter.get(position)));
         binding.editorRecyclerAttachments.setAdapter(attachmentAdapter);
@@ -712,21 +714,107 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
     }
 
+    /**
+     * Opens an attachment.
+     *
+     * A file of the caller's own is in their Files, and is handed to whatever
+     * app deals with it there. One on a note somebody shared is not: the only
+     * way to it is the download endpoint of this app, and sending its url to a
+     * browser would only get a 401, since the browser is not the one signed
+     * in. So it is downloaded here and opened from the phone.
+     */
     private void openAttachment(Attachment attachment) {
-        String url = attachment.getLinkUrl();
-        if (url == null || url.isEmpty()) {
-            return;
+        String url = attachment.getRedirectUrl();
+        if (url != null && !url.isEmpty()) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            intent.putExtra(KEY_ACTION_VIEW_FILE_ID, String.valueOf(attachment.getFileId()));
+            intent.putExtra(KEY_ACTION_VIEW_ACCOUNT, ApiProvider.getUsername());
+            try {
+                startActivity(intent);
+                return;
+            } catch (Exception e) {
+                Log.w(TAG, "Nothing could open " + url, e);
+            }
         }
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.putExtra(KEY_ACTION_VIEW_FILE_ID, String.valueOf(attachment.getFileId()));
-        intent.putExtra(KEY_ACTION_VIEW_ACCOUNT, ApiProvider.getUsername());
-        try {
-            startActivity(intent);
-        } catch (Exception e) {
-            Log.w(TAG, "Nothing could open " + url, e);
-            onRequestError(getString(R.string.error_unknown));
-        }
+        downloadAndOpen(attachment);
+    }
+
+    private void showAttachmentActions(Attachment attachment) {
+        String name = attachment.getBasename() != null
+                ? attachment.getBasename()
+                : getString(R.string.attachment_thumbnail);
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(name)
+                .setItems(new CharSequence[]{
+                        getString(R.string.open_attachment),
+                        getString(R.string.save_to_downloads),
+                }, (dialog, which) -> {
+                    dialog.dismiss();
+                    if (which == 0) {
+                        openAttachment(attachment);
+                    } else {
+                        saveAttachment(attachment);
+                    }
+                })
+                .show();
+    }
+
+    private void downloadAndOpen(Attachment attachment) {
+        showProgress();
+        AttachmentDownloader.open(this, attachment, new AttachmentDownloader.Callback() {
+            @Override
+            public void onReadyToOpen(@NonNull Uri uri, @NonNull String mime) {
+                hideProgress();
+
+                Intent intent = new Intent(Intent.ACTION_VIEW)
+                        .setDataAndType(uri, mime)
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Log.w(TAG, "Nothing on this phone opens " + mime, e);
+                    onRequestError(getString(R.string.error_nothing_opens_this));
+                }
+            }
+
+            @Override
+            public void onSaved(@NonNull String whereTo) {
+                // Not asked for here.
+            }
+
+            @Override
+            public void onFailed(@Nullable String message) {
+                hideProgress();
+                onRequestError(message != null ? message : getString(R.string.error_downloading_attachment));
+            }
+        });
+    }
+
+    private void saveAttachment(Attachment attachment) {
+        showProgress();
+        Toast.makeText(this, R.string.downloading, Toast.LENGTH_SHORT).show();
+
+        AttachmentDownloader.saveToDownloads(this, attachment, new AttachmentDownloader.Callback() {
+            @Override
+            public void onReadyToOpen(@NonNull Uri uri, @NonNull String mime) {
+                // Not asked for here.
+            }
+
+            @Override
+            public void onSaved(@NonNull String whereTo) {
+                hideProgress();
+                Toast.makeText(EditorActivity.this, getString(R.string.attachment_saved, whereTo),
+                        Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailed(@Nullable String message) {
+                hideProgress();
+                onRequestError(message != null ? message : getString(R.string.error_downloading_attachment));
+            }
+        });
     }
 
     private void showTagsSelection() {

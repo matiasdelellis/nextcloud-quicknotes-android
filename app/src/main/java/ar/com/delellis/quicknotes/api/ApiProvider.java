@@ -48,6 +48,9 @@ public class ApiProvider {
     @NonNull
     protected final Context context;
 
+    /** Kept for what does not go through Retrofit, such as downloading a file. */
+    protected static NextcloudAPI nextcloudAPI;
+
     protected static QuicknotesAPI quicknotesAPI;
 
     protected static NextcloudServerApi nextcloudServerApi;
@@ -63,7 +66,7 @@ public class ApiProvider {
     public void initSsoApi() {
         try {
             SingleSignOnAccount ssoAccount = SingleAccountHelper.getCurrentSingleSignOnAccount(context);
-            NextcloudAPI nextcloudAPI = new NextcloudAPI(context, ssoAccount, new GsonConfig().create(), new NextcloudAPI.ApiConnectedListener() {
+            nextcloudAPI = new NextcloudAPI(context, ssoAccount, new GsonConfig().create(), new NextcloudAPI.ApiConnectedListener() {
                 @Override
                 public void onConnected() {
                     // Ignore..
@@ -82,6 +85,11 @@ public class ApiProvider {
         } catch (NextcloudFilesAppAccountNotFoundException | NoCurrentAccountSelectedException e) {
             Log.d(TAG, "setAccount() called with: ex = [" + e + "]");
         }
+    }
+
+    @Nullable
+    public static NextcloudAPI getNextcloudAPI() {
+        return nextcloudAPI;
     }
 
     public static QuicknotesAPI getQuicknotesAPI() {

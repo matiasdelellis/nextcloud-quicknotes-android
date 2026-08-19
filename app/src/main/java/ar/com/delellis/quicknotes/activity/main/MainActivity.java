@@ -76,6 +76,7 @@ import ar.com.delellis.quicknotes.shared.ColorPickerDialog;
 import ar.com.delellis.quicknotes.shared.NoteActionsDialog;
 import ar.com.delellis.quicknotes.shared.ReminderPicker;
 import androidx.core.content.ContextCompat;
+import androidx.core.splashscreen.SplashScreen;
 
 import ar.com.delellis.quicknotes.util.CapabilitiesService;
 import ar.com.delellis.quicknotes.util.ColorUtil;
@@ -123,7 +124,20 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Holds the system splash screen until this is ready to draw, and puts
+        // the real theme on the activity afterwards.
+        SplashScreen.installSplashScreen(this);
+
         super.onCreate(savedInstanceState);
+
+        // Before anything is inflated: with no account there is no board to
+        // show, and this is the launcher activity now.
+        new ApiProvider(getApplicationContext());
+        if (!ApiProvider.isReady()) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         listBinding = binding.activityListView;
@@ -187,13 +201,6 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
         updateSortingIcon(sortRule);
         updateGridIcon(gridViewEnabled);
-
-        new ApiProvider(getApplicationContext());
-        if (!ApiProvider.isReady()) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
 
         checkServerSupport();
         presenter.getNotes();

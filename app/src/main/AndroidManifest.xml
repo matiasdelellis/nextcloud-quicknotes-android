@@ -35,15 +35,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity
-            android:exported="true"
-            android:name=".activity.splash.SplashscreenActivity"
-            android:theme="@style/SplashTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity android:name=".activity.login.LoginActivity">
         </activity>
         <!--
@@ -60,8 +51,18 @@
         <activity
             android:name=".activity.main.MainActivity"
             android:exported="true"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:theme="@style/SplashTheme">
             <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!--
+              ~ Deliberately not an App Link: verifying a domain asks for an
+              ~ assetlinks.json on the server, and a Nextcloud lives wherever
+              ~ its owner put it. The chooser is the right behaviour here.
+              -->
+            <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

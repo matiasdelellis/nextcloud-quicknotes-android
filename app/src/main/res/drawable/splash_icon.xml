@@ -20,14 +20,22 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<!--
+  ~ The splash icon of the app, with the room the system asks for around it.
+  ~
+  ~ The icon is drawn into a canvas of its own and masked with a circle, so
+  ~ artwork that reaches the edges — which ic_splashscreen does, it fills its
+  ~ square to the corners — comes out with the corners cut off. Drawing it at a
+  ~ fixed size in the middle is what keeps it whole: 104dp fits inside the
+  ~ 160dp circle the system leaves visible when there is an icon background,
+  ~ which is the case this theme asks for.
+  -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@color/defaultBrand" />
-
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/ic_splashscreen" />
-    </item>
+    <item
+        android:width="104dp"
+        android:height="104dp"
+        android:gravity="center"
+        android:drawable="@drawable/ic_splashscreen" />
 
 </layer-list>

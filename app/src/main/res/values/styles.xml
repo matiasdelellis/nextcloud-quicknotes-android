@@ -31,12 +31,23 @@
 
     <style name="AppTheme" parent="BaseTheme"/>
 
-    <style name="SplashTheme" parent="BaseTheme">
-        <!-- Customize your theme here. -->
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowFullscreen">false</item>
-        <item name="android:windowBackground">@drawable/splashscreen</item>
+    <!--
+      ~ Since Android 12 the system draws the splash screen itself, from these
+      ~ three values, and a window background of our own is either ignored or
+      ~ drawn on top of it. The compat library brings the same behaviour to
+      ~ older versions.
+      -->
+    <style name="SplashTheme" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/defaultBrand</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <!--
+          ~ Saying there is an icon background pins down what the system does:
+          ~ the icon gets a 240dp canvas with a 160dp circle visible, which is
+          ~ the size splash_icon is drawn for. It is the same brand colour as
+          ~ the screen behind it, so what shows is still a white logo on blue.
+          -->
+        <item name="windowSplashScreenIconBackgroundColor">@color/defaultBrand</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
 
     <style name="EditorTheme" parent="Theme.MaterialComponents.DayNight">

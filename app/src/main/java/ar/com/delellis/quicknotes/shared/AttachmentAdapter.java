@@ -44,6 +44,7 @@ import ar.com.delellis.quicknotes.util.SsoUrlUtil;
 public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.ViewHolder> {
 
     private ImageItemClickListener imageItemClickListener;
+    private ImageItemLongClickListener imageItemLongClickListener;
     private DeleteItemClickListener deleteItemClickListener;
 
     private boolean disableDeletion = false;
@@ -61,6 +62,15 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
                 if (itemIndex != RecyclerView.NO_POSITION && imageItemClickListener != null) {
                     imageItemClickListener.onImageItemClick(itemIndex);
                 }
+            });
+
+            binding.attachmentThumbnail.setOnLongClickListener(v -> {
+                int itemIndex = getBindingAdapterPosition();
+                if (itemIndex == RecyclerView.NO_POSITION || imageItemLongClickListener == null) {
+                    return false;
+                }
+                imageItemLongClickListener.onImageItemLongClick(itemIndex);
+                return true;
             });
 
             binding.deleteAttachment.setOnClickListener(v -> {
@@ -174,6 +184,14 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Vi
 
     public interface ImageItemClickListener {
         void onImageItemClick(int position);
+    }
+
+    public void setOnImageLongClickListener(ImageItemLongClickListener onImageLongClickListener) {
+        this.imageItemLongClickListener = onImageLongClickListener;
+    }
+
+    public interface ImageItemLongClickListener {
+        void onImageItemLongClick(int position);
     }
 
     public void setOnDeleteClickListener(DeleteItemClickListener onDeleteClickListener) {

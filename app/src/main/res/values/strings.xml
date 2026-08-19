@@ -200,7 +200,6 @@
     <string name="error_uploading_attachment">There was an error uploading the file</string>
     <string name="error_leaving_note">There was an error leaving the note</string>
     <string name="error_loading_shares">There was an error reading who has this note</string>
-    <string name="error_no_account">There is no Nextcloud account signed in</string>
 
     <!-- Empty states -->
     <string name="no_notes_yet">No notes here yet</string>
@@ -216,5 +215,13 @@
     <string name="filter_by_color">Show notes of one colour</string>
 
     <string name="error_note_not_found">That note is not there any more, or is not yours to see</string>
+
+    <!-- Attachments -->
+    <string name="open_attachment">Open</string>
+    <string name="save_to_downloads">Save to Downloads</string>
+    <string name="downloading">Downloading…</string>
+    <string name="attachment_saved">Saved “%1$s” to your downloads</string>
+    <string name="error_downloading_attachment">There was an error downloading the file</string>
+    <string name="error_nothing_opens_this">There is nothing on this phone that opens this kind of file</string>
 
 </resources>
