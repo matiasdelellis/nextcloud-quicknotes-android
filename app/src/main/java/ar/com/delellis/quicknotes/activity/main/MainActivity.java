@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -83,6 +84,8 @@ import ar.com.delellis.quicknotes.util.InsetsUtil;
 
 public class MainActivity extends AppCompatActivity implements MainView, OnSortingOrderListener,
         NoteAdapter.ItemClickListener, NoteActionsDialog.Callback {
+
+    private static final String TAG = MainActivity.class.getCanonicalName();
 
     public static final String ADAPTER_KEY_ALL = "all_notes";
     public static final String ADAPTER_KEY_PINNED = "pinned";
@@ -187,12 +190,52 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
 
         new ApiProvider(getApplicationContext());
         if (!ApiProvider.isReady()) {
-            showError(getString(R.string.error_no_account));
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
             return;
         }
 
         checkServerSupport();
         presenter.getNotes();
+        openLinkedNote(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(@NonNull Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        openLinkedNote(intent);
+    }
+
+    /**
+     * Opens the note a link named.
+     *
+     * The server points at a note as {@code …/apps/quicknotes/?n=<id>} — from
+     * the notification of a reminder, from the notification of a note somebody
+     * shared, and from its search results. Following it here is what makes
+     * those land in the app rather than in a browser.
+     */
+    private void openLinkedNote(Intent intent) {
+        if (presenter == null || intent == null || !Intent.ACTION_VIEW.equals(intent.getAction())) {
+            return;
+        }
+
+        Uri data = intent.getData();
+        if (data == null) {
+            return;
+        }
+
+        String noteId = data.getQueryParameter("n");
+        if (noteId == null || noteId.isEmpty()) {
+            return;
+        }
+
+        try {
+            presenter.openNote(Integer.parseInt(noteId));
+        } catch (NumberFormatException e) {
+            // A link to the app itself, with something else after the ?.
+            Log.d(TAG, "Not a note id: " + noteId);
+        }
     }
 
     private void registerLaunchers() {
@@ -657,6 +700,11 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         Toast.makeText(this, getResources().getQuantityString(R.plurals.trash_emptied, destroyed, destroyed),
                 Toast.LENGTH_SHORT).show();
         presenter.getNotes();
+    }
+
+    @Override
+    public void onNoteToOpen(Note note) {
+        onOpen(note);
     }
 
     @Override

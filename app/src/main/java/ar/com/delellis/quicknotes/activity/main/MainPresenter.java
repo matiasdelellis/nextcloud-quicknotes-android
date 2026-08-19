@@ -69,6 +69,29 @@ public class MainPresenter {
         });
     }
 
+    /**
+     * Reads one note, for a link that named it: the notification of a reminder
+     * or of a note somebody shared, and the search results of the server, all
+     * point at a single note by its id.
+     */
+    public void openNote(int noteId) {
+        ApiProvider.getQuicknotesAPI().getNote(noteId).enqueue(new ApiCallback<Note>() {
+            @Override
+            public void onSuccess(Note note) {
+                if (note != null) {
+                    view.onNoteToOpen(note);
+                } else {
+                    view.onActionError(getString(R.string.error_note_not_found));
+                }
+            }
+
+            @Override
+            public void onError(int statusCode, @Nullable String message, @Nullable String body) {
+                view.onActionError(getString(R.string.error_note_not_found));
+            }
+        });
+    }
+
     /** The pin is the caller's own, and saving it touches nothing else. */
     public void setPinned(Note note, boolean pinned) {
         Call<Note> call = ApiProvider.getQuicknotesAPI()

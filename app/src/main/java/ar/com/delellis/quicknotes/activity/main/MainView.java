@@ -42,4 +42,7 @@ public interface MainView {
 
     /** An action on a single note did not go through. */
     void onActionError(String errorMessage);
+
+    /** One note was asked for by name — a deep link — and is ready to open. */
+    void onNoteToOpen(Note note);
 }

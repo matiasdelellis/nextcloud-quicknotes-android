@@ -46,9 +46,30 @@
         </activity>
         <activity android:name=".activity.login.LoginActivity">
         </activity>
-        <activity android:name=".activity.main.MainActivity" android:exported="true">
+        <!--
+          ~ Following a link to a single note. The server points at one as
+          ~ `…/apps/quicknotes/?n=<id>` from the notification of a reminder,
+          ~ from the notification of a note somebody shared, and from its
+          ~ search results; without this they all open a browser instead.
+          ~
+          ~ The host is a wildcard because a Nextcloud lives wherever its owner
+          ~ put it, and the path is what makes the filter narrow. singleTop
+          ~ keeps a second link from stacking another board on top of the one
+          ~ already open.
+          -->
+        <activity
+            android:name=".activity.main.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:scheme="http" />
+                <data android:host="*" />
+                <data android:pathPrefix="/apps/quicknotes" />
+                <data android:pathPrefix="/index.php/apps/quicknotes" />
             </intent-filter>
         </activity>
         <!--

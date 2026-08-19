@@ -215,4 +215,6 @@
     <string name="colors">Colors</string>
     <string name="filter_by_color">Show notes of one colour</string>
 
+    <string name="error_note_not_found">That note is not there any more, or is not yours to see</string>
+
 </resources>
