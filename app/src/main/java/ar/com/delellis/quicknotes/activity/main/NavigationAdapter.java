@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -79,6 +80,20 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
         }
     }
 
+    /**
+     * An entry that stands for a colour, and so wears it: its icon is a swatch
+     * of the colour itself rather than something tinted by the selection.
+     */
+    public static class ColorNavigationItem extends NavigationItem {
+        @ColorInt
+        public final int color;
+
+        public ColorNavigationItem(@NonNull String id, @NonNull String label, @DrawableRes int icon, @ColorInt int color) {
+            super(id, label, icon);
+            this.color = color;
+        }
+    }
+
     public static class TagNavigationItem extends NavigationItem {
         public int tagId;
 
@@ -120,7 +135,9 @@ public class NavigationAdapter extends RecyclerView.Adapter<NavigationAdapter.Vi
                     isSelected ? R.color.defaultBrand : R.color.fg_default_selection);
 
             name.setTextColor(tintColor);
-            icon.setColorFilter(tintColor);
+            icon.setColorFilter(item instanceof ColorNavigationItem
+                    ? ((ColorNavigationItem) item).color
+                    : tintColor);
 
             view.setSelected(isSelected);
         }

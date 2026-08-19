@@ -32,6 +32,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +47,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.IntentCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -64,6 +66,7 @@ import java.util.Objects;
 import ar.com.delellis.quicknotes.BuildConfig;
 import ar.com.delellis.quicknotes.R;
 import ar.com.delellis.quicknotes.activity.editor.AttachBottomSheetDialog.OnAttachOptionListener;
+import ar.com.delellis.quicknotes.activity.login.LoginActivity;
 import ar.com.delellis.quicknotes.activity.shares.SharesActivity;
 import ar.com.delellis.quicknotes.activity.tags.TagsActivity;
 import ar.com.delellis.quicknotes.api.ApiProvider;
@@ -82,13 +85,18 @@ import ar.com.delellis.quicknotes.util.DateUtil;
 import ar.com.delellis.quicknotes.util.HtmlUtil;
 import ar.com.delellis.quicknotes.util.InsetsUtil;
 import ar.com.delellis.quicknotes.util.UploadUtil;
-import okhttp3.MultipartBody;
 
 public class EditorActivity extends AppCompatActivity implements EditorView, OnAttachOptionListener {
     private static final String TAG = EditorActivity.class.getCanonicalName();
 
     public static final String EXTRA_NOTE = "note";
     public static final String EXTRA_TAGS = "tags";
+
+    private static final String STATE_NOTE = "state_note";
+    private static final String STATE_SHADOW_NOTE = "state_shadow_note";
+    private static final String STATE_TAGS = "state_tags";
+    private static final String STATE_TEMP_PHOTO = "state_temp_photo";
+    private static final String STATE_TEMP_VIDEO = "state_temp_video";
 
     private static final String KEY_ACTION_VIEW_FILE_ID = "KEY_FILE_ID";
     private static final String KEY_ACTION_VIEW_ACCOUNT = "KEY_ACCOUNT";
@@ -109,6 +117,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
     /** Whether the share this note reaches the user through lets them write. */
     private boolean readOnly = false;
+
+    /** Whether onCreate got far enough for the screen to have state worth keeping. */
+    private boolean ready = false;
+
+    /** Files another app shared, waiting for the screen to be filled in. */
+    private final List<Uri> sharedStreams = new ArrayList<>();
 
     // Temporary files to capture from the camera
     private File tempPhotoCamera = null;
@@ -132,6 +146,12 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         registerLaunchers();
 
         new ApiProvider(getApplicationContext());
+        if (!ApiProvider.isReady()) {
+            // Reached from a share with nobody signed in yet.
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
 
         attachmentAdapter = new AttachmentAdapter();
         attachmentAdapter.setOnImageClickListener(position -> openAttachment(attachmentAdapter.get(position)));
@@ -151,7 +171,38 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
 
         presenter = new EditorPresenter(this);
 
-        Intent intent = getIntent();
+        if (savedInstanceState != null) {
+            restoreState(savedInstanceState);
+        } else {
+            readIntent(getIntent());
+        }
+
+        showNote();
+
+        // Store the either loaded or just created note as a copy so we can
+        // compare for modifications later. A restored one brought its own.
+        if (shadowCopyNote == null) {
+            shadowCopyNote = note.clone();
+        }
+
+        getOnBackPressedDispatcher().addCallback(this, onBackPressed);
+
+        ready = true;
+        uploadSharedStreams();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readIntent(Intent intent) {
+        if (intent == null) {
+            return;
+        }
+
+        String action = intent.getAction();
+        if (Intent.ACTION_SEND.equals(action) || Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+            readSharedContent(intent);
+            return;
+        }
+
         if (intent.hasExtra(EXTRA_NOTE)) {
             note = (Note) Objects.requireNonNull(intent.getSerializableExtra(EXTRA_NOTE));
         }
@@ -159,14 +210,114 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         if (extraTags != null) {
             tags = (List<Tag>) extraTags;
         }
+    }
 
-        showNote();
+    /**
+     * A new note out of what another app shared.
+     *
+     * The subject, when there is one, is the title, and the text becomes the
+     * body. Files are uploaded straight away so they are ready to be attached,
+     * but nothing is saved until the user says so: what arrives here is a
+     * draft, not a note.
+     */
+    private void readSharedContent(Intent intent) {
+        String subject = intent.getStringExtra(Intent.EXTRA_SUBJECT);
+        if (subject != null && !subject.trim().isEmpty()) {
+            note.setTitle(HtmlUtil.cleanString(subject));
+        }
 
-        // Store the either loaded or just created note as a copy so we can
-        // compare for modifications later.
-        shadowCopyNote = note.clone();
+        CharSequence text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT);
+        if (text != null && text.length() > 0) {
+            note.setContent(asHtml(text.toString()));
+        }
 
-        getOnBackPressedDispatcher().addCallback(this, onBackPressed);
+        // Uploaded once the screen is filled in: showNote() puts the
+        // attachment list back to what the note carries, which would undo an
+        // upload that landed before it.
+        sharedStreams.addAll(streamsOf(intent));
+    }
+
+    private void uploadSharedStreams() {
+        for (Uri uri : sharedStreams) {
+            try {
+                presenter.uploadAttachment(UploadUtil.partFromUri(this, uri));
+            } catch (IOException e) {
+                Log.w(TAG, "Could not read the shared file", e);
+                onRequestError(getString(R.string.error_uploading_attachment));
+            }
+        }
+        sharedStreams.clear();
+    }
+
+    @NonNull
+    private static List<Uri> streamsOf(Intent intent) {
+        List<Uri> streams = new ArrayList<>();
+        if (Intent.ACTION_SEND_MULTIPLE.equals(intent.getAction())) {
+            List<Uri> many = IntentCompat.getParcelableArrayListExtra(intent, Intent.EXTRA_STREAM, Uri.class);
+            if (many != null) {
+                streams.addAll(many);
+            }
+        } else {
+            Uri one = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri.class);
+            if (one != null) {
+                streams.add(one);
+            }
+        }
+        return streams;
+    }
+
+    /** Plain text as the one paragraph of html the editor works in. */
+    @NonNull
+    private static String asHtml(@NonNull String plainText) {
+        return "<p>" + TextUtils.htmlEncode(plainText).replace("\n", "<br>") + "</p>";
+    }
+
+    /**
+     * Android is free to take the process down while the user is in another
+     * app; without this, whatever they had written would be gone when they
+     * came back, and so would a rotation of the screen.
+     */
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (!ready) {
+            return;
+        }
+
+        fetchDataToNoteObject();
+        outState.putSerializable(STATE_NOTE, note);
+        outState.putSerializable(STATE_SHADOW_NOTE, shadowCopyNote);
+        outState.putSerializable(STATE_TAGS, new ArrayList<>(tags));
+        if (tempPhotoCamera != null) {
+            outState.putString(STATE_TEMP_PHOTO, tempPhotoCamera.getAbsolutePath());
+        }
+        if (tempVideoCamera != null) {
+            outState.putString(STATE_TEMP_VIDEO, tempVideoCamera.getAbsolutePath());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void restoreState(@NonNull Bundle state) {
+        Note savedNote = (Note) state.getSerializable(STATE_NOTE);
+        if (savedNote != null) {
+            note = savedNote;
+        }
+        shadowCopyNote = (Note) state.getSerializable(STATE_SHADOW_NOTE);
+
+        Serializable savedTags = state.getSerializable(STATE_TAGS);
+        if (savedTags != null) {
+            tags = (List<Tag>) savedTags;
+        }
+
+        String photo = state.getString(STATE_TEMP_PHOTO);
+        if (photo != null) {
+            tempPhotoCamera = new File(photo);
+        }
+        String video = state.getString(STATE_TEMP_VIDEO);
+        if (video != null) {
+            tempVideoCamera = new File(video);
+        }
     }
 
     private void setupActionBar() {
@@ -597,17 +748,13 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
     // ------------------------------------------------------------------
 
     private void showNote() {
-        if (note.isNew()) {
-            int defaultColor = ContextCompat.getColor(this, R.color.defaultNoteColor);
+        int defaultColor = ContextCompat.getColor(this, R.color.defaultNoteColor);
+        if (note.getColor() == null || note.getColor().isEmpty()) {
             note.setColor(ColorUtil.getRGBColorFromInt(defaultColor));
-            tintActivityColor(defaultColor);
-
-            binding.editorTitle.requestFocus();
-            editMode();
-            return;
         }
 
-        readOnly = !note.canEdit();
+        // A note that has not been saved yet is always the caller's to write.
+        readOnly = !note.isNew() && !note.canEdit();
 
         attachmentAdapter.setDisableDeletion(readOnly);
         attachmentAdapter.setItems(new ArrayList<>(note.getAttachments()));
@@ -618,8 +765,7 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
         note.setContent(HtmlUtil.cleanHtml(note.getContent()));
         binding.editorContent.fromHtml(note.getContent(), true);
 
-        tintActivityColor(ColorUtil.parseColorOr(note.getColor(),
-                ContextCompat.getColor(this, R.color.defaultNoteColor)));
+        tintActivityColor(ColorUtil.parseColorOr(note.getColor(), defaultColor));
 
         tagSelection = note.getTags();
         tagAdapter.setItems(tagSelection);
@@ -631,6 +777,10 @@ public class EditorActivity extends AppCompatActivity implements EditorView, OnA
             readMode();
         } else {
             editMode();
+        }
+
+        if (note.getTitle().isEmpty()) {
+            binding.editorTitle.requestFocus();
         }
     }
 

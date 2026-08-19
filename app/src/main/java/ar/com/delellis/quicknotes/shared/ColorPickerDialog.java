@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -71,6 +72,19 @@ public class ColorPickerDialog {
             colors.add(0, selectedColor);
         }
 
+        show(context, R.string.select_note_color, colors, selectedColor, listener);
+    }
+
+    /**
+     * The same grid over a list of colours decided by the caller, for choosing
+     * among the ones that are actually on the board rather than among the ones
+     * a note could be painted with.
+     */
+    public static void show(@NonNull Context context,
+                            @StringRes int title,
+                            @NonNull List<String> colors,
+                            @Nullable String selectedColor,
+                            @NonNull OnColorSelectedListener listener) {
         RecyclerView recyclerView = new RecyclerView(context);
         recyclerView.setLayoutManager(new GridLayoutManager(context, COLUMNS));
         int padding = context.getResources().getDimensionPixelSize(R.dimen.spacer_2x);
@@ -78,7 +92,7 @@ public class ColorPickerDialog {
         recyclerView.setClipToPadding(false);
 
         AlertDialog dialog = new MaterialAlertDialogBuilder(context)
-                .setTitle(R.string.select_note_color)
+                .setTitle(title)
                 .setView(recyclerView)
                 .setNegativeButton(R.string.common_cancel, (d, which) -> d.dismiss())
                 .create();

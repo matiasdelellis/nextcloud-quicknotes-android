@@ -211,4 +211,8 @@
         <item quantity="other">%1$d notes deleted permanently</item>
     </plurals>
 
+    <!-- Colours as a filter -->
+    <string name="colors">Colors</string>
+    <string name="filter_by_color">Show notes of one colour</string>
+
 </resources>

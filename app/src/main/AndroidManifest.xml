@@ -51,10 +51,28 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+        <!--
+          ~ Taking what another app shares and making a note out of it. The
+          ~ launch mode is the plain one on purpose: singleTask would route a
+          ~ share into whatever note happened to be open and throw away what
+          ~ was being written there.
+          -->
         <activity
             android:name=".activity.editor.EditorActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/EditorTheme" />
+            android:exported="true"
+            android:theme="@style/EditorTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
         <activity android:name=".activity.tags.TagsActivity"/>
         <activity
             android:name=".activity.shares.SharesActivity"

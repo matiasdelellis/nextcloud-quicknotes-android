@@ -71,9 +71,13 @@ import ar.com.delellis.quicknotes.databinding.ActivityListViewBinding;
 import ar.com.delellis.quicknotes.databinding.ActivityMainBinding;
 import ar.com.delellis.quicknotes.model.Note;
 import ar.com.delellis.quicknotes.model.Tag;
+import ar.com.delellis.quicknotes.shared.ColorPickerDialog;
 import ar.com.delellis.quicknotes.shared.NoteActionsDialog;
 import ar.com.delellis.quicknotes.shared.ReminderPicker;
+import androidx.core.content.ContextCompat;
+
 import ar.com.delellis.quicknotes.util.CapabilitiesService;
+import ar.com.delellis.quicknotes.util.ColorUtil;
 import ar.com.delellis.quicknotes.util.DateUtil;
 import ar.com.delellis.quicknotes.util.InsetsUtil;
 
@@ -88,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     public static final String ADAPTER_KEY_ARCHIVED = "archived";
     public static final String ADAPTER_KEY_TRASH = "trash";
     public static final String ADAPTER_KEY_TAG_PREFIX = "tag:";
+    public static final String ADAPTER_KEY_COLORS = "colors";
     public static final String ADAPTER_KEY_ABOUT = "about";
     public static final String ADAPTER_KEY_DONATE = "donate";
     public static final String ADAPTER_KEY_SWITCH_ACCOUNT = "switch_account";
@@ -106,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     private NavigationAdapter navigationCommonAdapter;
 
     private final List<Tag> tags = new ArrayList<>();
+
+    /** The colours actually on the board, for the colour filter. */
+    private final List<String> colors = new ArrayList<>();
 
     private ActivityResultLauncher<Intent> editorLauncher;
     private ActivityResultLauncher<Intent> sharesLauncher;
@@ -138,6 +146,16 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         noteAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onChanged() {
+                updateEmptyState();
+            }
+
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                updateEmptyState();
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
                 updateEmptyState();
             }
         });
@@ -253,6 +271,12 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
                 noteAdapter.setScope(NoteAdapter.SCOPE_ARCHIVED);
             } else if (item.id.equals(ADAPTER_KEY_TRASH)) {
                 noteAdapter.setScope(NoteAdapter.SCOPE_TRASH);
+            } else if (item.id.equals(ADAPTER_KEY_COLORS)) {
+                // Which colour is not something a single entry can say, so it
+                // is asked for, and only then does the board change.
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+                showColorFilter();
+                return;
             } else if (item.id.startsWith(ADAPTER_KEY_TAG_PREFIX)) {
                 noteAdapter.setTagScope(item.label);
             }
@@ -293,6 +317,8 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
      * when nothing is archived, no trash entry when the trash is empty.
      */
     private void updateNavigationMenu(List<Note> notes) {
+        collectTagsAndColors(notes);
+
         ArrayList<NavigationItem> navItems = new ArrayList<>();
         navItems.add(new NavigationItem(ADAPTER_KEY_ALL, getString(R.string.all_notes), NavigationAdapter.ICON_HOME));
 
@@ -327,6 +353,14 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         if (anyReminder)
             navItems.add(new NavigationItem(ADAPTER_KEY_REMINDERS, getString(R.string.with_reminder), NavigationAdapter.ICON_REMINDER));
 
+        // Only worth offering when there is something to tell apart by it.
+        if (colors.size() > 1) {
+            String selected = noteAdapter.getColorScope();
+            navItems.add(new NavigationAdapter.ColorNavigationItem(ADAPTER_KEY_COLORS,
+                    getString(R.string.colors), R.drawable.ic_color_circle,
+                    ColorUtil.parseColorOr(selected, ContextCompat.getColor(this, R.color.defaultBrand))));
+        }
+
         for (Tag tag : tags) {
             navItems.add(new TagNavigationItem(ADAPTER_KEY_TAG_PREFIX + tag.getId(), tag.getName(),
                     NavigationAdapter.ICON_TAG, tag.getId()));
@@ -350,6 +384,27 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         }
 
         navigationFilterAdapter.setItems(navItems);
+    }
+
+    /** The tags and the colours of the drawer are whatever the board carries. */
+    private void collectTagsAndColors(List<Note> notes) {
+        Set<Tag> uniqueTags = new LinkedHashSet<>();
+        Set<String> uniqueColors = new LinkedHashSet<>();
+
+        for (Note note : notes) {
+            if (note.isTrashed() || note.isArchived()) {
+                continue;
+            }
+            uniqueTags.addAll(note.getTags());
+            if (note.getColor() != null) {
+                uniqueColors.add(note.getColor());
+            }
+        }
+
+        tags.clear();
+        tags.addAll(uniqueTags);
+        colors.clear();
+        colors.addAll(uniqueColors);
     }
 
     /** The trash is not a place to add notes to, but it is one to empty. */
@@ -397,6 +452,20 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
         fragmentTransaction.addToBackStack(null);
 
         SortingOrderDialogFragment.newInstance(sortOrder).show(fragmentTransaction, SortingOrderDialogFragment.SORTING_ORDER_FRAGMENT);
+    }
+
+    /** Picks a colour out of the ones on the board, and shows only those. */
+    private void showColorFilter() {
+        if (colors.isEmpty()) {
+            return;
+        }
+        ColorPickerDialog.show(this, R.string.filter_by_color, colors, noteAdapter.getColorScope(),
+                (color, colorInt) -> {
+                    noteAdapter.setColorScope(color);
+                    navigationFilterAdapter.setSelectedItem(ADAPTER_KEY_COLORS);
+                    updateNavigationMenu(noteAdapter.getNoteList());
+                    updateScopeChrome();
+                });
     }
 
     private void confirmEmptyTrash() {
@@ -539,16 +608,6 @@ public class MainActivity extends AppCompatActivity implements MainView, OnSorti
     @Override
     public void onGetResult(List<Note> noteList) {
         noteAdapter.setNoteList(noteList);
-
-        // The tags of the drawer are whatever the notes on screen carry.
-        Set<Tag> uniqueTags = new LinkedHashSet<>();
-        for (Note note : noteList) {
-            if (!note.isTrashed() && !note.isArchived()) {
-                uniqueTags.addAll(note.getTags());
-            }
-        }
-        tags.clear();
-        tags.addAll(uniqueTags);
 
         updateNavigationMenu(noteList);
         updateScopeChrome();

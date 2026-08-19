@@ -27,13 +27,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 import ar.com.delellis.quicknotes.R;
 import ar.com.delellis.quicknotes.databinding.ItemNoteBinding;
@@ -45,6 +49,7 @@ import ar.com.delellis.quicknotes.shared.TagAdapter;
 import ar.com.delellis.quicknotes.util.ColorUtil;
 import ar.com.delellis.quicknotes.util.DateUtil;
 import ar.com.delellis.quicknotes.util.HtmlUtil;
+import ar.com.delellis.quicknotes.util.SearchUtil;
 
 /**
  * The grid of notes.
@@ -69,13 +74,22 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public static final int SCOPE_ARCHIVED = 5;
     public static final int SCOPE_TRASH = 6;
     public static final int SCOPE_TAG = 7;
+    public static final int SCOPE_COLOR = 8;
 
     private int sortRule = SORT_BY_UPDATED;
     private boolean firstPinned = true;
 
     private int scope = SCOPE_ALL;
     private String tagName = null;
+    private String colorFilter = null;
     private String query = "";
+
+    /**
+     * What each note is searched through, folded once when the list arrives
+     * rather than on every keystroke: the old filter parsed the html of every
+     * note again for each letter typed.
+     */
+    private final Map<Integer, String> searchIndex = new HashMap<>();
 
     private final Context context;
     private final int tintColor;
@@ -96,7 +110,30 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     public void setNoteList(@NonNull List<Note> noteList) {
         this.noteList = noteList;
+
+        searchIndex.clear();
+        for (Note note : noteList) {
+            searchIndex.put(note.getId(), searchTextOf(note));
+        }
+
         applyFilters();
+    }
+
+    /**
+     * Everything of a note worth searching through, folded down to what a
+     * query is compared against: its title, its text and the names of its
+     * tags, which is what the web interface of the app matches too.
+     */
+    @NonNull
+    private static String searchTextOf(@NonNull Note note) {
+        StringBuilder text = new StringBuilder()
+                .append(HtmlUtil.cleanString(note.getTitle()))
+                .append(' ')
+                .append(HtmlUtil.cleanString(note.getContent()));
+        for (Tag tag : note.getTags()) {
+            text.append(' ').append(tag.getName());
+        }
+        return SearchUtil.normalize(text.toString());
     }
 
     @NonNull
@@ -109,6 +146,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         for (int i = 0; i < noteList.size(); i++) {
             if (noteList.get(i).getId() == note.getId()) {
                 noteList.set(i, note);
+                searchIndex.put(note.getId(), searchTextOf(note));
                 break;
             }
         }
@@ -119,6 +157,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         for (int i = 0; i < noteList.size(); i++) {
             if (noteList.get(i).getId() == noteId) {
                 noteList.remove(i);
+                searchIndex.remove(noteId);
                 break;
             }
         }
@@ -155,13 +194,27 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public void setScope(int scope) {
         this.scope = scope;
         this.tagName = null;
+        this.colorFilter = null;
         applyFilters();
     }
 
     public void setTagScope(String tagName) {
         this.scope = SCOPE_TAG;
         this.tagName = tagName;
+        this.colorFilter = null;
         applyFilters();
+    }
+
+    public void setColorScope(String color) {
+        this.scope = SCOPE_COLOR;
+        this.colorFilter = color;
+        this.tagName = null;
+        applyFilters();
+    }
+
+    @Nullable
+    public String getColorScope() {
+        return colorFilter;
     }
 
     /** Narrows whatever scope is on screen by what the user typed. */
@@ -172,21 +225,27 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     private void applyFilters() {
         List<Note> filtered = new ArrayList<>();
-        String needle = query.trim().toLowerCase(Locale.getDefault());
+        List<String> tokens = SearchUtil.tokenize(query);
 
         for (Note note : noteList) {
             if (!matchesScope(note)) {
                 continue;
             }
-            if (!needle.isEmpty() && !matchesQuery(note, needle)) {
+            if (!tokens.isEmpty() && !matchesQuery(note, tokens)) {
                 continue;
             }
             filtered.add(note);
         }
 
+        List<Note> previous = noteListFiltered;
         noteListFiltered = filtered;
         performSort();
-        notifyDataSetChanged();
+
+        // Telling the list what actually changed keeps the scroll where it was
+        // and animates the one card that moved, instead of redrawing the whole
+        // mosaic on every keystroke and every refresh.
+        DiffUtil.calculateDiff(new NoteDiffCallback(previous, noteListFiltered), true)
+                .dispatchUpdatesTo(this);
     }
 
     private boolean matchesScope(@NonNull Note note) {
@@ -216,6 +275,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
                 return note.hasReminder();
             case SCOPE_TAG:
                 return hasTag(note, tagName);
+            case SCOPE_COLOR:
+                return colorFilter == null || colorFilter.equalsIgnoreCase(note.getColor());
             case SCOPE_ALL:
             default:
                 return true;
@@ -234,9 +295,62 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         return false;
     }
 
-    private static boolean matchesQuery(@NonNull Note note, @NonNull String needle) {
-        return HtmlUtil.cleanString(note.getTitle()).toLowerCase(Locale.getDefault()).contains(needle)
-                || HtmlUtil.cleanString(note.getContent()).toLowerCase(Locale.getDefault()).contains(needle);
+    private boolean matchesQuery(@NonNull Note note, @NonNull List<String> tokens) {
+        String haystack = searchIndex.get(note.getId());
+        if (haystack == null) {
+            haystack = searchTextOf(note);
+            searchIndex.put(note.getId(), haystack);
+        }
+        return SearchUtil.matchesAll(haystack, tokens);
+    }
+
+    /**
+     * What tells one card from another. Only what is drawn counts: a note that
+     * came back from the server with a new timestamp but the same face should
+     * not blink.
+     */
+    private static class NoteDiffCallback extends DiffUtil.Callback {
+        private final List<Note> before;
+        private final List<Note> after;
+
+        NoteDiffCallback(List<Note> before, List<Note> after) {
+            this.before = before;
+            this.after = after;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return before.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return after.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldPosition, int newPosition) {
+            return before.get(oldPosition).getId() == after.get(newPosition).getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldPosition, int newPosition) {
+            Note old = before.get(oldPosition);
+            Note current = after.get(newPosition);
+
+            return Objects.equals(old.getTitle(), current.getTitle())
+                    && Objects.equals(old.getContent(), current.getContent())
+                    && Objects.equals(old.getColor(), current.getColor())
+                    && old.isPinned() == current.isPinned()
+                    && old.isArchived() == current.isArchived()
+                    && old.isSharedWithMe() == current.isSharedWithMe()
+                    && old.isSharedByMe() == current.isSharedByMe()
+                    && Objects.equals(old.getReminderAt(), current.getReminderAt())
+                    && Objects.equals(old.getReminderNotifiedAt(), current.getReminderNotifiedAt())
+                    && Objects.equals(old.getTags(), current.getTags())
+                    && Objects.equals(old.getAttachments(), current.getAttachments())
+                    && old.getSharedWith().size() == current.getSharedWith().size();
+        }
     }
 
     @NonNull
